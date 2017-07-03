@@ -17,13 +17,13 @@ import java.util.Properties;
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class PastbinSpout extends BaseRichSpout{
+public class PastebinSpout extends BaseRichSpout{
 
     private SpoutOutputCollector collector;
     Properties properties = null;
     KafkaConsumer<String, String> consumer = null;
 
-    public PastbinSpout(){
+    public PastebinSpout(){
 
         properties = new Properties();
 
@@ -52,6 +52,6 @@ public class PastbinSpout extends BaseRichSpout{
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("word"));
+        outputFieldsDeclarer.declare(new Fields("scrape_out"));
     }
 }

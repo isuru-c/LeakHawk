@@ -13,6 +13,7 @@ import java.util.Map;
 public class TemporarySinkBolt extends BaseRichBolt {
 
     OutputCollector collector;
+    static int count = 0;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -20,13 +21,13 @@ public class TemporarySinkBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
-        String post_url = tuple.getString(0);
+        String post = tuple.getString(5);
         String key = tuple.getString(1);
         String date = tuple.getString(2);
-        String title = tuple.getString(3);
-        String user = tuple.getString(4);
+        String title = tuple.getString(4);
+        String user = tuple.getString(3);
 
-        System.out.println("\nUrl: " + post_url + "\nKey: " + key + "\nDate: " + date + "\nTitle: " + title + "\nUser: " + user);
+        System.out.println("\nKey: " + key + "\nDate: " + date + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\nCount: " + count++);
 
         collector.ack(tuple);
 

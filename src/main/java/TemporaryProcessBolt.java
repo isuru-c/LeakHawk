@@ -9,15 +9,21 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class TemporaryProcessBolt extends BaseRichBolt{
+public class TemporaryProcessBolt extends BaseRichBolt {
 
     OutputCollector collector;
     JSONParser parser = null;
+    String type = "pastbin";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -36,10 +42,22 @@ public class TemporaryProcessBolt extends BaseRichBolt{
             String date = (String) post_details.get("date");
             String title = (String) post_details.get("title");
             String user = (String) post_details.get("user");
+            String post = "";
 
-            collector.emit(tuple, new Values(post_url, key, date, title, user));
+            URL my_url2 = new URL(post_url);
+            BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(my_url2.openStream()));
+
+            while (bufferedReader2.ready()) {
+                post += bufferedReader2.readLine();
+            }
+
+            collector.emit(tuple, new Values(type, key, date, user, title, post));
 
         } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -48,6 +66,6 @@ public class TemporaryProcessBolt extends BaseRichBolt{
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("scrape_url", "key", "date", "title", "user"));
+        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "post"));
     }
 }

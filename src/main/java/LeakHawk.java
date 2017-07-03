@@ -19,8 +19,8 @@ public class LeakHawk {
         config.setMessageTimeoutSecs(120);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("pastbin-in", new PastbinSpout(), 2);
-        builder.setBolt("process-1", new TemporaryProcessBolt() , 3).shuffleGrouping("pastbin-in");
+        builder.setSpout("pastbin-in", new PastebinSpout(), 2);
+        builder.setBolt("process-1", new TemporaryProcessBolt() , 4).shuffleGrouping("pastbin-in");
         builder.setBolt("terminator", new TemporarySinkBolt(), 1).shuffleGrouping("process-1");
 
         final LocalCluster cluster = new LocalCluster();
