@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class TemporaryProcessBolt extends BaseRichBolt {
+public class PostDownloadBolt extends BaseRichBolt {
 
     OutputCollector collector;
     JSONParser parser = null;
@@ -42,16 +42,17 @@ public class TemporaryProcessBolt extends BaseRichBolt {
             String date = (String) post_details.get("date");
             String title = (String) post_details.get("title");
             String user = (String) post_details.get("user");
+            String syntax = (String) post_details.get("syntax");
             String post = "";
 
             URL my_url2 = new URL(post_url);
-            BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(my_url2.openStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url2.openStream()));
 
-            while (bufferedReader2.ready()) {
-                post += bufferedReader2.readLine();
+            while (bufferedReader.ready()) {
+                post += bufferedReader.readLine();
             }
 
-            collector.emit(tuple, new Values(type, key, date, user, title, post));
+            collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -66,6 +67,6 @@ public class TemporaryProcessBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "post"));
+        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post"));
     }
 }

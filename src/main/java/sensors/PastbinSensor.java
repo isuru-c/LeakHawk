@@ -48,7 +48,7 @@ public class PastbinSensor extends Thread {
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         Producer<String, String> producer = new KafkaProducer<String, String>(properties);
 
-        String topic = "pastbin-posts";
+        String topic = "pastebin-posts";
         ProducerRecord<String, String> message = null;
 
         try {

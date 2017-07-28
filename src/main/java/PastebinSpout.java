@@ -38,7 +38,7 @@ public class PastebinSpout extends BaseRichSpout{
         this.collector = spoutOutputCollector;
 
         consumer = new KafkaConsumer<String, String>(properties);
-        consumer.subscribe(Arrays.asList("pastbin-posts"));
+        consumer.subscribe(Arrays.asList("pastebin-posts"));
     }
 
     public void nextTuple() {
