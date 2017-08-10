@@ -52,42 +52,29 @@ public class PastbinSensor extends Thread {
         ProducerRecord<String, String> message = null;
 
         try {
-
             int postLimit = 100;
-
             URL my_url = new URL("http://pastebin.com/api_scraping.php?limit=" + postLimit);
-
             String lastKey = "";
             boolean pastebinSensorRunning = true;
-
             while (pastebinSensorRunning) {
-
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url.openStream()));
                 StringBuilder webPageContent = new StringBuilder();
-
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     webPageContent.append(line);
                 }
-
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(webPageContent.toString());
                 JSONArray array = (JSONArray) obj;
-
                 boolean lastKeyFound = false;
-
                 for (int i = array.size() - 1; i >= 0; i--) {
-
                     String post = array.get(i).toString();
-
                     JSONObject postDetails = (JSONObject) parser.parse(post);
-
                     String key = (String) postDetails.get("key");
-
                     if (lastKeyFound) {
                         lastKey = key;
                     } else if (lastKey == "" || lastKey.equals(key)) {
-                        if(lastKey == "") i++;
+                        if (lastKey == "") i++;
                         lastKey = key;
                         lastKeyFound = true;
                         continue;
@@ -95,13 +82,10 @@ public class PastbinSensor extends Thread {
                         //System.out.println("Last key: " + lastKey + "\tCurrent key: " + key);
                         continue;
                     }
-
                     //System.out.println("Current key: " + key);
-
                     message = new ProducerRecord<String, String>(topic, post);
                     producer.send(message);
                 }
-
                 sleep(10000);
             }
         } catch (MalformedURLException e) {
@@ -113,7 +97,6 @@ public class PastbinSensor extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         producer.close();
 
     }
