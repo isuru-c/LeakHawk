@@ -100,7 +100,7 @@ public class ContextFilterBolt extends BaseRichBolt {
                 Matcher m = p.matcher(input);
                 if (m.find()) {
 //                    System.out.println(pattern);
-                    System.out.println("found");
+//                    System.out.println("found");
                     found = true;
                 }
                 if (found == true) {
