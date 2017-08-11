@@ -32,7 +32,10 @@ public class EvidenceClassifierBolt extends BaseRichBolt{
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
+        System.out.println("*******************Evidence Classifier********************************");
+
         if(!isContainKeyWord(post)) {
+            System.out.println("Passed evidence classifier: "+post);
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }
 

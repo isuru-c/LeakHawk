@@ -34,9 +34,10 @@ public class PreFilterBolt extends BaseRichBolt {
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
-
+        System.out.println("*******************PRE Filter********************************");
         //System.out.println("\nKey: " + key + "\nDate: " + date + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\nCount: " + count++);
         if(!isContainKeyWord(post)) {
+            System.out.println("Passed pre filter: "+post);
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }
 
@@ -48,6 +49,9 @@ public class PreFilterBolt extends BaseRichBolt {
         ArrayList keyWordList = new ArrayList<String>();
         keyWordList.add("Game");
         keyWordList.add("Sports");
+        keyWordList.add("Porn");
+        keyWordList.add("Sex");
+        keyWordList.add("XXX");
 
         try {
 

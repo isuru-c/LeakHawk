@@ -6,6 +6,8 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,14 +17,14 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.sun.org.apache.xerces.internal.utils.SecuritySupport.getResourceAsStream;
+
 
 
 public class ContextFilterBolt extends BaseRichBolt {
     OutputCollector collector;
-    public static Properties properties = new Properties();
-    public static List<String> regExpHandlerList;
-    public static String entry = "bank of ceylon hacked";
+    public  Properties properties = new Properties();
+    public  List<String> regExpHandlerList;
+//    public  String entry = "bank of ceylon hacked";
 //   / public ArrayList<String> entryList=new ArrayList<>(Arrays.asList("bank of ceylon","hacked", "anonymous"));
 
 
@@ -39,21 +41,23 @@ public class ContextFilterBolt extends BaseRichBolt {
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
-        collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
-
-        collector.ack(tuple);
         System.out.println("*******************Context Filter********************************");
-        if (isPassContextFilter() == true) {
+
+        if (isPassContextFilter(post) == true) {
             //pass to evidence classifier
-            System.out.println("Passed context filter");
+            System.out.println("Passed context filter: "+post);
+            collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }
+        collector.ack(tuple);
     }
 
 
-    public static boolean isPassContextFilter() {
+    public  boolean isPassContextFilter(String entry) {
         InputStream input = null;
         try {
-            input = getResourceAsStream("context.properties");
+//            input = ContextFilterBolt.class.getClassLoader().getResourceAsStream("/home/warunika/Desktop/LeakHawk/context.properties");
+            input = new FileInputStream(new File("/home/warunika/Desktop/LeakHawk/context.properties"));
+//            System.out.println(input);
             // load a properties file
             properties.load(input);
             loadRegExpList(18);
@@ -74,7 +78,7 @@ public class ContextFilterBolt extends BaseRichBolt {
         return false;
     }
 
-    public static void loadRegExpList(int rgexpCount) {
+    public void loadRegExpList(int rgexpCount) {
         regExpHandlerList = new ArrayList<String>();
         for (int i = 1; i <= rgexpCount; i++) {
             regExpHandlerList.add(properties.getProperty("regexp" + i));
@@ -84,7 +88,7 @@ public class ContextFilterBolt extends BaseRichBolt {
     }
 
 
-    private static boolean regExpressionMatched(String input) {
+    private boolean regExpressionMatched(String input) {
 
 //        System.out.println(input);
         boolean found = false;
