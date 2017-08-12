@@ -19,10 +19,18 @@ import java.util.Map;
 public class PreFilterBolt extends BaseRichBolt {
 
     OutputCollector collector;
+    ArrayList keyWordList;
     static int count = 0;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
+
+        keyWordList = new ArrayList<String>();
+        keyWordList.add("Game");
+        keyWordList.add("Sports");
+        keyWordList.add("Porn");
+        keyWordList.add("Sex");
+        keyWordList.add("XXX");
     }
 
     public void execute(Tuple tuple) {
@@ -36,6 +44,8 @@ public class PreFilterBolt extends BaseRichBolt {
 
         if(!isContainKeyWord(post)) {
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
+        }else{
+            System.out.println("\nKey: " + key + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\n--- Filtered out by pre filter ---\n");
         }
 
         collector.ack(tuple);
@@ -43,12 +53,6 @@ public class PreFilterBolt extends BaseRichBolt {
     }
 
     private boolean isContainKeyWord(String post) {
-        ArrayList keyWordList = new ArrayList<String>();
-        keyWordList.add("Game");
-        keyWordList.add("Sports");
-        keyWordList.add("Porn");
-        keyWordList.add("Sex");
-        keyWordList.add("XXX");
 
         try {
             for (int i=0;i<keyWordList.size();i++) {

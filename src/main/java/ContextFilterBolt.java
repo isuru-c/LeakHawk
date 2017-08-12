@@ -17,7 +17,9 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Created by Isuru Chandima on 7/3/17.
+ */
 public class ContextFilterBolt extends BaseRichBolt {
     OutputCollector collector;
     public Properties properties = new Properties();
@@ -36,12 +38,10 @@ public class ContextFilterBolt extends BaseRichBolt {
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
-        System.out.println("*******************Context Filter********************************");
-
-        if (isPassContextFilter(post) == true) {
-            //pass to evidence classifier
-            System.out.println("Passed context filter: " + post);
+        if (isPassContextFilter(post)) {
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
+        }else{
+            System.out.println("\nKey: " + key + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\n--- Filtered out by context filter ---\n");
         }
         collector.ack(tuple);
     }

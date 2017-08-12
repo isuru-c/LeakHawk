@@ -9,7 +9,7 @@ import org.apache.storm.tuple.Values;
 import java.util.Map;
 
 /**
- * Created by root on 7/28/17.
+ * Created by Isuru Chandima on 7/28/17.
  */
 public class EndOfClassifierBolt extends BaseRichBolt {
 
