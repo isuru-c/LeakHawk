@@ -111,7 +111,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt{
             }
         }
 
-
         //#E5 	BODY:	Is there any evidence of a hacking attack in the body text?
         for (String i:keyWordList5) {
             if (post.toLowerCase().contains(i.toLowerCase())) {
