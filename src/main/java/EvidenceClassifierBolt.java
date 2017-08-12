@@ -1,3 +1,4 @@
+import Classifiers.EvidenceModel;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -14,17 +15,9 @@ import java.util.Map;
 /**
  * Created by Isuru Chandima on 7/28/17.
  */
-public class EvidenceClassifierBolt extends BaseRichBolt{
+public class EvidenceClassifierBolt extends BaseRichBolt {
 
     OutputCollector collector;
-//    private boolean isClassifier1Passed= false;
-//    private boolean isClassifier2Passed= false;
-//    private boolean isClassifier3Passed= false;
-//    private boolean isClassifier4Passed= false;
-//    private boolean isClassifier5Passed= false;
-//    private boolean isClassifier6Passed= false;
-//    private boolean isClassifier7Passed= false;
-//    private boolean isClassifier8Passed= false;
 
     ArrayList<String> keyWordList1;
     ArrayList<String> keyWordList2;
@@ -59,90 +52,95 @@ public class EvidenceClassifierBolt extends BaseRichBolt{
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
-        System.out.println("*******************Evidence Classifier********************************");
+        EvidenceModel evidenceModel = new EvidenceModel();
 
-        if(isPassedEvidenceClassifier(user,title,post)) {
-            System.out.println("Passed evidence classifier: "+post);
-            collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
-        }
+        Boolean evidenceFound = isPassedEvidenceClassifier(user, title, post, evidenceModel);
 
+        evidenceModel.setEvidenceFound(evidenceFound);
+
+        collector.emit(tuple, new Values(type, key, date, user, title, syntax, post, evidenceFound));
         collector.ack(tuple);
     }
 
-    private boolean isPassedEvidenceClassifier(String user, String title, String post) {
+    private boolean isPassedEvidenceClassifier(String user, String title, String post, EvidenceModel evidenceModel) {
 
-      //#U1-USER: Does the user, seems suspicious?
+        title = title.toLowerCase();
+        post = post.toLowerCase();
+
+        boolean evidenceFound = false;
+
+        //#U1-USER: Does the user, seems suspicious?
         //need to compare with the database
 
         //#E1 	SUBJECT:Is there any evidence of a hacking attack on the subject?
-        for (String i:keyWordList1) {
-            if (title.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier1Passed=true;
-                return true;
+        for (String i : keyWordList1) {
+            if (title.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier1Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E2 	SUBJECT:Are there any signs of usage of a security tool?
-        for (String i:keyWordList2) {
-            if (title.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier2Passed=true;
-                return true;
+        for (String i : keyWordList2) {
+            if (title.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier2Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E3 	SUBJECT:Are there any signs of security vulnerability?
-        for (String i:keyWordList3) {
-            if (title.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier3Passed=true;
-                return true;
+        for (String i : keyWordList3) {
+            if (title.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier3Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E4 	SUBJECT:Evidence of a Hacker involvement/Hacktivist movement?
-        for (String i:keyWordList4) {
-            if (title.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier4Passed=true;
-                return true;
+        for (String i : keyWordList4) {
+            if (title.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier4Passed(true);
+                evidenceFound = true;
             }
         }
 
 
         //#E5 	BODY:	Is there any evidence of a hacking attack in the body text?
-        for (String i:keyWordList5) {
-            if (post.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier5Passed=true;
-                return true;
+        for (String i : keyWordList5) {
+            if (post.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier5Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E6 	BODY:	Are there any signs of usage of a security tool in the body text?
-        for (String i:keyWordList6) {
-            if (post.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier6Passed=true;
-                return true;
+        for (String i : keyWordList6) {
+            if (post.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier6Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E7	BODY:	Are there any signs of security vulnerability in the body text?
-        for (String i:keyWordList7) {
-            if (post.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier7Passed=true;
-                return true;
+        for (String i : keyWordList7) {
+            if (post.contains(i.toLowerCase())) {
+                evidenceModel.setClassifier7Passed(true);
+                evidenceFound = true;
             }
         }
 
         //#E8	BODY:	Are there any signs of security vulnerability in the body text?
-        for (String i:keyWordList8) {
+        for (String i : keyWordList8) {
             if (post.toLowerCase().contains(i.toLowerCase())) {
-//                isClassifier8Passed=true;
-                return true;
+                evidenceModel.setClassifier8Passed(true);
+                evidenceFound = true;
             }
         }
 
-        return false;
+        return evidenceFound;
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post"));
+        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post", "evidence_status"));
     }
 }
