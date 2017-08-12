@@ -22,6 +22,9 @@ public class ContextFilterBolt extends BaseRichBolt {
     OutputCollector collector;
     public Properties properties = new Properties();
     public List<String> regExpHandlerList;
+//    public  String entry = "bank of ceylon hacked";
+//   / public ArrayList<String> entryList=new ArrayList<>(Arrays.asList("bank of ceylon","hacked", "anonymous"));
+
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;

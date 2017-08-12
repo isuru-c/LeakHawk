@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-public class CCClassifier {
+public class CCClassifier extends ContentClassifier {
     Pattern ccCardPattern;
     Pattern patterncc1;
     ArrayList<Pattern> unigramPatternList;
@@ -28,51 +28,11 @@ public class CCClassifier {
     Pattern digitPattern;
     Pattern alphaPattern;
     Pattern alphDigitPattern;
-    String heading = "@relation CC\n" +
-            "\n" +
-            "@attribute $CC1 numeric\n" +
-            "@attribute $CC2 numeric\n" +
-            "@attribute $CC3 numeric\n" +
-            "@attribute $CC4 numeric\n" +
-            "@attribute $CC5 numeric\n" +
-            "@attribute $CC6 numeric\n" +
-            "@attribute $CC7 numeric\n" +
-            "@attribute $CC8 numeric\n" +
-            "@attribute $CC9 numeric\n" +
-            "@attribute $CC10 numeric\n" +
-            "@attribute $CC11 numeric\n" +
-            "@attribute $CC12 numeric\n" +
-            "@attribute $CC13 numeric\n" +
-            "@attribute $CC14 numeric\n" +
-            "@attribute $CC15 numeric\n" +
-            "@attribute $CC16 numeric\n" +
-            "@attribute $CC17 numeric\n" +
-            "@attribute $CC18 numeric\n" +
-            "@attribute $CC19 numeric\n" +
-            "@attribute $CC20 numeric\n" +
-            "@attribute $CC21 numeric\n" +
-            "@attribute $CC22 numeric\n" +
-            "@attribute $CC23 numeric\n" +
-            "@attribute $CC24 numeric\n" +
-            "@attribute $CC25 numeric\n" +
-            "@attribute $CC26 numeric\n" +
-            "@attribute $CC27 numeric\n" +
-            "@attribute $CC28 numeric\n" +
-            "@attribute $CC29 numeric\n" +
-            "@attribute $CC30 numeric\n" +
-            "@attribute $CC31 numeric\n" +
-            "@attribute $CC32 numeric\n" +
-            "@attribute $CC33 numeric\n" +
-            "@attribute $CC34 numeric\n" +
-            "@attribute $CC35 numeric\n" +
-            "@attribute #N numeric\n" +
-            "@attribute #L numeric\n" +
-            "@attribute #A numeric\n" +
-            "@attribute #NP numeric\n" +
-            "@attribute #CP numeric\n" +
-            "@attribute @@class@@ {CC,non}\n" +
-            "\n" +
-            "@data\n";
+
+    public static void main(String[] args) {
+        CCClassifier ccClassifier = new CCClassifier();
+        System.out.println("Result is :"+ccClassifier.classify("",""));
+    }
 
     public CCClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();
@@ -109,7 +69,6 @@ public class CCClassifier {
         trigramList.add("visa card number");
 
         ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
-//        patterncc1 = Pattern.compile("\\bcard\\b");
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
@@ -144,8 +103,8 @@ public class CCClassifier {
 
     }
 
-
-    public String createARFF(String text) {
+    @Override
+    public String createARFF(String text,String title) {
         String feature_list = "";
         for (Pattern pattern : unigramPatternList) {
             Matcher matcher = pattern.matcher(text);
@@ -231,43 +190,39 @@ public class CCClassifier {
         double cp = ((double) b / c) * 100;
 
         feature_list += a + "," + b + "," + c + "," + String.format("%.02f", np) + "," + String.format("%.02f", cp) + ",?";
-
-
-        return heading+feature_list;
-
+        return headingCC+feature_list;
     }
 
-    int getMatchingCount(Matcher matcher) {
-        int count = 0;
-        while (matcher.find())
-            count++;
-        return count;
-    }
-
-    public boolean classify(String text) {
+    @Override
+    public boolean classify(String text,String title) {
         try{
-        // convert String into InputStream
-        String result = createARFF(text);
-        InputStream is = new ByteArrayInputStream(result.getBytes());
+            // convert String into InputStream
+            String result = createARFF(text,title);
+            InputStream is = new ByteArrayInputStream(result.getBytes());
 
-        // read it with BufferedReader
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            // read it with BufferedReader
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-        // BufferedReader reader = new BufferedReader
-        Instances unlabeled = new Instances(reader);
-        reader.close();
-        unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+            // BufferedReader reader = new BufferedReader
+            Instances unlabeled = new Instances(reader);
+            reader.close();
+            unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
 
-        // create copy
-        Instances labeled = new Instances(unlabeled);
+            // create copy
+            Instances labeled = new Instances(unlabeled);
 
-        RandomForest tclassifier = (RandomForest) SerializationHelper.read(new FileInputStream("./src/main/resources/CC.model"));
-        double pred = tclassifier.classifyInstance(unlabeled.instance(0));
-        System.out.println("Result:"+pred);
+            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CC.model");
+            String[] options = new String[2];
+            options[0] = "-P";
+            options[1] = "0";
+            tclassifier.setOptions(options);
 
-        if(pred>=0.5){
-            return true;
-        }
+            double pred = tclassifier.classifyInstance(unlabeled.instance(0));
+//        System.out.println("Result:"+pred);
+
+            if(pred>=0.5){
+                return true;
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -276,6 +231,9 @@ public class CCClassifier {
         }
         return false;
     }
+
+
+
 
 }
 

@@ -12,49 +12,57 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-public class CFClassifier extends ContentClassifier{
-    Pattern cfSymbalPattern;
+public class PKClassifier extends ContentClassifier {
+
     ArrayList<Pattern> unigramPatternList;
     ArrayList<Pattern> bigramPatternList;
     ArrayList<Pattern> trigramPatternList;
+    ArrayList<Pattern> fourgramPatternList;
 
-    Pattern digitPattern;
-    Pattern alphaPattern;
-    Pattern alphDigitPattern;
+    Pattern relatedPattern1;
+    Pattern relatedPattern2;
 
-    public CFClassifier() {
+
+    public PKClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("ip");
-        unigramList.add("cisco");
-        unigramList.add("password-encryption");
-        unigramList.add("spanning-tree");
-        unigramList.add("domain-lookup");
-        unigramList.add("serial0/0/0");
-        unigramList.add("access-list");
-
+        unigramList.add("PRIVATE");
+        unigramList.add("KEY");
+        unigramList.add("RSA");
+        unigramList.add("SSHRSA");
+        unigramList.add("KEY-----");
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("interface FastEthernet[0-9]|interface Serial[0-9]");
-        bigramList.add("speed auto|duplex auto");
-        bigramList.add("0 line");
-        bigramList.add("line vty|line aux|line con\"");
-        bigramList.add("service password");
-        bigramList.add("ip address");
-        bigramList.add("ip route");
-        bigramList.add("banner motd");
-        bigramList.add("no service");
-        bigramList.add("clock rate");
-        bigramList.add("ip cef|ipv6 cef");
-        bigramList.add("service password-encryption");
+        bigramList.add("PRIVATE KEY");
+        bigramList.add("RSA PRIVATE");
+        bigramList.add("BEGIN CERTIFICATE");
+        bigramList.add("DSA PRIVATE");
+        bigramList.add("ENCRYPTED PRIVATE");
+        bigramList.add("BEGIN RSA");
 
         ArrayList<String> trigramList = new ArrayList<String>();
-        trigramList.add("line vty 0|line con 0|line aux 0");
-        trigramList.add("no ip address");
-        trigramList.add("no ipv6 cef");
-        trigramList.add("switchport access vlan");
+        trigramList.add("RSA PRIVATE KEY");
+        trigramList.add("DSA PRIVATE KEY");
+        trigramList.add("BEGIN RSA PRIVATE");
+        trigramList.add("END PRIVATE KEY");
+        trigramList.add("BEGIN PRIVATE KEY");
+
+        ArrayList<String> fourgramList = new ArrayList<String>();
+        trigramList.add("BEGIN RSA PRIVATE KEY");
+        trigramList.add("BEGIN DSA PRIVATE KEY");
+        trigramList.add("END RSA PRIVATE KEY");
 
 
-        cfSymbalPattern = Pattern.compile("!");
+        /*
+        *
+
+	PK20=$(grep -oE "[-]{5}[A-Za-z0-9 ]+[-]{5}" "$i"| wc -l);
+
+	#PK related terms
+	PK21=$(grep -owiE "PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY" "$i"| wc -l);
+
+        * */
+
+
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
@@ -71,7 +79,16 @@ public class CFClassifier extends ContentClassifier{
         for (String word : trigramList) {
             trigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
+
+        fourgramPatternList = new ArrayList<Pattern>();
+        for (String word : fourgramList) {
+            fourgramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+        }
+
+        relatedPattern1 = Pattern.compile("[-]{5}[A-Za-z0-9 ]+[-]{5}");
+        relatedPattern2 = Pattern.compile("PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY", Pattern.CASE_INSENSITIVE);
     }
+
 
     @Override
     public String createARFF(String text,String title) {
@@ -92,11 +109,19 @@ public class CFClassifier extends ContentClassifier{
             feature_list += getMatchingCount(matcher) + ",";
         }
 
-        Matcher matcherCF = cfSymbalPattern.matcher(text);
-        feature_list += getMatchingCount(matcherCF) + ",";
+        for (Pattern pattern : fourgramPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        Matcher matcher = relatedPattern1.matcher(text);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern2.matcher(title);
+        feature_list += getMatchingCount(matcher) + ",";
 
         feature_list += ",?";
-        return headingCF+feature_list;
+        return headingDA+feature_list;
     }
 
     @Override
@@ -117,7 +142,7 @@ public class CFClassifier extends ContentClassifier{
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CF.model");
+            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/PK.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";
@@ -139,4 +164,3 @@ public class CFClassifier extends ContentClassifier{
     }
 
 }
-

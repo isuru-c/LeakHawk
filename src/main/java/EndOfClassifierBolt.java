@@ -1,3 +1,4 @@
+import Classifiers.ContentModel;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -29,6 +30,7 @@ public class EndOfClassifierBolt extends BaseRichBolt {
         String title = tuple.getString(4);
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
+
 
         System.out.println("\nKey: " + key + "\nDate: " + date + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\nCount: " + count++);
 
