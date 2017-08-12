@@ -6,10 +6,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +21,9 @@ public class ContextFilterBolt extends BaseRichBolt {
     OutputCollector collector;
     public Properties properties = new Properties();
     public List<String> regExpHandlerList;
+//    public  String entry = "bank of ceylon hacked";
+//   / public ArrayList<String> entryList=new ArrayList<>(Arrays.asList("bank of ceylon","hacked", "anonymous"));
+
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -38,11 +38,14 @@ public class ContextFilterBolt extends BaseRichBolt {
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
+        //if context filter is passed forward the data to next bolt(Evidence classifier)
         if (isPassContextFilter(post)) {
+            //pass to evidence classifier
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }else{
             System.out.println("\nKey: " + key + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\n--- Filtered out by context filter ---\n");
         }
+
         collector.ack(tuple);
     }
 

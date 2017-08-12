@@ -6,9 +6,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -41,8 +39,14 @@ public class PreFilterBolt extends BaseRichBolt {
         String title = tuple.getString(4);
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
+        Writer writer = null;
 
+        System.out.println("*******************PRE Filter********************************");
+        //System.out.println("\nKey: " + key + "\nDate: " + date + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\nCount: " + count++);
+
+        //if pre filter is passed forward the data to next bolt(context filter)
         if(!isContainKeyWord(post)) {
+            System.out.println("Passed pre filter: "+post);
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }else{
             System.out.println("\nKey: " + key + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\n--- Filtered out by pre filter ---\n");
@@ -55,6 +59,7 @@ public class PreFilterBolt extends BaseRichBolt {
     private boolean isContainKeyWord(String post) {
 
         try {
+
             for (int i=0;i<keyWordList.size();i++) {
                 if (post.toUpperCase().contains(keyWordList.get(i).toString().toUpperCase())) {
                     //exit after the first successful hit

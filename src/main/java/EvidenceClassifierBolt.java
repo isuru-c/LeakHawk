@@ -8,6 +8,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -27,6 +28,16 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     ArrayList<String> keyWordList6;
     ArrayList<String> keyWordList7;
     ArrayList<String> keyWordList8;
+
+    public boolean isEvidenceClassifierPassed() {
+        return evidenceClassifierPassed;
+    }
+
+    public void setEvidenceClassifierPassed(boolean evidenceClassifierPassed) {
+        this.evidenceClassifierPassed = evidenceClassifierPassed;
+    }
+
+    public boolean evidenceClassifierPassed = false;//needed for sensitivity prediction
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -70,7 +81,7 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
         boolean evidenceFound = false;
 
         //#U1-USER: Does the user, seems suspicious?
-        //need to compare with the database
+        //need to compare with the database - percentage
 
         //#E1 	SUBJECT:Is there any evidence of a hacking attack on the subject?
         for (String i : keyWordList1) {
@@ -103,7 +114,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
                 evidenceFound = true;
             }
         }
-
 
         //#E5 	BODY:	Is there any evidence of a hacking attack in the body text?
         for (String i : keyWordList5) {
