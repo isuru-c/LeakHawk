@@ -18,15 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-
-
 public class ContextFilterBolt extends BaseRichBolt {
     OutputCollector collector;
-    public  Properties properties = new Properties();
-    public  List<String> regExpHandlerList;
-//    public  String entry = "bank of ceylon hacked";
-//   / public ArrayList<String> entryList=new ArrayList<>(Arrays.asList("bank of ceylon","hacked", "anonymous"));
-
+    public Properties properties = new Properties();
+    public List<String> regExpHandlerList;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -45,19 +40,17 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         if (isPassContextFilter(post) == true) {
             //pass to evidence classifier
-            System.out.println("Passed context filter: "+post);
+            System.out.println("Passed context filter: " + post);
             collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
         }
         collector.ack(tuple);
     }
 
 
-    public  boolean isPassContextFilter(String entry) {
+    public boolean isPassContextFilter(String entry) {
         InputStream input = null;
         try {
-//            input = ContextFilterBolt.class.getClassLoader().getResourceAsStream("/home/warunika/Desktop/LeakHawk/context.properties");
-            input = new FileInputStream(new File("/home/warunika/Desktop/LeakHawk/context.properties"));
-//            System.out.println(input);
+            input = new FileInputStream(new File("./src/main/resources/context.properties"));
             // load a properties file
             properties.load(input);
             loadRegExpList(18);
@@ -96,11 +89,8 @@ public class ContextFilterBolt extends BaseRichBolt {
         try {
             for (String pattern : regExpHandlerList) {
                 Pattern p = Pattern.compile(String.valueOf(pattern));
-//                System.out.println(pattern);
                 Matcher m = p.matcher(input);
                 if (m.find()) {
-//                    System.out.println(pattern);
-//                    System.out.println("found");
                     found = true;
                 }
                 if (found == true) {

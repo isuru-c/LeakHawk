@@ -1,3 +1,5 @@
+import Classifiers.Content.CCClassifier;
+import Classifiers.ContentModel;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -12,11 +14,12 @@ import java.util.Map;
  * Created by root on 7/28/17.
  */
 public class ContentClassifierBolt extends BaseRichBolt {
-
     OutputCollector collector;
+    CCClassifier ccClassifier;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
+        ccClassifier = new CCClassifier();
     }
 
     public void execute(Tuple tuple) {
@@ -28,6 +31,13 @@ public class ContentClassifierBolt extends BaseRichBolt {
         String title = tuple.getString(4);
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
+
+        boolean ccClassify = ccClassifier.classify(post);
+
+
+
+        ContentModel contentModel = new ContentModel();
+        contentModel.setPassedCC(ccClassify);
 
         collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
 
