@@ -6,10 +6,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +35,7 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         System.out.println("*******************Context Filter********************************");
 
+        //if context filter is passed forward the data to next bolt(Evidence classifier)
         if (isPassContextFilter(post) == true) {
             //pass to evidence classifier
             System.out.println("Passed context filter: " + post);

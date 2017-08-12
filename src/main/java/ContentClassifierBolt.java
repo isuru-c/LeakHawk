@@ -17,6 +17,16 @@ public class ContentClassifierBolt extends BaseRichBolt {
     OutputCollector collector;
     CCClassifier ccClassifier;
 
+    public void setContentClassifierPassed(boolean contentClassifierPassed) {
+        this.contentClassifierPassed = contentClassifierPassed;
+    }
+
+    public boolean isContentClassifierPassed() {
+        return contentClassifierPassed;
+    }
+
+    private boolean contentClassifierPassed = false; //needed for sensitivity prediction
+
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
         ccClassifier = new CCClassifier();

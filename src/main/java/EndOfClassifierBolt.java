@@ -15,6 +15,16 @@ public class EndOfClassifierBolt extends BaseRichBolt {
 
     OutputCollector collector;
     static int count = 0;
+    private String sensitivity;
+//    SensitivityPredictor sensitivityPredictor = new SensitivityPredictor();
+
+    public String getSensitivity() {
+        return sensitivity;
+    }
+
+    public void setSensitivity(String sensitivity) {
+        this.sensitivity = sensitivity;
+    }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -32,6 +42,9 @@ public class EndOfClassifierBolt extends BaseRichBolt {
 
         System.out.println("\nKey: " + key + "\nDate: " + date + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\nCount: " + count++);
 
+//        sensitivityPredictor.predictSensitivity(tuple);
+//        setSensitivity(sensitivityPredictor.getSensitivityLabel());
+//        System.out.println("Sensitivity: "+sensitivity);
         collector.ack(tuple);
     }
 
