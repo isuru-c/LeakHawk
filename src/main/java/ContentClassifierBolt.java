@@ -1,4 +1,5 @@
 import Classifiers.Content.CCClassifier;
+import Classifiers.Content.ContentClassifier;
 import Classifiers.ContentModel;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -15,7 +16,13 @@ import java.util.Map;
  */
 public class ContentClassifierBolt extends BaseRichBolt {
     OutputCollector collector;
-    CCClassifier ccClassifier;
+    ContentClassifier ccClassifier;
+    ContentClassifier cfClassifier;
+    ContentClassifier daClassifier;
+    ContentClassifier dbClassifier;
+    ContentClassifier ecClassifier;
+    ContentClassifier eoClassifier;
+    ContentClassifier pkClassifier;
 
     public void setContentClassifierPassed(boolean contentClassifierPassed) {
         this.contentClassifierPassed = contentClassifierPassed;
@@ -30,6 +37,7 @@ public class ContentClassifierBolt extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
         ccClassifier = new CCClassifier();
+
     }
 
     public void execute(Tuple tuple) {
@@ -42,14 +50,25 @@ public class ContentClassifierBolt extends BaseRichBolt {
         String syntax = tuple.getString(5);
         String post = tuple.getString(6);
 
-        boolean ccClassify = ccClassifier.classify(post);
-
+        boolean ccClassify = ccClassifier.classify(post,title);
+        boolean cfClassify = cfClassifier.classify(post, title);
+        boolean daClassify = daClassifier.classify(post, title);
+        boolean dbClassify = dbClassifier.classify(post, title);
+        boolean ecClassify = ecClassifier.classify(post, title);
+        boolean eoClassify = eoClassifier.classify(post, title);
+        boolean pkClassify = pkClassifier.classify(post, title);
 
 
         ContentModel contentModel = new ContentModel();
         contentModel.setPassedCC(ccClassify);
+        contentModel.setPassedCF(cfClassify);
+        contentModel.setPassedDA(daClassify);
+        contentModel.setPassedDB(dbClassify);
+        contentModel.setPassedEC(ecClassify);
+        contentModel.setPassedEO(eoClassify);
+        contentModel.setPassedPK(pkClassify);
 
-        collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
+        collector.emit(tuple, new Values(type, key, date, user, title, syntax, post,contentModel));
 
         collector.ack(tuple);
     }

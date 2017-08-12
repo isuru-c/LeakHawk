@@ -12,49 +12,39 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-public class CFClassifier extends ContentClassifier{
-    Pattern cfSymbalPattern;
+public class DAClassifier extends ContentClassifier {
+
     ArrayList<Pattern> unigramPatternList;
     ArrayList<Pattern> bigramPatternList;
     ArrayList<Pattern> trigramPatternList;
 
-    Pattern digitPattern;
-    Pattern alphaPattern;
-    Pattern alphDigitPattern;
+    Pattern relatedPattern1;
+    Pattern relatedPattern2;
+    Pattern relatedPattern3;
+    Pattern relatedPattern4;
+    Pattern relatedPattern5;
+    Pattern relatedPattern6;
+    Pattern relatedPattern7;
 
-    public CFClassifier() {
+    public DAClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("ip");
-        unigramList.add("cisco");
-        unigramList.add("password-encryption");
-        unigramList.add("spanning-tree");
-        unigramList.add("domain-lookup");
-        unigramList.add("serial0/0/0");
-        unigramList.add("access-list");
-
+        unigramList.add("MX|NS|PTR|CNAME|SOA");
+        unigramList.add("dns|record|host");
+        unigramList.add("INTO");
+        unigramList.add("snoop|axfr|brute|poisoning");
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("interface FastEthernet[0-9]|interface Serial[0-9]");
-        bigramList.add("speed auto|duplex auto");
-        bigramList.add("0 line");
-        bigramList.add("line vty|line aux|line con\"");
-        bigramList.add("service password");
-        bigramList.add("ip address");
-        bigramList.add("ip route");
-        bigramList.add("banner motd");
-        bigramList.add("no service");
-        bigramList.add("clock rate");
-        bigramList.add("ip cef|ipv6 cef");
-        bigramList.add("service password-encryption");
+        bigramList.add("43200 IN|10800 IN|86400 IN|3600 IN");
+        bigramList.add("IN A|IN MX|IN NS|IN CNAME");
+        bigramList.add("no PTR");
+        bigramList.add("hostnames found");
+        bigramList.add("zone transfer");
+        bigramList.add("MX 10|MX 20|MX 30|MX 40|MX 50|MX 60");
 
         ArrayList<String> trigramList = new ArrayList<String>();
-        trigramList.add("line vty 0|line con 0|line aux 0");
-        trigramList.add("no ip address");
-        trigramList.add("no ipv6 cef");
-        trigramList.add("switchport access vlan");
+        trigramList.add("transfer not allowed");
+        trigramList.add("Trying zone transfer");
 
-
-        cfSymbalPattern = Pattern.compile("!");
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
@@ -71,7 +61,16 @@ public class CFClassifier extends ContentClassifier{
         for (String word : trigramList) {
             trigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
+
+        relatedPattern1 = Pattern.compile("\\b" + "dns-brute|dnsrecon|fierce|tsunami|Dnsdict6|axfr" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = Pattern.compile("dns-brute|dnsrecon|fierce|tsunami|Dnsdict6|axfr", Pattern.CASE_INSENSITIVE);
+        relatedPattern3 = Pattern.compile("\\b" + "DNS LeAkEd|DNS fuck3d|zone transfer|DNS_Enumeration|Enumeration_Attack" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern4 = Pattern.compile("DNS LeAkEd|DNS fuck3d|zone transfer|DNS_Enumeration|Enumeration_Attack", Pattern.CASE_INSENSITIVE);
+        relatedPattern5 = Pattern.compile("\\b" + "DNS Enumeration Attack|DNS enumeration|zone transfer|misconfigured DNS|DNS Cache Snooping" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern6 = Pattern.compile("DNS Enumeration Attack|DNS enumeration|zone transfer|misconfigured DNS|DNS Cache Snooping", Pattern.CASE_INSENSITIVE);
+        relatedPattern7 = Pattern.compile("\\[\\*\\]", Pattern.CASE_INSENSITIVE);
     }
+
 
     @Override
     public String createARFF(String text,String title) {
@@ -92,11 +91,29 @@ public class CFClassifier extends ContentClassifier{
             feature_list += getMatchingCount(matcher) + ",";
         }
 
-        Matcher matcherCF = cfSymbalPattern.matcher(text);
-        feature_list += getMatchingCount(matcherCF) + ",";
+        Matcher matcher = relatedPattern1.matcher(text);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern2.matcher(title);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern3.matcher(text);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern4.matcher(title);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern5.matcher(text);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern6.matcher(title);
+        feature_list += getMatchingCount(matcher) + ",";
+
+        matcher = relatedPattern7.matcher(text);
+        feature_list += getMatchingCount(matcher) + ",";
 
         feature_list += ",?";
-        return headingCF+feature_list;
+        return headingDA+feature_list;
     }
 
     @Override
@@ -117,7 +134,7 @@ public class CFClassifier extends ContentClassifier{
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CF.model");
+            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/DA.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";
@@ -139,4 +156,3 @@ public class CFClassifier extends ContentClassifier{
     }
 
 }
-
