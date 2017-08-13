@@ -1,8 +1,7 @@
-package Classifiers.Content;
+package classifiers.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 
 import java.io.*;
 import java.util.ArrayList;

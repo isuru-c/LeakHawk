@@ -1,3 +1,4 @@
+import data.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -23,7 +24,8 @@ public class PostDownloadBolt extends BaseRichBolt {
 
     OutputCollector collector;
     JSONParser parser = null;
-    String type = "pastbin";
+
+    String postType = "pastebin-posts";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -35,24 +37,31 @@ public class PostDownloadBolt extends BaseRichBolt {
         try {
 
             Object obj = parser.parse(tuple.getString(0));
-            JSONObject post_details = (JSONObject) obj;
+            JSONObject postDetails = (JSONObject) obj;
 
-            String post_url = (String) post_details.get("scrape_url");
-            String key = (String) post_details.get("key");
-            String date = (String) post_details.get("date");
-            String title = (String) post_details.get("title");
-            String user = (String) post_details.get("user");
-            String syntax = (String) post_details.get("syntax");
-            String post = "";
+            Post post = new Post();
 
-            URL my_url2 = new URL(post_url);
+            String postUrl = (String) postDetails.get("scrape_url");
+
+            post.setPostType(postType);
+            post.setKey((String) postDetails.get("key"));
+            post.setDate((String) postDetails.get("date"));
+            post.setTitle((String) postDetails.get("title"));
+            post.setUser((String) postDetails.get("user"));
+            post.setSyntax((String) postDetails.get("syntax"));
+
+            String postText = "";
+
+            URL my_url2 = new URL(postUrl);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url2.openStream()));
 
             while (bufferedReader.ready()) {
-                post += bufferedReader.readLine();
+                postText += bufferedReader.readLine();
             }
 
-            collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
+            post.setPostText(postText);
+
+            collector.emit(tuple, new Values(post));
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -67,6 +76,6 @@ public class PostDownloadBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post"));
+        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

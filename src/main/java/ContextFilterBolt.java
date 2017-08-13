@@ -1,3 +1,4 @@
+import data.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -18,32 +19,26 @@ import java.util.regex.Pattern;
  * Created by Isuru Chandima on 7/3/17.
  */
 public class ContextFilterBolt extends BaseRichBolt {
-    OutputCollector collector;
+
     public Properties properties = new Properties();
     public List<String> regExpHandlerList;
-//    public  String entry = "bank of ceylon hacked";
-//   / public ArrayList<String> entryList=new ArrayList<>(Arrays.asList("bank of ceylon","hacked", "anonymous"));
-
+    OutputCollector collector;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
     }
 
     public void execute(Tuple tuple) {
-        String type = tuple.getString(0);
-        String key = tuple.getString(1);
-        String date = tuple.getString(2);
-        String user = tuple.getString(3);
-        String title = tuple.getString(4);
-        String syntax = tuple.getString(5);
-        String post = tuple.getString(6);
+
+        Post post = (Post)tuple.getValue(0);
 
         //if context filter is passed forward the data to next bolt(Evidence classifier)
-        if (isPassContextFilter(post)) {
+        if (isPassContextFilter(post.getPostText())) {
             //pass to evidence classifier
-            collector.emit(tuple, new Values(type, key, date, user, title, syntax, post));
-        }else{
-            System.out.println("\nKey: " + key + "\nUser: " + user + "\nTitle: " + title + "\n" + post + "\n--- Filtered out by context filter ---\n");
+            collector.emit(tuple, new Values(post));
+            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by context filter ---\n");
+        } else {
+            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
         }
 
         collector.ack(tuple);
@@ -86,7 +81,6 @@ public class ContextFilterBolt extends BaseRichBolt {
 
     private boolean regExpressionMatched(String input) {
 
-//        System.out.println(input);
         boolean found = false;
 
         try {
@@ -108,11 +102,10 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         }
 
-
         return false;
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post"));
+        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

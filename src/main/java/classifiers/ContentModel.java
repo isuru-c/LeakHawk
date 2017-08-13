@@ -1,13 +1,12 @@
-package Classifiers;
+package classifiers;
 
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.Serializable;
 
 /**
  * @author Sugeesh Chandraweera
  */
-public class ContentModel{
+public class ContentModel implements Serializable{
+
     boolean passedCC;
     boolean passedCF;
     boolean passedDA;
@@ -17,9 +16,6 @@ public class ContentModel{
     boolean passedPK;
     boolean passedUC;
     boolean passedWD;
-
-    public ContentModel() {
-    }
 
     public boolean isPassedCC() {
         return passedCC;

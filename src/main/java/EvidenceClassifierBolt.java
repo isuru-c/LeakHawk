@@ -1,5 +1,5 @@
-import Classifiers.EvidenceModel;
-import org.apache.logging.log4j.util.Strings;
+import classifiers.EvidenceModel;
+import data.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -8,7 +8,6 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -29,16 +28,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     ArrayList<String> keyWordList7;
     ArrayList<String> keyWordList8;
 
-    public boolean isEvidenceClassifierPassed() {
-        return evidenceClassifierPassed;
-    }
-
-    public void setEvidenceClassifierPassed(boolean evidenceClassifierPassed) {
-        this.evidenceClassifierPassed = evidenceClassifierPassed;
-    }
-
-    public boolean evidenceClassifierPassed = false;//needed for sensitivity prediction
-
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
 
@@ -55,21 +44,16 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
-        String type = tuple.getString(0);
-        String key = tuple.getString(1);
-        String date = tuple.getString(2);
-        String user = tuple.getString(3);
-        String title = tuple.getString(4);
-        String syntax = tuple.getString(5);
-        String post = tuple.getString(6);
+        Post post = (Post)tuple.getValue(0);
 
         EvidenceModel evidenceModel = new EvidenceModel();
+        post.setEvidenceModel(evidenceModel);
 
-        Boolean evidenceFound = isPassedEvidenceClassifier(user, title, post, evidenceModel);
+        Boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getTitle(), post.getPostText(), evidenceModel);
 
         evidenceModel.setEvidenceFound(evidenceFound);
 
-        collector.emit(tuple, new Values(type, key, date, user, title, syntax, post, evidenceFound));
+        collector.emit(tuple, new Values(post));
         collector.ack(tuple);
     }
 
@@ -151,6 +135,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("type", "key", "date", "user", "title", "syntax", "post", "evidence_status"));
+        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

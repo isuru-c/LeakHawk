@@ -1,10 +1,9 @@
-package Classifiers.Content;
+package classifiers.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

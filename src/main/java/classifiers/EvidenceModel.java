@@ -1,9 +1,11 @@
-package Classifiers;
+package classifiers;
+
+import java.io.Serializable;
 
 /**
  * Created by Isuru Chandima on 8/13/17.
  */
-public class EvidenceModel {
+public class EvidenceModel implements Serializable{
 
     private boolean evidenceFound;
     private boolean userExists;
