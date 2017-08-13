@@ -112,7 +112,30 @@ public class EndOfClassifierBolt extends BaseRichBolt {
                     sensitivityLabel.append("LOW - CF");
                 }
             }
+            else if( contentModel.isPassedDB() ){
+                  //System.out.println("CONTENT: Possible Database Dump!");
+                sensitivityLabel.append("HIGH-DB");
 
+                // if evidence passed, escalated to CRITICAL
+
+                //weak hashes based on https://en.wikipedia.org/wiki/Hash_function_security_summary
+//                if(presenseOfSensitiveData("/home/nalinda/oct/leakhawk-app/predictor/DB_sensitiveData.sh")){
+//                    sensitivityLabel = "CRITICAL-DB";
+//                }
+            }
+            else if( contentModel.isPassedDA() ){
+                //            //System.out.println("CONTENT: Possible DNS attack!");
+                //
+                //            setDomainCount( Integer.parseInt( DAcounter() ));
+                //            if (domainCount < 10){
+                //                sensitivityLabel = "CRITICAL-DA";
+                //            }
+                //
+                //            if (domainCount >= 10){
+                //                sensitivityLabel = "CRITICAL-DA-l";
+                //            }
+
+                        }
         }
         if(evidenceModel.isEvidenceFound() && !contentModel.isContentFound()){
             sensitivityLabel.append("CRITICAL-Evidence only");
