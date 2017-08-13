@@ -1,5 +1,7 @@
 import classifiers.EvidenceModel;
 import data.Post;
+import db.DBConnection;
+import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -8,6 +10,9 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -27,6 +32,7 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     ArrayList<String> keyWordList6;
     ArrayList<String> keyWordList7;
     ArrayList<String> keyWordList8;
+    Connection connection;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -39,6 +45,15 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
         keyWordList6 = new ArrayList(Arrays.asList("dns-brute", "dnsrecon", "fierce", "Dnsdict6", "axfr", "SQLmap"));
         keyWordList7 = new ArrayList(Arrays.asList("SQL Injection", "SQLi", "SQL-i", "Blind SQL-i"));
         keyWordList8 = new ArrayList(Arrays.asList("UGLegion", "RetrOHacK", "Anonymous", "AnonSec", "AnonGhost", "ANONYMOUSSRILANKA", "W3BD3F4C3R", "SLCYBERARMY", "DAVYJONES", "BLACKHATANON", "ANUARLINUX", "UGLEGION", "HUSSEIN98D", "We Are Anonymous", "We do not Forget, We do not Forgive", "Laughing at your security since 2012", "AnonGhost is Everywhere"));
+
+        try {
+            connection = DBConnection.getDBConnection().getConnection();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -74,6 +89,20 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
                 evidenceFound = true;
             }
         }
+
+        try {
+            ResultSet data = DBHandle.getData(connection, "SELECT user FROM Incident");
+            while(data.next()){
+                String userFromDB = data.getString("user");
+                if (title.contains(userFromDB.toLowerCase())) {
+                    evidenceModel.setClassifier1Passed(true);
+                    evidenceFound = true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
 
         //#E2 	SUBJECT:Are there any signs of usage of a security tool?
         for (String i : keyWordList2) {
