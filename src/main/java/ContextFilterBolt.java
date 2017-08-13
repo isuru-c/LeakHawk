@@ -33,7 +33,6 @@ public class ContextFilterBolt extends BaseRichBolt {
         Post post = (Post)tuple.getValue(0);
 
         //if context filter is passed forward the data to next bolt(Evidence classifier)
-/*
         if (isPassContextFilter(post.getPostText())) {
             //pass to evidence classifier
             collector.emit(tuple, new Values(post));
@@ -42,8 +41,7 @@ public class ContextFilterBolt extends BaseRichBolt {
 //            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
         }
 
-*/
-        collector.emit(tuple, new Values(post));
+//        collector.emit(tuple, new Values(post));
 
         collector.ack(tuple);
 
