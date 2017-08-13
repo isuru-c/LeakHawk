@@ -36,11 +36,9 @@ public class PreFilterBolt extends BaseRichBolt {
         //if pre filter is passed forward the data to next bolt(context filter)
         if(!isContainKeyWord(post.getPostText())) {
             collector.emit(tuple, new Values(post));
-            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by pre filter ---\n");
         }else{
 //            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
         }
-
         collector.ack(tuple);
 
     }

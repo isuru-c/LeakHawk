@@ -42,6 +42,7 @@ public class ContentClassifierBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
+
         Post post = (Post)tuple.getValue(0);
 
         String title = post.getTitle();
@@ -50,24 +51,35 @@ public class ContentClassifierBolt extends BaseRichBolt {
         ContentModel contentModel = new ContentModel();
         post.setContentModel(contentModel);
 
-        boolean ccClassify = ccClassifier.classify(postText, title);
-        boolean cfClassify = cfClassifier.classify(postText, title);
-        boolean daClassify = daClassifier.classify(postText, title);
-        boolean dbClassify = dbClassifier.classify(postText, title);
-        boolean ecClassify = ecClassifier.classify(postText, title);
-        boolean eoClassify = eoClassifier.classify(postText, title);
-        boolean pkClassify = pkClassifier.classify(postText, title);
+        try {
+            boolean ccClassify = ccClassifier.classify(postText, title);
+            boolean cfClassify = cfClassifier.classify(postText, title);
+            boolean daClassify = daClassifier.classify(postText, title);
+            boolean dbClassify = dbClassifier.classify(postText, title);
+            boolean ecClassify = ecClassifier.classify(postText, title);
+            boolean eoClassify = eoClassifier.classify(postText, title);
+            boolean pkClassify = pkClassifier.classify(postText, title);
 
-        contentModel.setPassedCC(ccClassify);
-        contentModel.setPassedCF(cfClassify);
-        contentModel.setPassedDA(daClassify);
-        contentModel.setPassedDB(dbClassify);
-        contentModel.setPassedEC(ecClassify);
-        contentModel.setPassedEO(eoClassify);
-        contentModel.setPassedPK(pkClassify);
+            contentModel.setPassedCC(ccClassify);
+            contentModel.setPassedCF(cfClassify);
+            contentModel.setPassedDA(daClassify);
+            contentModel.setPassedDB(dbClassify);
+            contentModel.setPassedEC(ecClassify);
+            contentModel.setPassedEO(eoClassify);
+            contentModel.setPassedPK(pkClassify);
+
+        }catch (java.lang.StackOverflowError e){
+            contentModel.setPassedCC(false);
+            contentModel.setPassedCF(false);
+            contentModel.setPassedDA(false);
+            contentModel.setPassedDB(false);
+            contentModel.setPassedEC(false);
+            contentModel.setPassedEO(false);
+            contentModel.setPassedPK(false);
+
+        }
 
         collector.emit(tuple, new Values(post));
-
         collector.ack(tuple);
     }
 
