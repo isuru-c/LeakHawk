@@ -112,7 +112,7 @@ public class DAClassifier extends ContentClassifier {
         matcher = relatedPattern7.matcher(text);
         feature_list += getMatchingCount(matcher) + ",";
 
-        feature_list += ",?";
+        feature_list += "?";
         return headingDA+feature_list;
     }
 

@@ -1,5 +1,4 @@
-import classifiers.Content.CCClassifier;
-import classifiers.Content.ContentClassifier;
+import classifiers.Content.*;
 import classifiers.ContentModel;
 import data.Post;
 import org.apache.storm.task.OutputCollector;
@@ -32,6 +31,12 @@ public class ContentClassifierBolt extends BaseRichBolt {
         collector = outputCollector;
 
         ccClassifier = new CCClassifier();
+        cfClassifier = new CFClassifier();
+        daClassifier = new DAClassifier();
+        dbClassifier = new DBClassifier();
+        ecClassifier = new ECClassifier();
+        eoClassifier = new EOClassifier();
+        pkClassifier = new PKClassifier();
 
     }
 
