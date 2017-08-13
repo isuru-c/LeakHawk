@@ -120,8 +120,8 @@ public class PKClassifier extends ContentClassifier {
         matcher = relatedPattern2.matcher(title);
         feature_list += getMatchingCount(matcher) + ",";
 
-        feature_list += ",?";
-        return headingDA+feature_list;
+        feature_list += "?";
+        return headingPK + feature_list;
     }
 
     @Override

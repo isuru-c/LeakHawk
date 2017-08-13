@@ -16,15 +16,13 @@ public class DBClassifier extends ContentClassifier {
     Pattern symbalPattern;
     ArrayList<Pattern> unigramPatternList;
     ArrayList<Pattern> bigramPatternList;
-    ArrayList<Pattern> trigramPatternList;
 
     Pattern relatedPattern1;
     Pattern relatedPattern2;
     Pattern relatedPattern3;
     Pattern relatedPattern4;
     Pattern relatedPattern5;
-    Pattern relatedPattern6;
-    Pattern relatedPattern7;
+
 
     public DBClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();
@@ -41,7 +39,7 @@ public class DBClassifier extends ContentClassifier {
         bigramList.add("Dumped from|dumped by");
         bigramList.add("CREATE TABLE|ALTER TABLE");
         bigramList.add("INSERT INTO");
-        bigramList.add(") values");
+        bigramList.add("\\) values");
         bigramList.add("Found :");
         bigramList.add("Data found");
         bigramList.add("NOT NULL");
@@ -50,26 +48,6 @@ public class DBClassifier extends ContentClassifier {
         bigramList.add("available databases");
         bigramList.add("db dump");
 
-
-
-
-        /*
-        *
-        *
-	#Injection related terms
-	DB21=$(grep -owiE "SQL Injection|SQLi|SQL-i|Blind SQL-i" "$i"| wc -l);
-
-	#DB related terms
-	DB22=$(grep -owiE "PRIMARY KEY|ALTER TABLE|TABLE FOUND" "$i"| wc -l);
-
-	#SQL injection tool
-	DB23=$(ls "$i" | grep -oiE "sqlmap"| wc -l);
-
-	#filename
-	DB24=$(ls "$i" | grep -oiE "SQL Injection|SQLi|SQL-i|Blind SQL-i|database dump|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump" | wc -l);
-
-	#blended features
-	DB25=$(grep -owiE "\[\*\]" "$i"| wc -l);*/
 
 
         unigramPatternList = new ArrayList<Pattern>();
@@ -106,11 +84,6 @@ public class DBClassifier extends ContentClassifier {
             feature_list += getMatchingCount(matcher) + ",";
         }
 
-        for (Pattern pattern : trigramPatternList) {
-            Matcher matcher = pattern.matcher(text);
-            feature_list += getMatchingCount(matcher) + ",";
-        }
-
         Matcher matcherDB = symbalPattern.matcher(text);
         feature_list += getMatchingCount(matcherDB) + ",";
 
@@ -130,7 +103,7 @@ public class DBClassifier extends ContentClassifier {
         feature_list += getMatchingCount(matcherDB) + ",";
 
 
-        feature_list += ",?";
+        feature_list += "?";
         return headingDB + feature_list;
     }
 

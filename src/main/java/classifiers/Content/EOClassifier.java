@@ -55,8 +55,8 @@ public class EOClassifier extends ContentClassifier {
             feature_list += 0 + ",";
         }
 
-        feature_list += ",?";
-        return headingEC + feature_list;
+        feature_list += "?";
+        return headingEO + feature_list;
     }
 
     @Override

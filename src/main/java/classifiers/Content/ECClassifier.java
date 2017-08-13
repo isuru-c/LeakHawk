@@ -60,7 +60,7 @@ public class ECClassifier extends ContentClassifier {
         matcherEC = relatedPattern1.matcher(text);
         feature_list += getMatchingCount(matcherEC) + ",";
 
-        feature_list += ",?";
+        feature_list += "?";
         return headingEC + feature_list;
     }
 

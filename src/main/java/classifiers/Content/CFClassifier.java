@@ -95,7 +95,7 @@ public class CFClassifier extends ContentClassifier{
         Matcher matcherCF = cfSymbalPattern.matcher(text);
         feature_list += getMatchingCount(matcherCF) + ",";
 
-        feature_list += ",?";
+        feature_list += "?";
         return headingCF+feature_list;
     }
 
