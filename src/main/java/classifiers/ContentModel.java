@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class ContentModel implements Serializable{
 
+    boolean contentFound;
     boolean passedCC;
     boolean passedCF;
     boolean passedDA;
@@ -16,6 +17,16 @@ public class ContentModel implements Serializable{
     boolean passedPK;
     boolean passedUC;
     boolean passedWD;
+
+    public boolean isContentFound(){
+        if(passedCC || passedCF || passedDA || passedDB || passedEC || passedEO || passedPK){
+            contentFound = true;
+        }
+        else {
+            contentFound = false;
+        }
+        return contentFound;
+    }
 
     public boolean isPassedCC() {
         return passedCC;

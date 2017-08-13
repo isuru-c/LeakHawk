@@ -38,7 +38,7 @@ public class PreFilterBolt extends BaseRichBolt {
             collector.emit(tuple, new Values(post));
             System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by pre filter ---\n");
         }else{
-            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
+//            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
         }
 
         collector.ack(tuple);
