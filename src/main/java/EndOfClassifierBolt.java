@@ -2,6 +2,8 @@ import classifiers.EvidenceModel;
 import classifiers.ContentModel;
 import classifiers.Predictor.SensitivityModel;
 import data.Post;
+import db.DBConnection;
+import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -9,6 +11,8 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -28,10 +32,17 @@ public class EndOfClassifierBolt extends BaseRichBolt {
     Pattern ccCardPattern;
     EvidenceModel evidenceModel;
     ContentModel contentModel;
+    Connection connection;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
-
+        try {
+            connection = DBConnection.getDBConnection().getConnection();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void execute(Tuple tuple) {
@@ -42,7 +53,18 @@ public class EndOfClassifierBolt extends BaseRichBolt {
 
         SensitivityModel sensitivityModel = predictSensitivity(post.getPostText());
 
-        if (sensitivityModel.isEvidenceClassifier() || sensitivityModel.getLevel() > 2) {
+        if (sensitivityModel.isEvidenceClassifier() || sensitivityModel.isContentClassifier() && sensitivityModel.getLevel()>=2) {
+
+
+            try {
+                DBHandle.setData(connection,"INSERT INTO Incident VALUES ('"+post.getKey()+"','"+post.getUser()+"','"+post.getTitle()+"','"
+                        +post.getPostType()+"','"+post.getDate()+"',"+sensitivityModel.getLevel()+","+sensitivityModel.isContentClassifier()
+                        +","+sensitivityModel.isEvidenceClassifier()+",'"+sensitivityModel.getPredictClass()+"')");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+
             System.out.println("\nPost  : " + post.getKey());
             System.out.println("\nEvidence Found  : " + sensitivityModel.isEvidenceClassifier());
             System.out.println("\nContent Found  : " + sensitivityModel.isContentClassifier());
