@@ -1,6 +1,7 @@
 package classifiers.Content;
 
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Sugeesh Chandraweera
@@ -193,6 +194,10 @@ public class ContentClassifier {
         return null;
     }
 
+   /* public boolean classify(String text,String title,String key) {
+        return false;
+    }*/
+
     public boolean classify(String text,String title) {
         return false;
     }
@@ -202,5 +207,15 @@ public class ContentClassifier {
         while (matcher.find())
             count++;
         return count;
+    }
+
+    Pattern getCorrectPatten(String word,int type){
+        Pattern compile = Pattern.compile(word.replaceAll("\\|","\b|\b"),type);
+        return compile;
+    }
+
+    Pattern getCorrectPatten(String word){
+        Pattern compile = Pattern.compile(word.replaceAll("\\|","\b|\b"));
+        return compile;
     }
 }

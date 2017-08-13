@@ -53,11 +53,13 @@ public class EndOfClassifierBolt extends BaseRichBolt {
 
         SensitivityModel sensitivityModel = predictSensitivity(post.getPostText());
 
-        if (sensitivityModel.isEvidenceClassifier() || sensitivityModel.isContentClassifier() && sensitivityModel.getLevel()>=2) {
+        if ((sensitivityModel.isEvidenceClassifier() || sensitivityModel.isContentClassifier()) && sensitivityModel.getLevel()>=2) {
 
 
             try {
-                DBHandle.setData(connection,"INSERT INTO Incident VALUES ('"+post.getKey()+"','"+post.getUser()+"','"+post.getTitle()+"','"
+                String title = post.getTitle().replace("'","/'");
+                String user = post.getUser().replace("'","/'");
+                DBHandle.setData(connection,"INSERT INTO Incident VALUES ('"+post.getKey()+"','"+user+"','"+title+"','"
                         +post.getPostType()+"','"+post.getDate()+"',"+sensitivityModel.getLevel()+","+sensitivityModel.isContentClassifier()
                         +","+sensitivityModel.isEvidenceClassifier()+",'"+sensitivityModel.getPredictClass()+"')");
             } catch (SQLException e) {
@@ -133,7 +135,6 @@ public class EndOfClassifierBolt extends BaseRichBolt {
                 sensitivityModel.setPredictClass("DB");
 
             } else if (contentModel.isPassedDA()) {
-                //System.out.println("CONTENT: Possible DNS attack!");
                 ArrayList<String> DAlist = new ArrayList<String>(Arrays.asList("lanka", "lk", "ceylon", "sinhala", "buddhist", "colombo", "kandy", "kurunegala", "gampaha", "mahinda", "sirisena", "ranil"));
                 int domainCount = 0;
                 for (String i : DAlist) {
@@ -153,7 +154,6 @@ public class EndOfClassifierBolt extends BaseRichBolt {
                 }
 
             } else if (contentModel.isPassedEO()) {
-                //System.out.println("CONTENT: Possible Email Dump!");
                 sensitivityModel.setPredictClass("EO");
                 int email_count = EOCounter(post);
                 if (email_count < 50) {
@@ -179,7 +179,7 @@ public class EndOfClassifierBolt extends BaseRichBolt {
 
         }
         if (evidenceModel.isEvidenceFound() && !contentModel.isContentFound()) {
-            sensitivityModel.setLevel(3);
+            sensitivityModel.setLevel(1);
         }
         if (!evidenceModel.isEvidenceFound() && !contentModel.isContentFound()) {
             sensitivityModel.setLevel(0);

@@ -22,8 +22,8 @@ public class EOClassifier extends ContentClassifier {
     public EOClassifier() {
 
 
-        relatedPattern1 = Pattern.compile("\\b" + "\"email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack\"" + "\\b", Pattern.CASE_INSENSITIVE);
-        relatedPattern2 = Pattern.compile("\\b" + "leaked by|Emails LeakeD|domains hacked|leaked email list|email list leaked|leaked emails|leak of|email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = Pattern.compile("email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = Pattern.compile("leaked by|Emails LeakeD|domains hacked|leaked email list|email list leaked|leaked emails|leak of|email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
 
 
@@ -84,9 +84,9 @@ public class EOClassifier extends ContentClassifier {
             tclassifier.setOptions(options);
 
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
-//        System.out.println("Result:"+pred);
+            String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if (pred >= 0.5) {
+            if("EO".equals(classLabel)){
                 return true;
             }
 
@@ -98,5 +98,53 @@ public class EOClassifier extends ContentClassifier {
         return false;
     }
 
+   /* @Override
+    public boolean classify(String text, String title,String key) {
+        try {
+            String result = createARFF(text, title);
+
+            BufferedWriter bw = null;
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter("./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
+                bw = new BufferedWriter(fw);
+                bw.write(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (bw != null)
+                        bw.close();
+                    if (fw != null)
+                        fw.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/EO_validator.sh", "./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
+            final Process processVal = pbVal.start();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
+            String line = br.readLine();
+            if(line!=null) {
+                if (line.contains("non")) {
+                    return false;
+                } else if (line.contains("EO")) {
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            File file = new File("./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
+            file.delete();
+        }
+        return false;
+    }*/
 }
 

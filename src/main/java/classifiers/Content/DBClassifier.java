@@ -52,21 +52,21 @@ public class DBClassifier extends ContentClassifier {
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-            unigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
         symbalPattern = Pattern.compile("\\-|\\+|\\|");
 
-        relatedPattern1 = Pattern.compile("\\b" + "SQL Injection|SQLi|SQL-i|Blind SQL-i" + "\\b", Pattern.CASE_INSENSITIVE);
-        relatedPattern2 = Pattern.compile("\\b" + "PRIMARY KEY|ALTER TABLE|TABLE FOUND" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = getCorrectPatten("\\b" + "SQL Injection|SQLi|SQL-i|Blind SQL-i" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = getCorrectPatten("\\b" + "PRIMARY KEY|ALTER TABLE|TABLE FOUND" + "\\b", Pattern.CASE_INSENSITIVE);
         relatedPattern3 = Pattern.compile( "sqlmap" , Pattern.CASE_INSENSITIVE);
         relatedPattern4 = Pattern.compile( "SQL Injection|SQLi|SQL-i|Blind SQL-i|database dump|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump" , Pattern.CASE_INSENSITIVE);
-        relatedPattern5 = Pattern.compile("\\b" + "\\[\\*\\]" + "\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern5 = getCorrectPatten("\\b" + "\\[\\*\\]" + "\\b", Pattern.CASE_INSENSITIVE);
 
     }
 
@@ -132,11 +132,12 @@ public class DBClassifier extends ContentClassifier {
             tclassifier.setOptions(options);
 
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
-//        System.out.println("Result:"+pred);
+            String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if (pred >= 0.5) {
+            if("DB".equals(classLabel)){
                 return true;
             }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -146,5 +147,54 @@ public class DBClassifier extends ContentClassifier {
         return false;
     }
 
+    /*@Override
+    public boolean classify(String text, String title,String key) {
+        try {
+            String result = createARFF(text, title);
+
+            BufferedWriter bw = null;
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter("./src/main/java/classifiers/Content/arff/db" + key + ".arff");
+                bw = new BufferedWriter(fw);
+                bw.write(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (bw != null)
+                        bw.close();
+                    if (fw != null)
+                        fw.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/DB_validator.sh", "./src/main/java/classifiers/Content/arff/db" + key + ".arff");
+            final Process processVal = pbVal.start();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
+            String line = br.readLine();
+            if(line!=null) {
+                if (line.contains("non")) {
+                    return false;
+                } else if (line.contains("DB")) {
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            File file = new File("./src/main/java/classifiers/Content/arff/db" + key + ".arff");
+            file.delete();
+        }
+        return false;
+    }
+*/
 }
 

@@ -44,13 +44,10 @@ public class ContentClassifierBolt extends BaseRichBolt {
 
 
         Post post = (Post)tuple.getValue(0);
-
         String title = post.getTitle();
         String postText = post.getPostText();
-
         ContentModel contentModel = new ContentModel();
         post.setContentModel(contentModel);
-
         try {
             boolean ccClassify = ccClassifier.classify(postText, title);
             boolean cfClassify = cfClassifier.classify(postText, title);

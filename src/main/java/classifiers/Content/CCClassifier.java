@@ -27,13 +27,19 @@ public class CCClassifier extends ContentClassifier {
     Pattern digitPattern;
     Pattern alphaPattern;
     Pattern alphDigitPattern;
+    RandomForest tclassifier;
 
     public static void main(String[] args) {
         CCClassifier ccClassifier = new CCClassifier();
-        System.out.println("Result is :"+ccClassifier.classify("",""));
+        System.out.println("Result is :" + ccClassifier.classify("", "1.txt"));
     }
 
     public CCClassifier() {
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CC.model");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("card");
         unigramList.add("number");
@@ -72,20 +78,20 @@ public class CCClassifier extends ContentClassifier {
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
             if (word.equals("CC")) {
-                unigramPatternList.add(Pattern.compile("\\b" + word + "\\b"));
+                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b"));
             } else {
-                unigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
             }
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(Pattern.compile("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
         relatedTerms1Pattern = Pattern.compile("Expiry Date|Expire|Exp.Date|Expiration|Exp. month|Exp. Years|expyear|expmonth|(exp)|ExpDate|ExpD[m/y]|Date D'expiration", Pattern.CASE_INSENSITIVE);
@@ -103,7 +109,7 @@ public class CCClassifier extends ContentClassifier {
     }
 
     @Override
-    public String createARFF(String text,String title) {
+    public String createARFF(String text, String title) {
         String feature_list = "";
         for (Pattern pattern : unigramPatternList) {
             Matcher matcher = pattern.matcher(text);
@@ -189,7 +195,7 @@ public class CCClassifier extends ContentClassifier {
         double cp = ((double) b / c) * 100;
 
         feature_list += a + "," + b + "," + c + "," + String.format("%.02f", np) + "," + String.format("%.02f", cp) + ",?";
-        return headingCC+feature_list;
+        return headingCC + feature_list;
     }
 
     @Override
@@ -210,16 +216,18 @@ public class CCClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CC.model");
+
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";
             tclassifier.setOptions(options);
 
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
-//        System.out.println("Result:"+pred);
+            labeled.instance(0).setClassValue(pred);
 
-            if(pred>=0.5){
+            String classLabel = unlabeled.classAttribute().value((int) pred);
+
+            if("CC".equals(classLabel)){
                 return true;
             }
 
@@ -231,7 +239,54 @@ public class CCClassifier extends ContentClassifier {
         return false;
     }
 
+    /*@Override
+    public boolean classify(String text, String title,String key) {
+        try {
+            String result = createARFF(text, title);
 
+            BufferedWriter bw = null;
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter("./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
+                bw = new BufferedWriter(fw);
+                bw.write(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (bw != null)
+                        bw.close();
+                    if (fw != null)
+                        fw.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/CC_validator.sh", "./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
+            final Process processVal = pbVal.start();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
+            String line = br.readLine();
+            if(line!=null) {
+                if (line.contains("non")) {
+                    return false;
+                } else if (line.contains("CC")) {
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            File file = new File("./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
+            file.delete();
+        }
+        return false;
+    }*/
 
 
 }
