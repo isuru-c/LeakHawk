@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Isuru Chandima on 7/28/17.
  */
-public class EndOfClassifierBolt extends BaseRichBolt {
+public class Synthesizer extends BaseRichBolt {
 
     OutputCollector collector;
     static int count = 0;

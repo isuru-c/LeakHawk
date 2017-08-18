@@ -80,7 +80,7 @@ public class DAClassifier extends ContentClassifier {
         relatedPattern7 = Pattern.compile("\\b" +"\\[\\*\\]"+"\\b", Pattern.CASE_INSENSITIVE);
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         DAClassifier daClassifier = new DAClassifier();
         System.out.println("Result is :" + daClassifier.classify("//require modules\n" +
                 "import \"babel-core/register\"\n" +
@@ -229,7 +229,7 @@ public class DAClassifier extends ContentClassifier {
                 "                    return login;\n" +
                 "     }\n" +
                 "},", "1.txt","asas"));
-    }
+    }*/
 
 
     @Override

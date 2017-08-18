@@ -21,9 +21,9 @@ import java.util.Properties;
 /**
  * Created by Isuru Chandima on 6/19/17.
  */
-public class PastbinSensor extends Thread {
+public class PastebinSensor extends Thread {
 
-    public PastbinSensor() {
+    public PastebinSensor() {
 
     }
 

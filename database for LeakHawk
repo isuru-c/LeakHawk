@@ -1,0 +1,17 @@
+Use following database "LeakHawk" to run the LeakHawk.
+
+CREATE DATABASE LeakHawk;
+
+USE DATABASE LeakHawk;
+
+CREATE TABLE Incident(
+	post_key VARCHAR(255) NOT NULL,
+	user VARCHAR(255) NOT NULL,
+	title VARCHAR(255) NOT NULL,
+	type VARCHAR(255) NULL,
+	date VARCHAR(255) NOT NULL,
+	sensivityLevel VARCHAR(255) NOT NULL,
+	content BOOLEAN NOT NULL,
+	evidence BOOLEAN NOT NULL,
+	predictClass VARCHAR(255) NOT NULL
+)ENGINE=INNODB;
