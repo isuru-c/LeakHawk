@@ -34,8 +34,12 @@ public class Post implements Serializable{
     String syntax;
     String postText;
 
-    ContentModel contentModel;
-    EvidenceModel evidenceModel;
+    ContentModel contentModel = null;
+    EvidenceModel evidenceModel = null;
+
+    boolean evidenceClassifierPassed = false;
+
+    boolean contentClassifierPassed = false;
 
     public void setPostType(String postType) {
         this.postType = postType;
@@ -103,12 +107,28 @@ public class Post implements Serializable{
     }
 
     public ContentModel getContentModel() {
-
         return contentModel;
     }
 
     public EvidenceModel getEvidenceModel() {
         return evidenceModel;
+    }
+
+    public void setEvidenceClassifierPassed() {
+        this.evidenceClassifierPassed = true;
+    }
+
+    public void setContentClassifierPassed() {
+        this.contentClassifierPassed = true;
+    }
+
+    public boolean isEvidenceClassifierPassed() {
+
+        return evidenceClassifierPassed;
+    }
+
+    public boolean isContentClassifierPassed() {
+        return contentClassifierPassed;
     }
 
 }

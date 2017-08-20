@@ -84,8 +84,10 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
 
         evidenceModel.setEvidenceFound(evidenceFound);
 
-        collector.emit(tuple, new Values(post));
+        post.setEvidenceClassifierPassed();
+        collector.emit("EvidenceClassifier-out", tuple, new Values(post));
         collector.ack(tuple);
+
     }
 
     private boolean isPassedEvidenceClassifier(String user, String title, String post, EvidenceModel evidenceModel) {
@@ -180,6 +182,7 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        //outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream("EvidenceClassifier-out", new Fields("post"));
     }
 }

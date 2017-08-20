@@ -16,6 +16,8 @@
 
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.topology.BoltDeclarer;
+import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensors.PastebinSensor;
 
@@ -35,13 +37,30 @@ public class LeakHawk {
         config.setMessageTimeoutSecs(120);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("pastebin-spout", new PastebinSpout(), 2);
-        builder.setBolt("post-download", new PostDownloadBolt() , 4).shuffleGrouping("pastebin-spout");
-        builder.setBolt("pre-filter", new PreFilterBolt() , 3).shuffleGrouping("post-download");
-        builder.setBolt("context-filter", new ContextFilterBolt() , 2).shuffleGrouping("pre-filter");
-        builder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1).shuffleGrouping("context-filter");
-        builder.setBolt("content-classifier", new ContentClassifierBolt() , 1).shuffleGrouping("evidence-classifier");
-        builder.setBolt("synthesizer", new Synthesizer(), 1).shuffleGrouping("content-classifier");
+
+        SpoutDeclarer pastebinSpout = builder.setSpout("pastebin-spout", new PastebinSpout(), 2);
+
+        BoltDeclarer postDownloadBolt = builder.setBolt("post-download", new PostDownloadBolt() , 4);
+        postDownloadBolt.shuffleGrouping("pastebin-spout");
+
+        BoltDeclarer preFilterBolt = builder.setBolt("pre-filter", new PreFilterBolt() , 3);
+        preFilterBolt.shuffleGrouping("post-download");
+
+        BoltDeclarer contextFilterBolt = builder.setBolt("context-filter", new ContextFilterBolt() , 2);
+        contextFilterBolt.shuffleGrouping("pre-filter");
+
+        BoltDeclarer evidenceClassifierBolt = builder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1);
+        evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
+
+        BoltDeclarer contentClassifierBolt = builder.setBolt("content-classifier", new ContentClassifierBolt() , 1);
+        contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
+
+        BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new EvidenceContentJoinBolt(), 1);
+        evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
+        evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
+
+        BoltDeclarer synthesizerBolt = builder.setBolt("synthesizer", new Synthesizer(), 1);
+        synthesizerBolt.shuffleGrouping("evidence-content-join");
 
         final LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
