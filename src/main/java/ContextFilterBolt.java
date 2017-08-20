@@ -81,8 +81,8 @@ public class ContextFilterBolt extends BaseRichBolt {
             properties.load(input);
             loadRegExpList(18);
 
-            //if (regExpressionMatched(entry) == true || isWordsetMatched(entry) == true) {
-            if (regExpressionMatched(entry)) {
+            if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
+//            if (regExpressionMatched(entry)) {
                 return true;
             }
         } catch (IOException ex) {
