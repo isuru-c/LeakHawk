@@ -15,6 +15,11 @@
  */
 
 import data.Post;
+import net.didion.jwnl.JWNL;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.data.*;
+import net.didion.jwnl.dictionary.Dictionary;
+import java.io.FileInputStream;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -24,10 +29,7 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +41,11 @@ public class ContextFilterBolt extends BaseRichBolt {
     public Properties properties = new Properties();
     public List<String> regExpHandlerList;
     OutputCollector collector;
+    ArrayList<String> synonyms = new ArrayList<String>();
+    static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala","South Asia", "Mathripala sirisena",
+            "Mahinda Rajapaksa","Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
+            "Velupillai Prabhakaran","Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence","hemas", "LTTE",
+            "Colombo", "Kandy", "Kurunegala", "Gampaha"));
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -63,14 +70,16 @@ public class ContextFilterBolt extends BaseRichBolt {
 
     }
 
-
     public boolean isPassContextFilter(String entry) {
         InputStream input = null;
+        configureWordNet();
         try {
             input = new FileInputStream(new File("./src/main/resources/context.properties"));
             // load a properties file
             properties.load(input);
             loadRegExpList(18);
+
+//            if (regExpressionMatched(entry) == true || isWordsetMatched(entry) == true) {
             if (regExpressionMatched(entry) == true) {
                 return true;
             }
@@ -93,10 +102,8 @@ public class ContextFilterBolt extends BaseRichBolt {
         for (int i = 1; i <= rgexpCount; i++) {
             regExpHandlerList.add(properties.getProperty("regexp" + i));
 //            System.out.println(regExpHandlerList);
-
         }
     }
-
 
     private boolean regExpressionMatched(String input) {
         boolean found = false;
@@ -117,6 +124,57 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         }
         return false;
+    }
+
+    public boolean isWordsetMatched(String entry){
+        for(String s: wordset){
+            getSynonyms(s);
+        }
+        for (String s:synonyms) {
+            if (entry.toUpperCase().contains(s.toUpperCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void getSynonyms(String noun){
+
+        Dictionary dictionary = Dictionary.getInstance();
+        IndexWord indexWord = null;
+        synonyms.add(noun);
+        try {
+            indexWord = dictionary.lookupIndexWord(POS.NOUN,noun);
+        } catch (JWNLException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(indexWord!=null){
+                for(Synset synset: indexWord.getSenses()){
+                    Word[] words = synset.getWords();
+                    for(Word word: words){
+                        if(!synonyms.contains(word.getLemma())){
+//                            System.out.println("\t"+word.getLemma());
+                            synonyms.add(word.getLemma());
+                        }
+                    }
+                }
+            }
+
+        } catch (JWNLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void configureWordNet() {
+        try {
+            // initialize JWNL (this must be done before JWNL can be used)
+            // See the JWordnet documentation for details on the properties file
+            JWNL.initialize(new FileInputStream("/media/warunika/Academic/FYP/LeakHawk/wordnetTestapp/src/main/resources/properties.xml"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
