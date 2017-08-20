@@ -80,7 +80,7 @@ public class ContextFilterBolt extends BaseRichBolt {
             loadRegExpList(18);
 
 //            if (regExpressionMatched(entry) == true || isWordsetMatched(entry) == true) {
-            if (regExpressionMatched(entry) == true) {
+            if (regExpressionMatched(entry)) {
                 return true;
             }
         } catch (IOException ex) {
@@ -114,11 +114,11 @@ public class ContextFilterBolt extends BaseRichBolt {
                 if (m.find()) {
                     found = true;
                 }
-                if (found == true) {
+                if (found) {
                     break;
                 }
             }
-            if (found == true)
+            if (found)
                 return true;
         } catch (Exception ex) {
 
@@ -141,16 +141,19 @@ public class ContextFilterBolt extends BaseRichBolt {
     public void getSynonyms(String noun){
 
         Dictionary dictionary = Dictionary.getInstance();
-        IndexWord indexWord = null;
+        IndexWord indexWord1 = null;
+        IndexWord indexWord2 = null;
         synonyms.add(noun);
         try {
-            indexWord = dictionary.lookupIndexWord(POS.NOUN,noun);
+            indexWord1 = dictionary.lookupIndexWord(POS.NOUN,noun);
+            indexWord2 = dictionary.lookupIndexWord(POS.VERB,noun);
         } catch (JWNLException e) {
             e.printStackTrace();
         }
+
         try {
-            if(indexWord!=null){
-                for(Synset synset: indexWord.getSenses()){
+            if(indexWord1!=null){
+                for(Synset synset: indexWord1.getSenses()){
                     Word[] words = synset.getWords();
                     for(Word word: words){
                         if(!synonyms.contains(word.getLemma())){
@@ -160,6 +163,18 @@ public class ContextFilterBolt extends BaseRichBolt {
                     }
                 }
             }
+            if(indexWord2!=null){
+                for(Synset synset: indexWord2.getSenses()){
+                    Word[] words = synset.getWords();
+                    for(Word word: words){
+                        if(!synonyms.contains(word.getLemma())){
+//                            System.out.println("\t"+word.getLemma());
+                            synonyms.add(word.getLemma());
+                        }
+                    }
+                }
+            }
+
 
         } catch (JWNLException e) {
             e.printStackTrace();
