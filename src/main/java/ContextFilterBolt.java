@@ -46,9 +46,12 @@ public class ContextFilterBolt extends BaseRichBolt {
             "Mahinda Rajapaksa","Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
             "Velupillai Prabhakaran","Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence","hemas", "LTTE",
             "Colombo", "Kandy", "Kurunegala", "Gampaha"));
+    Dictionary dictionary ;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
+        configureWordNet();
+        dictionary = Dictionary.getInstance();
     }
 
     public void execute(Tuple tuple) {
@@ -72,15 +75,15 @@ public class ContextFilterBolt extends BaseRichBolt {
 
     public boolean isPassContextFilter(String entry) {
         InputStream input = null;
-        configureWordNet();
+
         try {
             input = new FileInputStream(new File("./src/main/resources/context.properties"));
             // load a properties file
             properties.load(input);
             loadRegExpList(18);
 
-            if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
-//            if (regExpressionMatched(entry)) {
+//            if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
+            if (regExpressionMatched(entry)) {
                 return true;
             }
         } catch (IOException ex) {
@@ -139,8 +142,6 @@ public class ContextFilterBolt extends BaseRichBolt {
     }
 
     public void getSynonyms(String noun){
-
-        Dictionary dictionary = Dictionary.getInstance();
         IndexWord indexWord1 = null;
         IndexWord indexWord2 = null;
         synonyms.add(noun);
@@ -185,7 +186,7 @@ public class ContextFilterBolt extends BaseRichBolt {
         try {
             // initialize JWNL (this must be done before JWNL can be used)
             // See the JWordnet documentation for details on the properties file
-            JWNL.initialize(new FileInputStream("/media/warunika/Academic/FYP/LeakHawk/wordnetTestapp/src/main/resources/properties.xml"));
+            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
