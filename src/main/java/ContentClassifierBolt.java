@@ -92,11 +92,14 @@ public class ContentClassifierBolt extends BaseRichBolt {
 
         }
 
-        collector.emit(tuple, new Values(post));
+        post.setContentClassifierPassed();
+        collector.emit("ContentClassifier-out", tuple, new Values(post));
         collector.ack(tuple);
+
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        //outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream("ContentClassifier-out", new Fields("post"));
     }
 }

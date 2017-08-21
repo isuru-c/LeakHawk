@@ -59,15 +59,17 @@ public class ContextFilterBolt extends BaseRichBolt {
         Post post = (Post)tuple.getValue(0);
 
         //if context filter is passed forward the data to next bolt(Evidence classifier)
-        if (isPassContextFilter(post.getPostText())) {
+        /*if (isPassContextFilter(post.getPostText())) {
             //pass to evidence classifier
-            collector.emit(tuple, new Values(post));
-            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by context filter ---\n");
+            collector.emit("ContentClassifier-in", tuple, new Values(post));
+            collector.emit("EvidenceClassifier-in", tuple, new Values(post));
+            //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by context filter ---\n");
         } else {
             //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
-        }
+        }*/
 
-        //collector.emit(tuple, new Values(post));
+        collector.emit("ContentClassifier-in", tuple, new Values(post));
+        collector.emit("EvidenceClassifier-in", tuple, new Values(post));
 
         collector.ack(tuple);
 
@@ -104,7 +106,7 @@ public class ContextFilterBolt extends BaseRichBolt {
         regExpHandlerList = new ArrayList<String>();
         for (int i = 1; i <= rgexpCount; i++) {
             regExpHandlerList.add(properties.getProperty("regexp" + i));
-//            System.out.println(regExpHandlerList);
+            //System.out.println(regExpHandlerList);
         }
     }
 
@@ -194,6 +196,8 @@ public class ContextFilterBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        //outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream("ContentClassifier-in", new Fields("post"));
+        outputFieldsDeclarer.declareStream("EvidenceClassifier-in", new Fields("post"));
     }
 }

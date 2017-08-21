@@ -91,7 +91,7 @@ public class Synthesizer extends BaseRichBolt {
             System.out.println("Sensitivity level of post is :" + sensitivityModel.getLevel() + "\n");
             System.out.println("Sensitivity class is  :" + sensitivityModel.getPredictClass() + "\n");
         }
-//        System.out.println("\nKey: " + post.getKey() + "\nDate: " + post.getDate() + "\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\nCount: " + count++);
+        //System.out.println("\nKey: " + post.getKey() + "\nDate: " + post.getDate() + "\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\nCount: " + count++);
         collector.ack(tuple);
     }
 
