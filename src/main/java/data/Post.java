@@ -25,21 +25,18 @@ import java.io.Serializable;
  * Created by Isuru Chandima on 8/13/17.
  */
 public class Post implements Serializable{
-
-    String postType;
-    String key;
-    String date;
-    String title;
-    String user;
-    String syntax;
-    String postText;
-
-    ContentModel contentModel = null;
-    EvidenceModel evidenceModel = null;
-
-    boolean evidenceClassifierPassed = false;
-
-    boolean contentClassifierPassed = false;
+    private String postType;
+    private String key;
+    private String date;
+    private String title;
+    private String user;
+    private String syntax;
+    private String postText;
+    private ContentModel contentModel = null;
+    private EvidenceModel evidenceModel = null;
+    private boolean evidenceClassifierPassed = false;
+    private boolean contentClassifierPassed = false;
+    private boolean evidenceFinderPassed = false;
 
     public void setPostType(String postType) {
         this.postType = postType;
@@ -123,7 +120,6 @@ public class Post implements Serializable{
     }
 
     public boolean isEvidenceClassifierPassed() {
-
         return evidenceClassifierPassed;
     }
 
@@ -131,4 +127,11 @@ public class Post implements Serializable{
         return contentClassifierPassed;
     }
 
+    public boolean isEvidenceFinderPassed() {
+        return evidenceFinderPassed;
+    }
+
+    public void setEvidenceFinderPassed(boolean evidenceFinderPassed) {
+        this.evidenceFinderPassed = evidenceFinderPassed;
+    }
 }
