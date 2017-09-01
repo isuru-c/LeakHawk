@@ -38,17 +38,17 @@ import java.util.Map;
  */
 public class EvidenceClassifierBolt extends BaseRichBolt {
 
-    OutputCollector collector;
+    private OutputCollector collector;
 
-    ArrayList<String> keyWordList1;
-    ArrayList<String> keyWordList2;
-    ArrayList<String> keyWordList3;
-    ArrayList<String> keyWordList4;
-    ArrayList<String> keyWordList5;
-    ArrayList<String> keyWordList6;
-    ArrayList<String> keyWordList7;
-    ArrayList<String> keyWordList8;
-    Connection connection;
+    private ArrayList<String> keyWordList1;
+    private ArrayList<String> keyWordList2;
+    private ArrayList<String> keyWordList3;
+    private ArrayList<String> keyWordList4;
+    private ArrayList<String> keyWordList5;
+    private ArrayList<String> keyWordList6;
+    private ArrayList<String> keyWordList7;
+    private ArrayList<String> keyWordList8;
+    private Connection connection;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;

@@ -25,6 +25,7 @@ import java.io.Serializable;
  * Created by Isuru Chandima on 8/13/17.
  */
 public class Post implements Serializable{
+
     private String postType;
     private String key;
     private String date;
@@ -32,8 +33,10 @@ public class Post implements Serializable{
     private String user;
     private String syntax;
     private String postText;
+
     private ContentModel contentModel = null;
     private EvidenceModel evidenceModel = null;
+
     private boolean evidenceClassifierPassed = false;
     private boolean contentClassifierPassed = false;
     private boolean evidenceFinderPassed = false;

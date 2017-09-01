@@ -38,11 +38,11 @@ import java.util.regex.Pattern;
  */
 public class ContextFilterBolt extends BaseRichBolt {
 
-    public Properties properties = new Properties();
-    public List<String> regExpHandlerList;
-    OutputCollector collector;
-    ArrayList<String> synonyms = new ArrayList<String>();
-    static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala","South Asia", "Mathripala sirisena",
+    private  Properties properties = new Properties();
+    private  List<String> regExpHandlerList;
+    private OutputCollector collector;
+    private ArrayList<String> synonyms = new ArrayList<String>();
+    private static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala","South Asia", "Mathripala sirisena",
             "Mahinda Rajapaksa","Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
             "Velupillai Prabhakaran","Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence","hemas", "LTTE",
             "Colombo", "Kandy", "Kurunegala", "Gampaha"));

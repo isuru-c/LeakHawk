@@ -32,15 +32,15 @@ import java.util.Map;
  */
 public class ContentClassifierBolt extends BaseRichBolt {
 
-    OutputCollector collector;
+    private OutputCollector collector;
 
-    ContentClassifier ccClassifier;
-    ContentClassifier cfClassifier;
-    ContentClassifier daClassifier;
-    ContentClassifier dbClassifier;
-    ContentClassifier ecClassifier;
-    ContentClassifier eoClassifier;
-    ContentClassifier pkClassifier;
+    private ContentClassifier ccClassifier;
+    private ContentClassifier cfClassifier;
+    private ContentClassifier daClassifier;
+    private ContentClassifier dbClassifier;
+    private ContentClassifier ecClassifier;
+    private ContentClassifier eoClassifier;
+    private ContentClassifier pkClassifier;
 
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {

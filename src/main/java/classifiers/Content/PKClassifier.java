@@ -30,13 +30,13 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class PKClassifier extends ContentClassifier {
 
-    ArrayList<Pattern> unigramPatternList;
-    ArrayList<Pattern> bigramPatternList;
-    ArrayList<Pattern> trigramPatternList;
-    ArrayList<Pattern> fourgramPatternList;
+    private ArrayList<Pattern> unigramPatternList;
+    private ArrayList<Pattern> bigramPatternList;
+    private ArrayList<Pattern> trigramPatternList;
+    private ArrayList<Pattern> fourgramPatternList;
 
-    Pattern relatedPattern1;
-    Pattern relatedPattern2;
+    private Pattern relatedPattern1;
+    private Pattern relatedPattern2;
 
 
     public PKClassifier() {

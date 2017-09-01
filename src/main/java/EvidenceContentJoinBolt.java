@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class EvidenceContentJoinBolt extends BaseRichBolt {
 
-    OutputCollector collector;
+    private OutputCollector collector;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;

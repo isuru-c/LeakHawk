@@ -29,14 +29,15 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 public class CFClassifier extends ContentClassifier{
-    Pattern cfSymbalPattern;
-    ArrayList<Pattern> unigramPatternList;
-    ArrayList<Pattern> bigramPatternList;
-    ArrayList<Pattern> trigramPatternList;
 
-    Pattern digitPattern;
-    Pattern alphaPattern;
-    Pattern alphDigitPattern;
+    private Pattern cfSymbalPattern;
+    private ArrayList<Pattern> unigramPatternList;
+    private ArrayList<Pattern> bigramPatternList;
+    private ArrayList<Pattern> trigramPatternList;
+
+    private Pattern digitPattern;
+    private Pattern alphaPattern;
+    private Pattern alphDigitPattern;
 
     public CFClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();

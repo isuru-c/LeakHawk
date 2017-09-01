@@ -36,8 +36,8 @@ import java.util.Properties;
 public class PastebinSpout extends BaseRichSpout{
 
     private SpoutOutputCollector collector;
-    Properties properties = null;
-    KafkaConsumer<String, String> consumer = null;
+    private Properties properties = null;
+    private KafkaConsumer<String, String> consumer = null;
 
     public PastebinSpout(){
 

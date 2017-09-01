@@ -31,8 +31,8 @@ import java.util.Map;
  */
 public class PreFilterBolt extends BaseRichBolt {
 
-    OutputCollector collector;
-    ArrayList keyWordList;
+    private OutputCollector collector;
+    private ArrayList keyWordList;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
