@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import data.Post;
+import model.Post;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
@@ -55,18 +55,24 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         Post post = (Post)tuple.getValue(0);
 
-        //if context filter is passed forward the data to next bolt(Evidence classifier)
+        //if context filter is passed forward the model to next bolt(Evidence classifier)
         /*if (isPassContextFilter(post.getPostText())) {
             //pass to evidence classifier
-            collector.emit("ContentClassifier-in", tuple, new Values(post));
-            collector.emit("EvidenceClassifier-in", tuple, new Values(post));
+            collector.emit(tuple, new Values(post));
+
+            //collector.emit("ContentClassifier-in", tuple, new Values(post));
+            //collector.emit("EvidenceClassifier-in", tuple, new Values(post));
+
             //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by context filter ---\n");
         } else {
             //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
         }*/
 
-        collector.emit("ContentClassifier-in", tuple, new Values(post));
-        collector.emit("EvidenceClassifier-in", tuple, new Values(post));
+        collector.emit(tuple, new Values(post));
+
+        // Following lines are used to make Context and Evidence classifiers run parallel.
+        // collector.emit("ContentClassifier-in", tuple, new Values(post));
+        // collector.emit("EvidenceClassifier-in", tuple, new Values(post));
 
         collector.ack(tuple);
 
@@ -195,8 +201,11 @@ public class ContextFilterBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        //outputFieldsDeclarer.declare(new Fields("post"));
-        outputFieldsDeclarer.declareStream("ContentClassifier-in", new Fields("post"));
-        outputFieldsDeclarer.declareStream("EvidenceClassifier-in", new Fields("post"));
+
+        outputFieldsDeclarer.declare(new Fields("post"));
+
+        // Following lines are used to make Context and Evidence classifiers run parallel.
+        //outputFieldsDeclarer.declareStream("ContentClassifier-in", new Fields("post"));
+        //outputFieldsDeclarer.declareStream("EvidenceClassifier-in", new Fields("post"));
     }
 }

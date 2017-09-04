@@ -71,8 +71,8 @@
 //
 ////            if((creditCardNumberCount > 0) && presenseOfSensitiveData("/home/nalinda/oct/leakhawk-app/predictor/CC_sensitiveData.sh")){
 ////                sensitivityLabel = "CRITICAL-CC";
-//////                entry.getSensitivityResultMsgList().add( "Possible sensitive authentication data found!" );
-////                //System.out.println("Possible sensitive authentication data found!");
+//////                entry.getSensitivityResultMsgList().add( "Possible sensitive authentication model found!" );
+////                //System.out.println("Possible sensitive authentication model found!");
 ////            }
 //
 //            if( creditCardNumberCount > 20 ){

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package data;
+package model;
 
 import classifiers.ContentModel;
 import classifiers.EvidenceModel;

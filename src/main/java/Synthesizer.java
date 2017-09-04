@@ -17,7 +17,7 @@
 import classifiers.EvidenceModel;
 import classifiers.ContentModel;
 import classifiers.Predictor.SensitivityModel;
-import data.Post;
+import model.Post;
 import db.DBConnection;
 import db.DBHandle;
 import org.apache.storm.task.OutputCollector;

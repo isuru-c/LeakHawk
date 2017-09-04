@@ -43,24 +43,30 @@ public class LeakHawk {
         BoltDeclarer postDownloadBolt = builder.setBolt("post-download", new PostDownloadBolt() , 4);
         postDownloadBolt.shuffleGrouping("pastebin-spout");
 
+        BoltDeclarer preProcessorBolt = builder.setBolt("pre-processor", new PreProcessorBolt(), 3);
+        preProcessorBolt.shuffleGrouping("post-download");
+
         BoltDeclarer preFilterBolt = builder.setBolt("pre-filter", new PreFilterBolt() , 3);
-        preFilterBolt.shuffleGrouping("post-download");
+        preFilterBolt.shuffleGrouping("pre-processor");
 
         BoltDeclarer contextFilterBolt = builder.setBolt("context-filter", new ContextFilterBolt() , 2);
         contextFilterBolt.shuffleGrouping("pre-filter");
 
         BoltDeclarer evidenceClassifierBolt = builder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1);
-        evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
+        evidenceClassifierBolt.shuffleGrouping("context-filter");
+        //evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
 
         BoltDeclarer contentClassifierBolt = builder.setBolt("content-classifier", new ContentClassifierBolt() , 1);
-        contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
+        contentClassifierBolt.shuffleGrouping("evidence-classifier");
+        //contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
 
-        BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new EvidenceContentJoinBolt(), 1);
-        evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
-        evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
+        //BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new EvidenceContentJoinBolt(), 1);
+        //evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
+        //evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
 
         BoltDeclarer synthesizerBolt = builder.setBolt("synthesizer", new Synthesizer(), 1);
-        synthesizerBolt.shuffleGrouping("evidence-content-join");
+        synthesizerBolt.shuffleGrouping("content-classifier");
+        //synthesizerBolt.shuffleGrouping("evidence-content-join");
 
         final LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
