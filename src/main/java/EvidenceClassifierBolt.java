@@ -15,7 +15,7 @@
  */
 
 import classifiers.EvidenceModel;
-import data.Post;
+import model.Post;
 import db.DBConnection;
 import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
@@ -38,26 +38,26 @@ import java.util.Map;
  */
 public class EvidenceClassifierBolt extends BaseRichBolt {
 
-    OutputCollector collector;
+    private OutputCollector collector;
 
-    ArrayList<String> keyWordList1;
-    ArrayList<String> keyWordList2;
-    ArrayList<String> keyWordList3;
-    ArrayList<String> keyWordList4;
-    ArrayList<String> keyWordList5;
-    ArrayList<String> keyWordList6;
-    ArrayList<String> keyWordList7;
-    ArrayList<String> keyWordList8;
-    Connection connection;
+    private ArrayList<String> keyWordList1;
+    private ArrayList<String> keyWordList2;
+    private ArrayList<String> keyWordList3;
+    private ArrayList<String> keyWordList4;
+    private ArrayList<String> keyWordList5;
+    private ArrayList<String> keyWordList6;
+    private ArrayList<String> keyWordList7;
+    private ArrayList<String> keyWordList8;
+    private Connection connection;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
 
-        keyWordList1 = new ArrayList(Arrays.asList("Hacked", "leaked by", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db_dump", "db leak", "data base dump", "data base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak,email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email,leaked emails", "email_hack"));
+        keyWordList1 = new ArrayList(Arrays.asList("Hacked", "leaked by", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db_dump", "db leak", "model base dump", "model base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak,email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email,leaked emails", "email_hack"));
         keyWordList2 = new ArrayList(Arrays.asList("dns-brute", "dnsrecon", "fierce", "Dnsdict6", "axfr", "SQLmap"));
         keyWordList3 = new ArrayList(Arrays.asList("SQL_Injection", "SQLi", "SQL-i", "Blind SQL-i"));
         keyWordList4 = new ArrayList(Arrays.asList("UGLegion", "RetrOHacK", "Anonymous", "AnonSec", "AnonGhost", "ANONYMOUSSRILANKA", "W3BD3F4C3R", "SLCYBERARMY", "DAVYJONES", "BLACKHATANON", "ANUARLINUX", "UGLEGION", "HUSSEIN98D", "We_Are_Anonymous", "We_do_not_Forget", "We_do_not_Forgive", "Laughing_at_your_security_since_2012", "AnonGhost_is_Everywhere"));
-        keyWordList5 = new ArrayList(Arrays.asList("Hacked", "leaked by", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db dump", "db leak", "data base dump", "data base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak,email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email,leaked emails", "email_hack"));
+        keyWordList5 = new ArrayList(Arrays.asList("Hacked", "leaked by", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db dump", "db leak", "model base dump", "model base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak,email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email,leaked emails", "email_hack"));
         keyWordList6 = new ArrayList(Arrays.asList("dns-brute", "dnsrecon", "fierce", "Dnsdict6", "axfr", "SQLmap"));
         keyWordList7 = new ArrayList(Arrays.asList("SQL Injection", "SQLi", "SQL-i", "Blind SQL-i"));
         keyWordList8 = new ArrayList(Arrays.asList("UGLegion", "RetrOHacK", "Anonymous", "AnonSec", "AnonGhost", "ANONYMOUSSRILANKA", "W3BD3F4C3R", "SLCYBERARMY", "DAVYJONES", "BLACKHATANON", "ANUARLINUX", "UGLEGION", "HUSSEIN98D", "We Are Anonymous", "We do not Forget, We do not Forgive", "Laughing at your security since 2012", "AnonGhost is Everywhere"));
@@ -85,7 +85,12 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
         evidenceModel.setEvidenceFound(evidenceFound);
 
         post.setEvidenceClassifierPassed();
-        collector.emit("EvidenceClassifier-out", tuple, new Values(post));
+
+        collector.emit(tuple, new Values(post));
+
+        // Following line is used to make Context and Evidence classifiers run parallel.
+        //collector.emit("EvidenceClassifier-out", tuple, new Values(post));
+
         collector.ack(tuple);
 
     }
@@ -182,7 +187,10 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        //outputFieldsDeclarer.declare(new Fields("post"));
-        outputFieldsDeclarer.declareStream("EvidenceClassifier-out", new Fields("post"));
+
+        outputFieldsDeclarer.declare(new Fields("post"));
+
+        // Following line is used to make Context and Evidence classifiers run parallel.
+        // outputFieldsDeclarer.declareStream("EvidenceClassifier-out", new Fields("post"));
     }
 }

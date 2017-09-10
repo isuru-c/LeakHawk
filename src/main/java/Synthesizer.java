@@ -17,7 +17,7 @@
 import classifiers.EvidenceModel;
 import classifiers.ContentModel;
 import classifiers.Predictor.SensitivityModel;
-import data.Post;
+import model.Post;
 import db.DBConnection;
 import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
@@ -40,15 +40,15 @@ import java.util.regex.Pattern;
  */
 public class Synthesizer extends BaseRichBolt {
 
-    OutputCollector collector;
-    static int count = 0;
+    private OutputCollector collector;
+    private static int count = 0;
     private int creditCardNumberCount;
     private int URLratio;
     private int email_hash_count;
-    Pattern ccCardPattern;
-    EvidenceModel evidenceModel;
-    ContentModel contentModel;
-    Connection connection;
+    private Pattern ccCardPattern;
+    private EvidenceModel evidenceModel;
+    private ContentModel contentModel;
+    private Connection connection;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;

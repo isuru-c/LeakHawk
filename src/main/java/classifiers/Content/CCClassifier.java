@@ -29,21 +29,22 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 public class CCClassifier extends ContentClassifier {
-    Pattern ccCardPattern;
-    Pattern patterncc1;
-    ArrayList<Pattern> unigramPatternList;
-    ArrayList<Pattern> bigramPatternList;
-    ArrayList<Pattern> trigramPatternList;
-    Pattern relatedTerms1Pattern;
-    Pattern relatedTerms2Pattern;
-    Pattern relatedTerms3Pattern;
-    Pattern relatedTerms4Pattern;
-    Pattern relatedTerms5Pattern;
-    Pattern relatedTerms6Pattern;
-    Pattern digitPattern;
-    Pattern alphaPattern;
-    Pattern alphDigitPattern;
-    RandomForest tclassifier;
+
+    private Pattern ccCardPattern;
+    private Pattern patterncc1;
+    private ArrayList<Pattern> unigramPatternList;
+    private ArrayList<Pattern> bigramPatternList;
+    private ArrayList<Pattern> trigramPatternList;
+    private Pattern relatedTerms1Pattern;
+    private Pattern relatedTerms2Pattern;
+    private Pattern relatedTerms3Pattern;
+    private Pattern relatedTerms4Pattern;
+    private Pattern relatedTerms5Pattern;
+    private Pattern relatedTerms6Pattern;
+    private Pattern digitPattern;
+    private Pattern alphaPattern;
+    private Pattern alphDigitPattern;
+    private RandomForest tclassifier;
 
     public static void main(String[] args) {
         CCClassifier ccClassifier = new CCClassifier();

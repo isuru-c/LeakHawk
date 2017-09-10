@@ -16,7 +16,7 @@
 
 import classifiers.Content.*;
 import classifiers.ContentModel;
-import data.Post;
+import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -32,15 +32,15 @@ import java.util.Map;
  */
 public class ContentClassifierBolt extends BaseRichBolt {
 
-    OutputCollector collector;
+    private OutputCollector collector;
 
-    ContentClassifier ccClassifier;
-    ContentClassifier cfClassifier;
-    ContentClassifier daClassifier;
-    ContentClassifier dbClassifier;
-    ContentClassifier ecClassifier;
-    ContentClassifier eoClassifier;
-    ContentClassifier pkClassifier;
+    private ContentClassifier ccClassifier;
+    private ContentClassifier cfClassifier;
+    private ContentClassifier daClassifier;
+    private ContentClassifier dbClassifier;
+    private ContentClassifier ecClassifier;
+    private ContentClassifier eoClassifier;
+    private ContentClassifier pkClassifier;
 
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
@@ -93,13 +93,21 @@ public class ContentClassifierBolt extends BaseRichBolt {
         }
 
         post.setContentClassifierPassed();
-        collector.emit("ContentClassifier-out", tuple, new Values(post));
+
+        collector.emit(tuple, new Values(post));
+
+        // Following lines is used to make Context and Evidence classifiers run parallel.
+        // collector.emit("ContentClassifier-out", tuple, new Values(post));
+
         collector.ack(tuple);
 
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        //outputFieldsDeclarer.declare(new Fields("post"));
-        outputFieldsDeclarer.declareStream("ContentClassifier-out", new Fields("post"));
+
+        outputFieldsDeclarer.declare(new Fields("post"));
+
+        // Following line is used to make Context and Evidence classifiers run parallel.
+        // outputFieldsDeclarer.declareStream("ContentClassifier-out", new Fields("post"));
     }
 }

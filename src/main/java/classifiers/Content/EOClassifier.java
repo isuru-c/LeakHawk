@@ -29,10 +29,10 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class EOClassifier extends ContentClassifier {
 
-    Pattern relatedPattern1;
-    Pattern relatedPattern2;
+    private Pattern relatedPattern1;
+    private Pattern relatedPattern2;
 
-    Pattern emailPattern;
+    private Pattern emailPattern;
 
 
     public EOClassifier() {

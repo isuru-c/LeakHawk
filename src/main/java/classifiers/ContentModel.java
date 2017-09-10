@@ -23,16 +23,16 @@ import java.io.Serializable;
  */
 public class ContentModel implements Serializable{
 
-    boolean contentFound;
-    boolean passedCC;
-    boolean passedCF;
-    boolean passedDA;
-    boolean passedDB;
-    boolean passedEC;
-    boolean passedEO;
-    boolean passedPK;
-    boolean passedUC;
-    boolean passedWD;
+    private boolean contentFound;
+    private boolean passedCC;
+    private boolean passedCF;
+    private boolean passedDA;
+    private boolean passedDB;
+    private boolean passedEC;
+    private boolean passedEO;
+    private boolean passedPK;
+    private boolean passedUC;
+    private boolean passedWD;
 
     public boolean isContentFound(){
         if(passedCC || passedCF || passedDA || passedDB || passedEC || passedEO || passedPK){

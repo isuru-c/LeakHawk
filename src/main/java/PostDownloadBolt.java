@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import data.Post;
+import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -38,10 +38,10 @@ import java.util.Map;
  */
 public class PostDownloadBolt extends BaseRichBolt {
 
-    OutputCollector collector;
-    JSONParser parser = null;
+    private OutputCollector collector;
+    private JSONParser parser = null;
 
-    String postType = "pastebin-posts";
+    private String postType = "pastebin-posts";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;

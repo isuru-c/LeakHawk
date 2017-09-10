@@ -29,16 +29,16 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 public class ECClassifier extends ContentClassifier {
-    Pattern titlePattern;
-    ArrayList<Pattern> unigramPatternList;
+    private Pattern titlePattern;
+    private ArrayList<Pattern> unigramPatternList;
 
-    Pattern relatedPattern1;
-    Pattern relatedPattern2;
-    Pattern relatedPattern3;
-    Pattern relatedPattern4;
-    Pattern relatedPattern5;
-    Pattern relatedPattern6;
-    Pattern relatedPattern7;
+    private Pattern relatedPattern1;
+    private Pattern relatedPattern2;
+    private Pattern relatedPattern3;
+    private Pattern relatedPattern4;
+    private Pattern relatedPattern5;
+    private Pattern relatedPattern6;
+    private Pattern relatedPattern7;
 
     public ECClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();

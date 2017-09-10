@@ -30,17 +30,17 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class DAClassifier extends ContentClassifier {
 
-    ArrayList<Pattern> unigramPatternList;
-    ArrayList<Pattern> bigramPatternList;
-    ArrayList<Pattern> trigramPatternList;
+    private ArrayList<Pattern> unigramPatternList;
+    private ArrayList<Pattern> bigramPatternList;
+    private ArrayList<Pattern> trigramPatternList;
 
-    Pattern relatedPattern1;
-    Pattern relatedPattern2;
-    Pattern relatedPattern3;
-    Pattern relatedPattern4;
-    Pattern relatedPattern5;
-    Pattern relatedPattern6;
-    Pattern relatedPattern7;
+    private Pattern relatedPattern1;
+    private Pattern relatedPattern2;
+    private Pattern relatedPattern3;
+    private Pattern relatedPattern4;
+    private Pattern relatedPattern5;
+    private Pattern relatedPattern6;
+    private Pattern relatedPattern7;
 
     public DAClassifier() {
         ArrayList<String> unigramList = new ArrayList<String>();
