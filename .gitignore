@@ -3,3 +3,4 @@ logs/*
 target/*
 leakhawk.iml
 leakhawk-app.iml
+dict/*
