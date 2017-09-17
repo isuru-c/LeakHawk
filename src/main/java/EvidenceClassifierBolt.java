@@ -25,13 +25,28 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayesMultinomial;
+import weka.classifiers.evaluation.ThresholdCurve;
+import weka.core.Instances;
+import weka.core.Utils;
+import weka.core.converters.TextDirectoryLoader;
+import weka.core.stemmers.SnowballStemmer;
+import weka.core.stopwords.StopwordsHandler;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.StringToWordVector;
+import weka.gui.visualize.PlotData2D;
+import weka.gui.visualize.ThresholdVisualizePanel;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * Created by Isuru Chandima on 7/28/17.
@@ -49,9 +64,21 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     private ArrayList<String> keyWordList7;
     private ArrayList<String> keyWordList8;
     private Connection connection;
+    private TextDirectoryLoader loader;
+    private Instances dataRaw;
+    private StringToWordVector filter;
+    private Instances dataFiltered;
+    private List<String> stopWordList;
+    private String regex;
+    private String regex1;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
+
+        loader = new TextDirectoryLoader();
+        stopWordList = Arrays.asList("a","about","above","after","again"," against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves");
+        regex = "[0-9]+";
+        regex1 = "[.,?!@#%;:'\"\\-]";
 
         keyWordList1 = new ArrayList(Arrays.asList("Hacked", "leaked by", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db_dump", "db leak", "model base dump", "model base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak,email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email,leaked emails", "email_hack"));
         keyWordList2 = new ArrayList(Arrays.asList("dns-brute", "dnsrecon", "fierce", "Dnsdict6", "axfr", "SQLmap"));
@@ -184,6 +211,89 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
         }
 
         return evidenceFound;
+    }
+
+    private void buildClassifier() {
+        try{
+            loader.setDirectory(new File("/home/sewwandi/Documents/"));
+            dataRaw = loader.getDataSet();
+
+            filter = new StringToWordVector();
+
+            StopwordsHandler stopwordsHandler = new StopwordsHandler() {
+                Matcher matcher;
+
+                //@Override
+                public boolean isStopword(String s) {
+                    if(stopWordList.contains(s) || s.length()<3 || s.matches(regex1) || s.matches(regex)) //matcher == p.matcher(s)
+                        return true;
+                    else return false;
+                }
+            };
+
+            filter.setStopwordsHandler(stopwordsHandler);
+            SnowballStemmer stemmer = new SnowballStemmer();
+            filter.setStemmer(stemmer);
+            filter.setLowerCaseTokens(true);
+            filter.setTFTransform(true);
+            filter.setIDFTransform(true);
+            filter.setInputFormat(dataRaw);
+
+            dataFiltered = Filter.useFilter(dataRaw, filter);
+            System.out.println("\n\nFiltered data:\n\n" + dataFiltered);
+
+            NaiveBayesMultinomial classifier = new NaiveBayesMultinomial();
+            classifier.buildClassifier(dataFiltered);
+            //System.out.println("\n\nClassifier model:\n\n" + classifier);
+
+            Evaluation evaluation = new Evaluation(dataFiltered);
+            evaluation.crossValidateModel(classifier,dataFiltered,10,new Random());
+            System.out.println(evaluation.toSummaryString()+evaluation.toMatrixString());
+
+            // generate curve
+           /* ThresholdCurve tc = new ThresholdCurve();
+            int classIndex = 0;
+            Instances result = tc.getCurve(evaluation.predictions(), classIndex);
+
+            // plot curve
+            ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
+            vmc.setROCString("(Area under ROC = " +
+                    Utils.doubleToString(tc.getROCArea(result), 4) + ")");
+            vmc.setName(result.relationName());
+            PlotData2D tempd = new PlotData2D(result);
+            tempd.setPlotName(result.relationName());
+            tempd.addInstanceNumberAttribute();
+            // specify which points are connected
+            boolean[] cp = new boolean[result.numInstances()];
+            for (int n = 1; n < cp.length; n++)
+                cp[n] = true;
+            tempd.setConnectPoints(cp);
+            // add plot
+            vmc.addPlot(tempd);
+
+            // display curve
+            String plotName = vmc.getName();
+            final javax.swing.JFrame jf =
+                    new javax.swing.JFrame("Weka Classifier Visualize: "+plotName);
+            jf.setSize(500,400);
+            jf.getContentPane().setLayout(new BorderLayout());
+            jf.getContentPane().add(vmc, BorderLayout.CENTER);
+            jf.addWindowListener(new java.awt.event.WindowAdapter() {
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    jf.dispose();
+                }
+            });
+            jf.setVisible(true);
+
+*/
+
+        }
+        catch (IOException ex){
+            System.out.println("IOException");
+        }catch(Exception ex1){
+
+        }
+
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {

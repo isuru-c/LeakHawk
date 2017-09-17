@@ -58,13 +58,9 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         Post post = (Post)tuple.getValue(0);
 
-<<<<<<< Updated upstream
-        //if context filter is passed forward the model to next bolt(Evidence classifier)
-        /*if (isPassContextFilter(post.getPostText())) {
-=======
         //if context filter is passed forward the data to next bolt(Evidence classifier)
         if (isPassContextFilter(post.getPostText())) {
->>>>>>> Stashed changes
+
             //pass to evidence classifier
             collector.emit(tuple, new Values(post));
 
@@ -76,16 +72,12 @@ public class ContextFilterBolt extends BaseRichBolt {
             //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
         }
 
-<<<<<<< Updated upstream
         collector.emit(tuple, new Values(post));
 
         // Following lines are used to make Context and Evidence classifiers run parallel.
         // collector.emit("ContentClassifier-in", tuple, new Values(post));
         // collector.emit("EvidenceClassifier-in", tuple, new Values(post));
-=======
-        //collector.emit("ContentClassifier-in", tuple, new Values(post));
-        //collector.emit("EvidenceClassifier-in", tuple, new Values(post));
->>>>>>> Stashed changes
+
 
         collector.ack(tuple);
 

@@ -75,6 +75,12 @@
             <version>2.2.0</version> <!-- or whatever the latest version is -->
         </dependency>
 
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
     </dependencies>
 
 
