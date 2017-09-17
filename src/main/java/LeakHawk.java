@@ -19,6 +19,7 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
+import sensors.DumpSensor;
 import sensors.PastebinSensor;
 
 /**
@@ -31,32 +32,37 @@ public class LeakHawk {
         PastebinSensor pastebinSensor = new PastebinSensor();
         pastebinSensor.start();
 
+        //DumpSensor dumpSensor = new DumpSensor();
+        //dumpSensor.start();
+
         final String TOPOLOGY_NAME = "LeakHawk-topology";
 
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
 
-        TopologyBuilder builder = new TopologyBuilder();
+        TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-        SpoutDeclarer pastebinSpout = builder.setSpout("pastebin-spout", new PastebinSpout(), 2);
+        SpoutDeclarer pastebinSpout = topologyBuilder.setSpout("pastebin-spout", new PastebinSpout(), 2);
+        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 1);
 
-        BoltDeclarer postDownloadBolt = builder.setBolt("post-download", new PostDownloadBolt() , 4);
+        BoltDeclarer postDownloadBolt = topologyBuilder.setBolt("post-download", new PostDownloadBolt() , 4);
         postDownloadBolt.shuffleGrouping("pastebin-spout");
 
-        BoltDeclarer preProcessorBolt = builder.setBolt("pre-processor", new PreProcessorBolt(), 3);
+        BoltDeclarer preProcessorBolt = topologyBuilder.setBolt("pre-processor", new PreProcessorBolt(), 3);
         preProcessorBolt.shuffleGrouping("post-download");
+        preProcessorBolt.shuffleGrouping("dump-spout");
 
-        BoltDeclarer preFilterBolt = builder.setBolt("pre-filter", new PreFilterBolt() , 3);
+        BoltDeclarer preFilterBolt = topologyBuilder.setBolt("pre-filter", new PreFilterBolt() , 3);
         preFilterBolt.shuffleGrouping("pre-processor");
 
-        BoltDeclarer contextFilterBolt = builder.setBolt("context-filter", new ContextFilterBolt() , 2);
+        BoltDeclarer contextFilterBolt = topologyBuilder.setBolt("context-filter", new ContextFilterBolt() , 2);
         contextFilterBolt.shuffleGrouping("pre-filter");
 
-        BoltDeclarer evidenceClassifierBolt = builder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1);
+        BoltDeclarer evidenceClassifierBolt = topologyBuilder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1);
         evidenceClassifierBolt.shuffleGrouping("context-filter");
         //evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
 
-        BoltDeclarer contentClassifierBolt = builder.setBolt("content-classifier", new ContentClassifierBolt() , 1);
+        BoltDeclarer contentClassifierBolt = topologyBuilder.setBolt("content-classifier", new ContentClassifierBolt() , 1);
         contentClassifierBolt.shuffleGrouping("evidence-classifier");
         //contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
 
@@ -64,12 +70,12 @@ public class LeakHawk {
         //evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
         //evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
 
-        BoltDeclarer synthesizerBolt = builder.setBolt("synthesizer", new Synthesizer(), 1);
+        BoltDeclarer synthesizerBolt = topologyBuilder.setBolt("synthesizer", new Synthesizer(), 1);
         synthesizerBolt.shuffleGrouping("content-classifier");
         //synthesizerBolt.shuffleGrouping("evidence-content-join");
 
         final LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
+        cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
