@@ -29,11 +29,11 @@ public class LeakHawk {
 
     public static void main(String[] args) {
 
-        PastebinSensor pastebinSensor = new PastebinSensor();
-        pastebinSensor.start();
+        //PastebinSensor pastebinSensor = new PastebinSensor();
+        //pastebinSensor.start();
 
-        //DumpSensor dumpSensor = new DumpSensor();
-        //dumpSensor.start();
+        DumpSensor dumpSensor = new DumpSensor();
+        dumpSensor.start();
 
         final String TOPOLOGY_NAME = "LeakHawk-topology";
 
