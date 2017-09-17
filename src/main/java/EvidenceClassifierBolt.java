@@ -215,7 +215,7 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
 
     private void buildClassifier() {
         try{
-            loader.setDirectory(new File("/home/sewwandi/Documents/"));
+            loader.setDirectory(new File("~/IdeaProjects/LeakHawk/dataset/"));
             dataRaw = loader.getDataSet();
 
             filter = new StringToWordVector();
