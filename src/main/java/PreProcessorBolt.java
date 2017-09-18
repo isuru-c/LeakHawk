@@ -23,6 +23,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.text.Normalizer;
 import java.util.Map;
 
 /**
@@ -38,6 +39,21 @@ public class PreProcessorBolt extends BaseRichBolt{
 
     public void execute(Tuple tuple) {
         Post post = (Post)tuple.getValue(0);
+
+        String postText = post.getPostText();
+
+        postText = Normalizer.normalize(postText, Normalizer.Form.NFD);
+
+        postText = postText.toLowerCase();
+
+        //norm = norm.replaceAll("[^a-zA-Z0-9]", " ");
+        //norm = norm.replaceAll("\\s+", " ");
+        postText = postText.replaceAll("\\<[^>]*>","");
+        postText = postText.replaceAll("[^a-zA-Z0-9.]", " ");
+        postText = postText.replaceAll("\\s+", " ");
+        //norm = norm.replaceAll("[^\\p{ASCII}]", ""); // drop non latin
+
+        post.setPostText(postText);
 
         collector.emit(tuple, new Values(post));
 
