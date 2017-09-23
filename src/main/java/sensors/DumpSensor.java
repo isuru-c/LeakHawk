@@ -53,7 +53,6 @@ public class DumpSensor extends Thread {
 
                         StringBuilder sb = new StringBuilder();
                         String line = br.readLine();
-
                         while (line != null) {
                             sb.append(line + "\n");
                             line = br.readLine();

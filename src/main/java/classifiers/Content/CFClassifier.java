@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "CF", filePath = "./src/main/resources/CF.model")
 public class CFClassifier extends ContentClassifier{
 
     private Pattern cfSymbalPattern;
@@ -39,7 +40,8 @@ public class CFClassifier extends ContentClassifier{
     private Pattern alphaPattern;
     private Pattern alphDigitPattern;
 
-    public CFClassifier() {
+    public CFClassifier(String model) {
+        super(model);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("ip");
         unigramList.add("cisco");

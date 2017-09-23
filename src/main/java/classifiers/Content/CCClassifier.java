@@ -25,9 +25,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * This is custom class written for classify the incidents related to the Credit Cards.
+ *
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "CC", filePath = "./src/main/resources/CC.model")
 public class CCClassifier extends ContentClassifier {
 
     private Pattern ccCardPattern;
@@ -46,14 +49,15 @@ public class CCClassifier extends ContentClassifier {
     private Pattern alphDigitPattern;
     private RandomForest tclassifier;
 
-    public static void main(String[] args) {
-        CCClassifier ccClassifier = new CCClassifier();
-        System.out.println("Result is :" + ccClassifier.classify("", "1.txt"));
-    }
+//    public static void main(String[] args) {
+//        CCClassifier ccClassifier = new CCClassifier();
+//        System.out.println("Result is :" + ccClassifier.classify("", "1.txt"));
+//    }
 
-    public CCClassifier() {
+    public CCClassifier(String model) {
+        super(model);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CC.model");
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,12 +180,10 @@ public class CCClassifier extends ContentClassifier {
         feature_list += matchingCount + ",";
         relatedTermsSum += matchingCount;
 
-
         matcher = relatedTerms6Pattern.matcher(text);
         matchingCount = getMatchingCount(matcher);
         feature_list += matchingCount + ",";
         relatedTermsSum += matchingCount;
-
 
         feature_list += relatedTermsSum + ",";
 
@@ -255,55 +257,6 @@ public class CCClassifier extends ContentClassifier {
         }
         return false;
     }
-
-    /*@Override
-    public boolean classify(String text, String title,String key) {
-        try {
-            String result = createARFF(text, title);
-
-            BufferedWriter bw = null;
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter("./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
-                bw = new BufferedWriter(fw);
-                bw.write(result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (bw != null)
-                        bw.close();
-                    if (fw != null)
-                        fw.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/CC_validator.sh", "./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
-            final Process processVal = pbVal.start();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
-            String line = br.readLine();
-            if(line!=null) {
-                if (line.contains("non")) {
-                    return false;
-                } else if (line.contains("CC")) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            File file = new File("./src/main/java/classifiers/Content/arff/cc" + key + ".arff");
-            file.delete();
-        }
-        return false;
-    }*/
 
 
 }

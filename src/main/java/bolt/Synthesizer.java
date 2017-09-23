@@ -1,4 +1,4 @@
-/*
+package bolt;/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-import classifiers.EvidenceModel;
-import classifiers.ContentModel;
+import model.EvidenceModel;
+import model.ContentModel;
 import classifiers.Predictor.SensitivityModel;
 import model.Post;
 import db.DBConnection;

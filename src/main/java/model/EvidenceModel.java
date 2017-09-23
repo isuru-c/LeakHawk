@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers;
+package model;
 
 import java.io.Serializable;
 

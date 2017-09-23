@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "DA", filePath = "./src/main/resources/DA.model")
 public class DAClassifier extends ContentClassifier {
 
     private ArrayList<Pattern> unigramPatternList;
@@ -42,7 +43,8 @@ public class DAClassifier extends ContentClassifier {
     private Pattern relatedPattern6;
     private Pattern relatedPattern7;
 
-    public DAClassifier() {
+    public DAClassifier(String model) {
+        super(model);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("MX|NS|PTR|CNAME|SOA");
         unigramList.add("dns|record|host");

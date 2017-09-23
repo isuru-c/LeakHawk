@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "EC", filePath = "./src/main/resources/EC.model")
 public class ECClassifier extends ContentClassifier {
     private Pattern titlePattern;
     private ArrayList<Pattern> unigramPatternList;
@@ -40,7 +41,8 @@ public class ECClassifier extends ContentClassifier {
     private Pattern relatedPattern6;
     private Pattern relatedPattern7;
 
-    public ECClassifier() {
+    public ECClassifier(String model) {
+        super(model);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("reply|forward");
         unigramList.add("subject");

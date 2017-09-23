@@ -16,9 +16,6 @@
 
 package model;
 
-import classifiers.ContentModel;
-import classifiers.EvidenceModel;
-
 import java.io.Serializable;
 
 /**

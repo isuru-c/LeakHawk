@@ -53,8 +53,8 @@
 //    public void predictSensitivity(Tuple tuple){
 //
 //        String post = tuple.getString(6);
-//        EvidenceClassifierBolt evidenceClassifier= new EvidenceClassifierBolt();
-//        ContentClassifierBolt contentClassifier= new ContentClassifierBolt();
+//        bolt.EvidenceClassifierBolt evidenceClassifier= new bolt.EvidenceClassifierBolt();
+//        bolt.ContentClassifierBolt contentClassifier= new bolt.ContentClassifierBolt();
 //
 ////        if( contentClassifier.isCCPassed() ){
 //            //System.out.println("CONTENT: Possible Credit Card Breach");

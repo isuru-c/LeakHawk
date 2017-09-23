@@ -1,4 +1,4 @@
-/*
+package spout;/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-import model.Post;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -32,31 +31,30 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by Isuru Chandima on 9/11/17.
+ * Created by Isuru Chandima on 7/3/17.
  */
-public class DumpSpout extends BaseRichSpout{
+public class PastebinSpout extends BaseRichSpout{
 
     private SpoutOutputCollector collector;
     private Properties properties = null;
     private KafkaConsumer<String, String> consumer = null;
 
-    private String postType = "dump-posts";
-
-    public DumpSpout(){
+    public PastebinSpout(){
 
         properties = new Properties();
 
         properties.put("bootstrap.servers", "localhost:9092");
-        properties.put("group.id", "consumer-dump");
+        properties.put("group.id", "consumer-test");
         properties.put("key.deserializer", StringDeserializer.class.getName());
         properties.put("value.deserializer", StringDeserializer.class.getName());
+
     }
 
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
 
         consumer = new KafkaConsumer<String, String>(properties);
-        consumer.subscribe(Arrays.asList("dump-posts"));
+        consumer.subscribe(Arrays.asList("pastebin-posts"));
     }
 
     public void nextTuple() {
@@ -65,22 +63,11 @@ public class DumpSpout extends BaseRichSpout{
         ConsumerRecords<String, String> records = consumer.poll(1000);
         for (ConsumerRecord<String, String> record : records) {
             //System.out.println(record.offset() + ": " + record.value());
-
-            Post post = new Post();
-
-            post.setPostType(postType);
-            post.setKey("");
-            post.setDate("");
-            post.setTitle("");
-            post.setUser("");
-            post.setSyntax("");
-            post.setPostText(record.value());
-
-            collector.emit(new Values(post));
+            collector.emit(new Values(record.value()));
         }
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declare(new Fields("scrape_out"));
     }
 }

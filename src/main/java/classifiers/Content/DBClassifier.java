@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "DB", filePath = "./src/main/resources/DB.model")
 public class DBClassifier extends ContentClassifier {
     private Pattern symbalPattern;
     private ArrayList<Pattern> unigramPatternList;
@@ -40,7 +41,8 @@ public class DBClassifier extends ContentClassifier {
     private Pattern relatedPattern5;
 
 
-    public DBClassifier() {
+    public DBClassifier(String model) {
+        super(model);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("0|null|blank");
         unigramList.add("insert|update|create");

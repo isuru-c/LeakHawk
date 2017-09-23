@@ -34,7 +34,7 @@ public class DBConnection {
 
     private DBConnection() throws ClassNotFoundException, SQLException{
         Class.forName("com.mysql.jdbc.Driver");
-        connection=DriverManager.getConnection("jdbc:mysql://localhost/LeakHawk","root","");
+        connection=DriverManager.getConnection("jdbc:mysql://localhost/LeakHawk","root","lpdscneo");
     }
 
     public Connection getConnection(){

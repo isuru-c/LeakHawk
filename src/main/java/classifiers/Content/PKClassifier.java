@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
+@ContentPattern(patternName = "PK", filePath = "./src/main/resources/PK.model")
 public class PKClassifier extends ContentClassifier {
 
     private ArrayList<Pattern> unigramPatternList;
@@ -39,7 +40,8 @@ public class PKClassifier extends ContentClassifier {
     private Pattern relatedPattern2;
 
 
-    public PKClassifier() {
+    public PKClassifier(String model) {
+        super(model);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("PRIVATE");
         unigramList.add("KEY");

@@ -20,9 +20,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Content Classifier is the template for the custom classifiers. Custom classifiers can follow this template and easily
+ * add the classifier to the system.
+ *
  * @author Sugeesh Chandraweera
  */
+
 public class ContentClassifier {
+
+    /**
+     * This field is for storing the path of the model file. (model file should be .arff  file)
+     */
+    private String model = null;
+
+    /**
+     * This field is for creating the .arff string stream.
+     */
     String headingCC = "@relation CC\n" +
             "\n" +
             "@attribute $CC1 numeric\n" +
@@ -206,15 +219,17 @@ public class ContentClassifier {
             "\n" +
             "@data\n";
 
-    public String createARFF(String text,String title) {
+    public ContentClassifier(String model) {
+        this.model = model;
+    }
+
+
+    public String createARFF(String text, String title) {
         return null;
     }
 
-   /* public boolean classify(String text,String title,String key) {
-        return false;
-    }*/
 
-    public boolean classify(String text,String title) {
+    public boolean classify(String text, String title) {
         return false;
     }
 
@@ -225,13 +240,21 @@ public class ContentClassifier {
         return count;
     }
 
-    Pattern getCorrectPatten(String word,int type){
-        Pattern compile = Pattern.compile(word.replaceAll("\\|","\b|\b"),type);
+    Pattern getCorrectPatten(String word, int type) {
+        Pattern compile = Pattern.compile(word.replaceAll("\\|", "\b|\b"), type);
         return compile;
     }
 
-    Pattern getCorrectPatten(String word){
-        Pattern compile = Pattern.compile(word.replaceAll("\\|","\b|\b"));
+    Pattern getCorrectPatten(String word) {
+        Pattern compile = Pattern.compile(word.replaceAll("\\|", "\b|\b"));
         return compile;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }

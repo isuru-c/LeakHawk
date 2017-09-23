@@ -83,18 +83,13 @@ public class TwitterSensor extends Thread{
     public void run(){
 
         // Create tweeter connection
-
         BlockingQueue<String> queue = new LinkedBlockingQueue<String>(100);
-
         Hosts hosts = new HttpHosts(Constants.STREAM_HOST);
-
         StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
-
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("twitterapi");
         arrayList.add("a");
         endpoint.trackTerms(arrayList);
-
         Authentication auth = new OAuth1(consumerKey, consumerSecret, token, tokenSecret);
 
         ClientBuilder builder = new ClientBuilder()
@@ -104,13 +99,11 @@ public class TwitterSensor extends Thread{
                 .processor(new StringDelimitedProcessor(queue));
 
         Client client = builder.build();
-
         client.connect();
 
 
 
         // Create Kafka producer
-
         Properties properties = new Properties();
 
         //Assign localhost id
@@ -132,14 +125,9 @@ public class TwitterSensor extends Thread{
         properties.put("buffer.memory", 33554432);
 
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
         Producer<String, String> producer = new KafkaProducer<String, String>(properties);
-
-
-
-        // Read and print tweets
 
         String topic = "tweets";
         //String message = null;

@@ -14,13 +14,15 @@
  *    limitations under the License.
  */
 
+import bolt.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensors.DumpSensor;
-import sensors.PastebinSensor;
+import spout.DumpSpout;
+import spout.PastebinSpout;
 
 /**
  * Created by Isuru Chandima on 6/18/17.
@@ -66,7 +68,7 @@ public class LeakHawk {
         contentClassifierBolt.shuffleGrouping("evidence-classifier");
         //contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
 
-        //BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new EvidenceContentJoinBolt(), 1);
+        //BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new bolt.EvidenceContentJoinBolt(), 1);
         //evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
         //evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
 

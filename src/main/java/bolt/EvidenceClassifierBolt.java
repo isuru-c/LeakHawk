@@ -1,4 +1,4 @@
-/*
+package bolt;/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-import classifiers.EvidenceModel;
+import model.EvidenceModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
@@ -27,18 +27,13 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayesMultinomial;
-import weka.classifiers.evaluation.ThresholdCurve;
 import weka.core.Instances;
-import weka.core.Utils;
 import weka.core.converters.TextDirectoryLoader;
 import weka.core.stemmers.SnowballStemmer;
 import weka.core.stopwords.StopwordsHandler;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.StringToWordVector;
-import weka.gui.visualize.PlotData2D;
-import weka.gui.visualize.ThresholdVisualizePanel;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;

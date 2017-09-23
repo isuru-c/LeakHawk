@@ -1,4 +1,4 @@
-/*
+package bolt;/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,56 +23,41 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
-import java.util.ArrayList;
+import java.text.Normalizer;
 import java.util.Map;
 
 /**
- * Created by Isuru Chandima on 7/3/17.
+ * Created by Isuru Chandima on 9/1/17.
  */
-public class PreFilterBolt extends BaseRichBolt {
+public class PreProcessorBolt extends BaseRichBolt{
 
     private OutputCollector collector;
-    private ArrayList keyWordList;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
-
-        keyWordList = new ArrayList<String>();
-        keyWordList.add("Game");
-        keyWordList.add("Sports");
-        keyWordList.add("Porn");
-        keyWordList.add("Sex");
-        keyWordList.add("XXX");
     }
 
     public void execute(Tuple tuple) {
-
         Post post = (Post)tuple.getValue(0);
 
-        //if pre filter is passed forward the model to next bolt(context filter)
-        if(!isContainKeyWord(post.getPostText())) {
-            collector.emit(tuple, new Values(post));
-        }else{
-//            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
-        }
+        String postText = post.getPostText();
+
+        postText = Normalizer.normalize(postText, Normalizer.Form.NFD);
+
+        postText = postText.toLowerCase();
+
+        //norm = norm.replaceAll("[^a-zA-Z0-9]", " ");
+        //norm = norm.replaceAll("\\s+", " ");
+        postText = postText.replaceAll("\\<[^>]*>","");
+        postText = postText.replaceAll("[^a-zA-Z0-9.]", " ");
+        postText = postText.replaceAll("\\s+", " ");
+        //norm = norm.replaceAll("[^\\p{ASCII}]", ""); // drop non latin
+
+        post.setPostText(postText);
+
+        collector.emit(tuple, new Values(post));
+
         collector.ack(tuple);
-
-    }
-
-    private boolean isContainKeyWord(String post) {
-
-        try {
-
-            for (int i=0;i<keyWordList.size();i++) {
-                if (post.toUpperCase().contains(keyWordList.get(i).toString().toUpperCase())) {
-                    //exit after the first successful hit
-                    return true;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
