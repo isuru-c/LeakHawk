@@ -71,10 +71,10 @@ Now you should be able to run the projet.
 
 ## Authors
 
-* **Sugeesh Chandraweera** - [PurpleBooth](https://github.com/sugeesh)
-* **Isuru Chandima** - [PurpleBooth](https://github.com/isuru-c)
-* **Warunika Amali** - [PurpleBooth](https://github.com/warunikaAmali)
-* **Udeshika Sewwandi** - [PurpleBooth](https://github.com/udeshika-sewwandi)
+* **Sugeesh Chandraweera** - [Sugeesh](https://github.com/sugeesh)
+* **Isuru Chandima** - [Isuru](https://github.com/isuru-c)
+* **Warunika Amali** - [Warunika](https://github.com/warunikaAmali)
+* **Udeshika Sewwandi** - [Sewwandi](https://github.com/udeshika-sewwandi)
 
 
 ## License
