@@ -21,6 +21,7 @@ import java.io.Serializable;
 /**
  * Created by Isuru Chandima on 8/13/17.
  */
+
 public class Post implements Serializable{
 
     private String postType;

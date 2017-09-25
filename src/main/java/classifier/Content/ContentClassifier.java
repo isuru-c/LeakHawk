@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers.Content;
+package classifier.Content;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +27,11 @@ import java.util.regex.Pattern;
  */
 
 public class ContentClassifier {
+
+    /**
+     * This field is for identify the content classifier
+     */
+    private String name = null;
 
     /**
      * This field is for storing the path of the model file. (model file should be .arff  file)
@@ -219,8 +224,9 @@ public class ContentClassifier {
             "\n" +
             "@data\n";
 
-    public ContentClassifier(String model) {
+    public ContentClassifier(String model, String name) {
         this.model = model;
+        this.name = name;
     }
 
 
@@ -256,5 +262,17 @@ public class ContentClassifier {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getSensivityLevel(String post){
+        return  1;
     }
 }

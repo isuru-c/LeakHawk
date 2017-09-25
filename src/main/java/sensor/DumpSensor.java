@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-package sensors;
+package sensor;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.io.*;
-import java.util.Properties;
+
 
 /**
- * Created by Isuru Chandima on 9/11/17.
+ * This Sensor will add files to the kafka getting from post folder
+ *
+ * @author Isuru Chandima
  */
 public class DumpSensor extends Thread {
 
@@ -33,19 +34,15 @@ public class DumpSensor extends Thread {
     private String topic = "dump-posts";
 
     public DumpSensor() {
-
         leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         dumpProducer = leakHawkKafkaProducer.getProducer();
     }
 
     public void run() {
-
         ProducerRecord<String, String> message = null;
-
         try {
             File folder = new File("./posts");
             File[] listOfFiles = folder.listFiles();
-
             for (File file : listOfFiles) {
                 try {
                     if (file.isFile()) {

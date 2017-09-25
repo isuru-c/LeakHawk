@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers.Content;
+package classifier.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
@@ -36,9 +36,9 @@ public class EOClassifier extends ContentClassifier {
     private Pattern emailPattern;
 
 
-    public EOClassifier(String model) {
+    public EOClassifier(String model, String name) {
 
-        super(model);
+        super(model, name);
         relatedPattern1 = Pattern.compile("email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         relatedPattern2 = Pattern.compile("leaked by|Emails LeakeD|domains hacked|leaked email list|email list leaked|leaked emails|leak of|email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
@@ -115,53 +115,19 @@ public class EOClassifier extends ContentClassifier {
         return false;
     }
 
-   /* @Override
-    public boolean classify(String text, String title,String key) {
-        try {
-            String result = createARFF(text, title);
-
-            BufferedWriter bw = null;
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter("./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
-                bw = new BufferedWriter(fw);
-                bw.write(result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (bw != null)
-                        bw.close();
-                    if (fw != null)
-                        fw.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/EO_validator.sh", "./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
-            final Process processVal = pbVal.start();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
-            String line = br.readLine();
-            if(line!=null) {
-                if (line.contains("non")) {
-                    return false;
-                } else if (line.contains("EO")) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            File file = new File("./src/main/java/classifiers/Content/arff/eo" + key + ".arff");
-            file.delete();
+    public int getSensivityLevel(String post){
+        int email_count = EOCounter(post);
+        if (email_count < 50) {
+            return 1;
         }
-        return false;
-    }*/
+        return 2;
+    }
+
+    public int EOCounter(String post) {
+        Pattern emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
+        Matcher matcherEO = emailPattern.matcher(post);
+        int EO_Count = getMatchingCount(matcherEO);
+        return EO_Count;
+    }
 }
 

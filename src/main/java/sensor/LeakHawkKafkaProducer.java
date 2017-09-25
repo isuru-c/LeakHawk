@@ -14,12 +14,13 @@
  *    limitations under the License.
  */
 
-package sensors;
+package sensor;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 
 import java.util.Properties;
+
 
 /**
  * Created by Isuru Chandima on 9/17/17.

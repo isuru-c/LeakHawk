@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *    Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package sensors;
+package sensor;
 
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Client;
@@ -34,18 +34,28 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+
+/**
+ * This get the data from twitter api and send them to the kafka
+ *
+ * @author Isuru Chandima
+ */
 public class TwitterSensor extends Thread{
 
-    String consumerKey = "";
-    String consumerSecret = "";
-    String token = "";
-    String tokenSecret = "";
+    private String consumerKey = "";
+    private String consumerSecret = "";
+    private String token = "";
+    private String tokenSecret = "";
+    private LeakHawkKafkaProducer leakHawkKafkaProducer;
+    private Producer<String, String> pastebinProducer;
 
     public TwitterSensor(){
         consumerKey = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
         consumerSecret = "9jXaU9kTDHh2pLGDyQc69AI9YhHmj2Huf2AbYcaWKgE8M3Jmzy";
         token = "1627974024-AmWhRjy2pThPIpc1nwEhTmhws1U0AYPHkukUZrc";
         tokenSecret = "HC7Vq3VSsOLuQ1QjZ3NihpwCymWi00pbvT10kelCtS29t";
+        leakHawkKafkaProducer = new LeakHawkKafkaProducer();
+        pastebinProducer = leakHawkKafkaProducer.getProducer();
     }
 
     public String getConsumerKey() {
@@ -81,11 +91,11 @@ public class TwitterSensor extends Thread{
     }
 
     public void run(){
-
         // Create tweeter connection
         BlockingQueue<String> queue = new LinkedBlockingQueue<String>(100);
         Hosts hosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
+
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("twitterapi");
         arrayList.add("a");
@@ -101,55 +111,18 @@ public class TwitterSensor extends Thread{
         Client client = builder.build();
         client.connect();
 
-
-
-        // Create Kafka producer
-        Properties properties = new Properties();
-
-        //Assign localhost id
-        properties.put("bootstrap.servers", "localhost:9092");
-
-        //Set acknowledgements for producer requests
-        properties.put("acks", "all");
-
-        //If the request fails, the producer can automatically retry,
-        properties.put("retries", 0);
-
-        //Specify buffer size in config
-        properties.put("batch.size", 16384);
-
-        //Reduce the no of requests less than 0
-        properties.put("linger.ms", 1);
-
-        //The buffer.memory controls the total amount of memory available to the producer for buffering.
-        properties.put("buffer.memory", 33554432);
-
-        properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
-        Producer<String, String> producer = new KafkaProducer<String, String>(properties);
-
         String topic = "tweets";
-        //String message = null;
 
-        for (int msgRead = 0; msgRead < 100; msgRead++) {
-
+        for (int msgRead = 0; true; msgRead++) {
             ProducerRecord<String, String> message = null;
-
             try {
                 message = new ProducerRecord<String, String>(topic, queue.take());
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            producer.send(message);
+            pastebinProducer.send(message);
         }
-
-        producer.close();
-
-        client.stop();
+//        pastebinProducer.close();
+//        client.stop();
     }
-
-
 }

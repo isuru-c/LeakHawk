@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers.Content;
+package classifier.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
@@ -40,8 +40,8 @@ public class CFClassifier extends ContentClassifier{
     private Pattern alphaPattern;
     private Pattern alphDigitPattern;
 
-    public CFClassifier(String model) {
-        super(model);
+    public CFClassifier(String model, String name) {
+        super(model,name);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("ip");
         unigramList.add("cisco");
@@ -158,55 +158,12 @@ public class CFClassifier extends ContentClassifier{
         return false;
     }
 
-
-  /*  @Override
-    public boolean classify(String text, String title,String key) {
-        try {
-            String result = createARFF(text, title);
-
-            BufferedWriter bw = null;
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter("./src/main/java/classifiers/Content/arff/cf" + key + ".arff");
-                bw = new BufferedWriter(fw);
-                bw.write(result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (bw != null)
-                        bw.close();
-                    if (fw != null)
-                        fw.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/CF_validator.sh", "./src/main/java/classifiers/Content/arff/cf" + key + ".arff");
-            final Process processVal = pbVal.start();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
-            String line = br.readLine();
-            if(line!=null) {
-                if (line.contains("non")) {
-                    return false;
-                } else if (line.contains("CF")) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            File file = new File("./src/main/java/classifiers/Content/arff/cf" + key + ".arff");
-            file.delete();
+    @Override
+    public int getSensivityLevel(String post) {
+        if (post.contains("enable password")) {
+            return 3;
         }
-        return false;
-    }*/
-
+        return 1;
+    }
 }
 

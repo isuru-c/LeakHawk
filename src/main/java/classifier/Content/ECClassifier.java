@@ -14,13 +14,14 @@
  *    limitations under the License.
  */
 
-package classifiers.Content;
+package classifier.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +42,8 @@ public class ECClassifier extends ContentClassifier {
     private Pattern relatedPattern6;
     private Pattern relatedPattern7;
 
-    public ECClassifier(String model) {
-        super(model);
+    public ECClassifier(String model, String name) {
+        super(model, name);
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("reply|forward");
         unigramList.add("subject");
@@ -121,54 +122,19 @@ public class ECClassifier extends ContentClassifier {
         return false;
     }
 
-    /*@Override
-    public boolean classify(String text, String title,String key) {
-        try {
-            String result = createARFF(text, title);
-
-            BufferedWriter bw = null;
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter("./src/main/java/classifiers/Content/arff/ec" + key + ".arff");
-                bw = new BufferedWriter(fw);
-                bw.write(result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (bw != null)
-                        bw.close();
-                    if (fw != null)
-                        fw.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+    public int getSensivityLevel(String post){
+        ArrayList<String> ECList = new ArrayList<String>(Arrays.asList("CONFIDENTIAL", "secret", "do not disclose"));
+        int ecCount = 0;
+        for (String i : ECList) {
+            if (post.contains(i)) {
+                ecCount++;
             }
-
-            ProcessBuilder pbVal = new ProcessBuilder("/bin/bash", "/home/neo/Desktop/FinalYearProject/LeakHawk/src/main/java/classifiers/Content/validator/EC_validator.sh", "./src/main/java/classifiers/Content/arff/ec" + key + ".arff");
-            final Process processVal = pbVal.start();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(processVal.getInputStream()));
-            String line = br.readLine();
-            if(line!=null) {
-                if (line.contains("non")) {
-                    return false;
-                } else if (line.contains("EC")) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            File file = new File("./src/main/java/classifiers/Content/arff/ec" + key + ".arff");
-            file.delete();
         }
-        return false;
-    }*/
+        if (ecCount > 0) {
+            return 3;
+        }
+        return 1;
+    }
 
 }
 

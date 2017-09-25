@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *     Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package sensors;
+package sensor;
 
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import org.json.simple.JSONArray;
@@ -32,10 +31,11 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.Properties;
 
 /**
- * Created by Isuru Chandima on 6/19/17.
+ * This Sensor will put the pastebin files getting from the pastebin api to the kafka
+ *
+ * @author Isuru Chandima
  */
 public class PastebinSensor extends Thread {
 
@@ -44,16 +44,13 @@ public class PastebinSensor extends Thread {
     private String topic = "pastebin-posts";
 
     public PastebinSensor() {
-
         leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         pastebinProducer = leakHawkKafkaProducer.getProducer();
-
     }
 
     public void run() {
 
         ProducerRecord<String, String> message = null;
-
         try {
             int postLimit = 100;
             URL my_url = new URL("http://pastebin.com/api_scraping.php?limit=" + postLimit);

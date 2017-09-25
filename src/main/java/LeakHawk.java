@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *    Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,60 +20,75 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
-import sensors.DumpSensor;
+import sensor.DumpSensor;
+import sensor.PastebinSensor;
+import sensor.TwitterSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
+import spout.TwitterSpout;
 
 /**
- * Created by Isuru Chandima on 6/18/17.
+ *
+ * This is the main class of the system. running main method in here will start to run the storm topology.
+ *
+ * @author Isuru Chandima
+ * @author Sugeesh Chandraweera
  */
 public class LeakHawk {
 
     public static void main(String[] args) {
 
-        //PastebinSensor pastebinSensor = new PastebinSensor();
-        //pastebinSensor.start();
+        /* Pastebin sensor */
+        PastebinSensor pastebinSensor = new PastebinSensor();
+        pastebinSensor.start();
 
-        DumpSensor dumpSensor = new DumpSensor();
-        dumpSensor.start();
+        /* Twitter sensor */
+//        TwitterSensor twitterSensor = new TwitterSensor();
+//        twitterSensor.start();
 
+         /* Testing sensor */
+//        DumpSensor dumpSensor = new DumpSensor();
+//        dumpSensor.start();
+
+        // Create topology
         final String TOPOLOGY_NAME = "LeakHawk-topology";
-
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
-
         TopologyBuilder topologyBuilder = new TopologyBuilder();
 
+        // Create Spout and connect to the topology
         SpoutDeclarer pastebinSpout = topologyBuilder.setSpout("pastebin-spout", new PastebinSpout(), 2);
-        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 1);
+//        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 1);
+//        SpoutDeclarer twitterSpout = topologyBuilder.setSpout("twitter-spout", new TwitterSpout(), 1);
 
-        BoltDeclarer postDownloadBolt = topologyBuilder.setBolt("post-download", new PostDownloadBolt() , 4);
+
+        // Create bolts and connect to the topology
+        BoltDeclarer postDownloadBolt = topologyBuilder.setBolt("pastebin-post-download-bolt", new PostDownloadBolt() , 4);
         postDownloadBolt.shuffleGrouping("pastebin-spout");
 
-        BoltDeclarer preProcessorBolt = topologyBuilder.setBolt("pre-processor", new PreProcessorBolt(), 3);
-        preProcessorBolt.shuffleGrouping("post-download");
-        preProcessorBolt.shuffleGrouping("dump-spout");
+        BoltDeclarer preFilterBolt = topologyBuilder.setBolt("pre-filter-bolt", new PreFilterBolt() , 3);
+        preFilterBolt.shuffleGrouping("pastebin-post-download-bolt");
+//        preProcessorBolt.shuffleGrouping("dump-spout");
+//        preProcessorBolt.shuffleGrouping("twitter-spout");
 
-        BoltDeclarer preFilterBolt = topologyBuilder.setBolt("pre-filter", new PreFilterBolt() , 3);
-        preFilterBolt.shuffleGrouping("pre-processor");
 
-        BoltDeclarer contextFilterBolt = topologyBuilder.setBolt("context-filter", new ContextFilterBolt() , 2);
-        contextFilterBolt.shuffleGrouping("pre-filter");
+        BoltDeclarer contextFilterBolt = topologyBuilder.setBolt("context-filter-bolt", new ContextFilterBolt() , 2);
+        contextFilterBolt.shuffleGrouping("pre-filter-bolt");
 
-        BoltDeclarer evidenceClassifierBolt = topologyBuilder.setBolt("evidence-classifier", new EvidenceClassifierBolt() , 1);
-        evidenceClassifierBolt.shuffleGrouping("context-filter");
+        BoltDeclarer evidenceClassifierBolt = topologyBuilder.setBolt("evidence-classifier-bolt", new EvidenceClassifierBolt() , 1);
+        evidenceClassifierBolt.shuffleGrouping("context-filter-bolt");
         //evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
 
-        BoltDeclarer contentClassifierBolt = topologyBuilder.setBolt("content-classifier", new ContentClassifierBolt() , 1);
-        contentClassifierBolt.shuffleGrouping("evidence-classifier");
+        BoltDeclarer contentClassifierBolt = topologyBuilder.setBolt("content-classifier-bolt", new ContentClassifierBolt() , 1);
+        contentClassifierBolt.shuffleGrouping("evidence-classifier-bolt");
         //contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
 
         //BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new bolt.EvidenceContentJoinBolt(), 1);
         //evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
         //evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
 
-        BoltDeclarer synthesizerBolt = topologyBuilder.setBolt("synthesizer", new Synthesizer(), 1);
-        synthesizerBolt.shuffleGrouping("content-classifier");
+        BoltDeclarer synthesizerBolt = topologyBuilder.setBolt("synthesizer-bolt", new Synthesizer(), 1);
+        synthesizerBolt.shuffleGrouping("content-classifier-bolt");
         //synthesizerBolt.shuffleGrouping("evidence-content-join");
 
         final LocalCluster cluster = new LocalCluster();

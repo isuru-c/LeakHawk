@@ -1,4 +1,4 @@
-package bolt;/*
+/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,10 @@ package bolt;/*
  *    limitations under the License.
  */
 
-import classifiers.Content.*;
+package bolt;
+
+import classifier.Content.*;
+import model.ContentData;
 import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
@@ -29,6 +32,7 @@ import org.reflections.Reflections;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,14 +49,15 @@ public class ContentClassifierBolt extends BaseRichBolt {
         collector = outputCollector;
         classifierList = new ArrayList<ContentClassifier>();
 
-        Reflections reflections = new Reflections("classifiers.Content");
+        Reflections reflections = new Reflections("classifier.Content");
         Set<Class<?>> classifierCache = reflections.getTypesAnnotatedWith(ContentPattern.class);
 
         for (Class<?> clazz : classifierCache) {
             final Constructor<?> ctor = clazz.getConstructors()[0];
             try {
                 classifierList.add(ContentClassifier.class.cast(ctor.newInstance(
-                        new Object[]{clazz.getAnnotation(ContentPattern.class).filePath()})));
+                        new Object[]{clazz.getAnnotation(ContentPattern.class).filePath(),
+                                clazz.getAnnotation(ContentPattern.class).patternName()})));
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -70,41 +75,45 @@ public class ContentClassifierBolt extends BaseRichBolt {
         String title = post.getTitle();
         String postText = post.getPostText();
         ContentModel contentModel = new ContentModel();
-        post.setContentModel(contentModel);
-        ArrayList<Boolean> booleanList = new ArrayList<Boolean>();
+        List<ContentData> contentDataList = new ArrayList();
+
         try {
 
+//            for (ContentClassifier classifier : classifierList) {
+//                booleanList.add(classifier.classify(postText, title));
+//            }
+//
+//            boolean ccClassify = booleanList.get(0);
+//            boolean cfClassify = booleanList.get(1);
+//            boolean daClassify = booleanList.get(2);
+//            boolean dbClassify = booleanList.get(3);
+//            boolean ecClassify = booleanList.get(4);
+//            boolean eoClassify = booleanList.get(5);
+//            boolean pkClassify = booleanList.get(6);
+//
+//            contentModel.setPassedCC(ccClassify);
+//            contentModel.setPassedCF(cfClassify);
+//            contentModel.setPassedDA(daClassify);
+//            contentModel.setPassedDB(dbClassify);
+//            contentModel.setPassedEC(ecClassify);
+//            contentModel.setPassedEO(eoClassify);
+//            contentModel.setPassedPK(pkClassify);
+
             for (ContentClassifier classifier : classifierList) {
-                booleanList.add(classifier.classify(postText, title));
+                if(classifier.classify(postText, title)) {
+                    ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
+                    contentDataList.add(contentData);
+                }
             }
 
-            boolean ccClassify = booleanList.get(0);
-            boolean cfClassify = booleanList.get(1);
-            boolean daClassify = booleanList.get(2);
-            boolean dbClassify = booleanList.get(3);
-            boolean ecClassify = booleanList.get(4);
-            boolean eoClassify = booleanList.get(5);
-            boolean pkClassify = booleanList.get(6);
-
-            contentModel.setPassedCC(ccClassify);
-            contentModel.setPassedCF(cfClassify);
-            contentModel.setPassedDA(daClassify);
-            contentModel.setPassedDB(dbClassify);
-            contentModel.setPassedEC(ecClassify);
-            contentModel.setPassedEO(eoClassify);
-            contentModel.setPassedPK(pkClassify);
+            contentModel.setContentDataList(contentDataList);
 
         } catch (java.lang.StackOverflowError e) {
-            contentModel.setPassedCC(false);
-            contentModel.setPassedCF(false);
-            contentModel.setPassedDA(false);
-            contentModel.setPassedDB(false);
-            contentModel.setPassedEC(false);
-            contentModel.setPassedEO(false);
-            contentModel.setPassedPK(false);
+            System.err.println("\n\n\n\n"+e.getMessage()+"\n\n\n\n");
         }
 
         post.setContentClassifierPassed();
+        post.setContentModel(contentModel);
         collector.emit(tuple, new Values(post));
         collector.ack(tuple);
 

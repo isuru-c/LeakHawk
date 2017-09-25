@@ -1,5 +1,5 @@
-package spout;/*
- * Copyright 2017 SWIS
+/*
+ *    Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@ package spout;/*
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+package spout;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -31,38 +33,34 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by Isuru Chandima on 7/3/17.
+ * This Spout will get the data from kafka and connect it to the storm topology
+ *
+ * @author Isuru Chandima
  */
-public class PastebinSpout extends BaseRichSpout{
+public class PastebinSpout extends BaseRichSpout {
 
     private SpoutOutputCollector collector;
     private Properties properties = null;
     private KafkaConsumer<String, String> consumer = null;
 
-    public PastebinSpout(){
-
+    public PastebinSpout() {
         properties = new Properties();
-
         properties.put("bootstrap.servers", "localhost:9092");
         properties.put("group.id", "consumer-test");
         properties.put("key.deserializer", StringDeserializer.class.getName());
         properties.put("value.deserializer", StringDeserializer.class.getName());
-
     }
 
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
         this.collector = spoutOutputCollector;
-
         consumer = new KafkaConsumer<String, String>(properties);
         consumer.subscribe(Arrays.asList("pastebin-posts"));
     }
 
     public void nextTuple() {
         Utils.sleep(100);
-
         ConsumerRecords<String, String> records = consumer.poll(1000);
         for (ConsumerRecord<String, String> record : records) {
-            //System.out.println(record.offset() + ": " + record.value());
             collector.emit(new Values(record.value()));
         }
     }

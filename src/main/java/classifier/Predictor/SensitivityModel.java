@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers.Predictor;
+package classifier.Predictor;
 
 /**
  * @author Sugeesh Chandraweera

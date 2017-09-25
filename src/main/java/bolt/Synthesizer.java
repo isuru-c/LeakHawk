@@ -1,4 +1,4 @@
-package bolt;/*
+/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,13 @@ package bolt;/*
  *    limitations under the License.
  */
 
+package bolt;
+
+import classifier.Content.ContentClassifier;
+import model.ContentData;
 import model.EvidenceModel;
 import model.ContentModel;
-import classifiers.Predictor.SensitivityModel;
+import classifier.Predictor.SensitivityModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
@@ -31,6 +35,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,171 +72,56 @@ public class Synthesizer extends BaseRichBolt {
         evidenceModel = post.getEvidenceModel();
         contentModel = post.getContentModel();
 
-        SensitivityModel sensitivityModel = predictSensitivity(post.getPostText());
+        if (contentModel.isContentFound()) {
+            List contentDataList = contentModel.getContentDataList();
+            int highestLevel = 0;
 
-        if ((sensitivityModel.isEvidenceClassifier() || sensitivityModel.isContentClassifier()) && sensitivityModel.getLevel()>=2) {
+            for (Object contentDataObj : contentDataList) {
+                ContentData contentData = (ContentData) contentDataObj;
+                if (contentData.getLevel() > highestLevel) {
+                    highestLevel = contentData.getLevel();
+                }
+            }
 
-
-            try {
-                String title = post.getTitle().replace("'","/'");
-                String user = post.getUser().replace("'","/'");
-                DBHandle.setData(connection,"INSERT INTO Incident VALUES ('"+post.getKey()+"','"+user+"','"+title+"','"
-                        +post.getPostType()+"','"+post.getDate()+"',"+sensitivityModel.getLevel()+","+sensitivityModel.isContentClassifier()
-                        +","+sensitivityModel.isEvidenceClassifier()+",'"+sensitivityModel.getPredictClass()+"')");
-            } catch (SQLException e) {
-                e.printStackTrace();
+            ArrayList<ContentData> highestContent = new ArrayList<>();
+            for (Object contentDataObj : contentDataList) {
+                ContentData contentData = (ContentData) contentDataObj;
+                if (contentData.getLevel() == highestLevel) {
+                    highestContent.add(contentData);
+                }
             }
 
 
-            System.out.println("\nPost  : " + post.getKey());
-            System.out.println("\nEvidence Found  : " + sensitivityModel.isEvidenceClassifier());
-            System.out.println("\nContent Found  : " + sensitivityModel.isContentClassifier());
+            String classString = "";
+            for (int i = 0; i < highestContent.size(); i++) {
+                classString += highestContent.get(i).getContentType();
+                if (i != highestContent.size() - 1) {
+                    classString += ",";
+                }
+            }
 
+            if (evidenceModel.isEvidenceFound() && highestLevel > 0) {
+                String title = post.getTitle().replace("'", "/'");
+                String user = post.getUser().replace("'", "/'");
+                try {
+                    DBHandle.setData(connection, "INSERT INTO Incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
+                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
+                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
 
-            System.out.println("Sensitivity level of post is :" + sensitivityModel.getLevel() + "\n");
-            System.out.println("Sensitivity class is  :" + sensitivityModel.getPredictClass() + "\n");
+                    System.out.println("\nPost  : " + post.getKey());
+                    System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
+                    System.out.println("\nContent Found  : " + contentModel.isContentFound());
+                    System.out.println("Sensitivity level of post is :" + highestLevel + "\n");
+                    System.out.println("Sensitivity class is  :" + classString + "\n");
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
-        //System.out.println("\nKey: " + post.getKey() + "\nDate: " + post.getDate() + "\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\nCount: " + count++);
+
         collector.ack(tuple);
-    }
-
-
-    public int getCreditCardNumberCount() {
-        return creditCardNumberCount;
-    }
-
-    public void setCreditCardNumberCount(int creditCardNumberCount) {
-        this.creditCardNumberCount = creditCardNumberCount;
-    }
-
-    public void setURLratio(int URLratio) {
-        this.URLratio = URLratio;
-    }
-
-    public void setEmail_hash_count(int email_hash_count) {
-        this.email_hash_count = email_hash_count;
-    }
-
-    public int getURLratio() {
-        return URLratio;
-    }
-
-    public int getEmail_hash_count() {
-        return email_hash_count;
-    }
-
-    public SensitivityModel predictSensitivity(String post) {
-        SensitivityModel sensitivityModel = new SensitivityModel();
-        sensitivityModel.setContentClassifier(contentModel.isContentFound());
-        sensitivityModel.setEvidenceClassifier(evidenceModel.isEvidenceFound());
-
-        if ((contentModel.isContentFound() && evidenceModel.isEvidenceFound())) {
-            if (contentModel.isPassedCC()) {
-                setCreditCardNumberCount(extractCCNumberCount(post));
-                if ((creditCardNumberCount < 5)) {
-                    sensitivityModel.setLevel(1);
-                } else if ((creditCardNumberCount < 20) && (creditCardNumberCount > 5)) {
-                    sensitivityModel.setLevel(2);
-                } else if (creditCardNumberCount > 20) {
-                    sensitivityModel.setLevel(3);
-                }
-                sensitivityModel.setPredictClass("CC");
-            } else if (contentModel.isPassedPK()) {
-                sensitivityModel.setLevel(3);
-                sensitivityModel.setPredictClass("PK");
-            } else if (contentModel.isPassedCF()) {
-                if (post.contains("enable password")) {
-                    sensitivityModel.setLevel(3);
-                } else {
-                    sensitivityModel.setLevel(1);
-                }
-                sensitivityModel.setPredictClass("CF");
-            } else if (contentModel.isPassedDB()) {
-                sensitivityModel.setLevel(2);
-                sensitivityModel.setPredictClass("DB");
-
-            } else if (contentModel.isPassedDA()) {
-                ArrayList<String> DAlist = new ArrayList<String>(Arrays.asList("lanka", "lk", "ceylon", "sinhala", "buddhist", "colombo", "kandy", "kurunegala", "gampaha", "mahinda", "sirisena", "ranil"));
-                int domainCount = 0;
-                for (String i : DAlist) {
-                    if (post.contains(i)) {
-                        count++;
-                    }
-                }
-                if (domainCount < 10) {
-                    sensitivityModel.setLevel(2);
-                    sensitivityModel.setPredictClass("DA");
-                } else if (domainCount >= 10) {
-                    sensitivityModel.setLevel(3);
-                    sensitivityModel.setPredictClass("DA");
-                } else {
-                    sensitivityModel.setLevel(1);
-                    sensitivityModel.setPredictClass("DA");
-                }
-
-            } else if (contentModel.isPassedEO()) {
-                sensitivityModel.setPredictClass("EO");
-                int email_count = EOCounter(post);
-                if (email_count < 50) {
-                    sensitivityModel.setLevel(1);
-                } else {
-                    sensitivityModel.setLevel(2);
-                }
-            }
-        } else if (contentModel.isPassedEC()) {
-            sensitivityModel.setPredictClass("EC");
-            ArrayList<String> ECList = new ArrayList<String>(Arrays.asList("CONFIDENTIAL", "secret", "do not disclose"));
-            int ecCount = 0;
-            for (String i : ECList) {
-                if (post.contains(i)) {
-                    ecCount++;
-                }
-            }
-            if (ecCount > 0) {
-                sensitivityModel.setLevel(3);
-            } else {
-                sensitivityModel.setLevel(1);
-            }
-
-        }
-        if (evidenceModel.isEvidenceFound() && !contentModel.isContentFound()) {
-            sensitivityModel.setLevel(1);
-        }
-        if (!evidenceModel.isEvidenceFound() && !contentModel.isContentFound()) {
-            sensitivityModel.setLevel(0);
-        }
-
-        return sensitivityModel;
-        //System.err.println("Sensitivity : " + sensitivityLabel);
-
-    }
-
-
-    //******************************** EO related functions ******************************************** //
-    public int EOCounter(String post) {
-
-        Pattern emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
-
-        Matcher matcherEO = emailPattern.matcher(post);
-        int EO_Count = getMatchingCount(matcherEO);
-        return EO_Count;
-    }
-
-    //******************************** CC related functions ******************************************** //
-    public int extractCCNumberCount(String post) {
-
-        ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
-
-        Matcher matcherCC = ccCardPattern.matcher(post);
-        int CC_Count = getMatchingCount(matcherCC);
-        return CC_Count;
-    }
-
-    public int getMatchingCount(Matcher matcher) {
-        int count = 0;
-        while (matcher.find())
-            count++;
-        return count;
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {

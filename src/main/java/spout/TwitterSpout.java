@@ -36,9 +36,9 @@ import java.util.Properties;
 /**
  * This Spout will get the data from kafka and connect it to the storm topology
  *
- * @author Isuru Chandima
+ * @author Sugeesh Chandraweera
  */
-public class DumpSpout extends BaseRichSpout {
+public class TwitterSpout extends BaseRichSpout {
 
     private SpoutOutputCollector collector;
     private Properties properties = null;
@@ -46,7 +46,7 @@ public class DumpSpout extends BaseRichSpout {
 
     private String postType = "dump-posts";
 
-    public DumpSpout() {
+    public TwitterSpout() {
         properties = new Properties();
         properties.put("bootstrap.servers", "localhost:9092");
         properties.put("group.id", "consumer-dump");
@@ -64,15 +64,7 @@ public class DumpSpout extends BaseRichSpout {
         Utils.sleep(100);
         ConsumerRecords<String, String> records = consumer.poll(1000);
         for (ConsumerRecord<String, String> record : records) {
-            Post post = new Post();
-            post.setPostType(postType);
-            post.setKey("");
-            post.setDate("");
-            post.setTitle("");
-            post.setUser("");
-            post.setSyntax("");
-            post.setPostText(record.value());
-            collector.emit(new Values(post));
+            collector.emit(new Values(record.value()));
         }
     }
 

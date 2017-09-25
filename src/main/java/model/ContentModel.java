@@ -16,7 +16,9 @@
 
 package model;
 
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Sugeesh Chandraweera
@@ -24,95 +26,23 @@ import java.io.Serializable;
 public class ContentModel implements Serializable{
 
     private boolean contentFound;
-    private boolean passedCC;
-    private boolean passedCF;
-    private boolean passedDA;
-    private boolean passedDB;
-    private boolean passedEC;
-    private boolean passedEO;
-    private boolean passedPK;
-    private boolean passedUC;
-    private boolean passedWD;
+    private List contentDataList;
 
     public boolean isContentFound(){
-        if(passedCC || passedCF || passedDA || passedDB || passedEC || passedEO || passedPK){
+        if (!contentDataList.isEmpty())
             contentFound = true;
-        }
-        else {
-            contentFound = false;
-        }
         return contentFound;
     }
 
-    public boolean isPassedCC() {
-        return passedCC;
+    public void setContentFound(boolean contentFound) {
+        this.contentFound = contentFound;
     }
 
-    public void setPassedCC(boolean passedCC) {
-        this.passedCC = passedCC;
+    public List getContentDataList() {
+        return contentDataList;
     }
 
-    public boolean isPassedCF() {
-        return passedCF;
-    }
-
-    public void setPassedCF(boolean passedCF) {
-        this.passedCF = passedCF;
-    }
-
-    public boolean isPassedDA() {
-        return passedDA;
-    }
-
-    public void setPassedDA(boolean passedDA) {
-        this.passedDA = passedDA;
-    }
-
-    public boolean isPassedDB() {
-        return passedDB;
-    }
-
-    public void setPassedDB(boolean passedDB) {
-        this.passedDB = passedDB;
-    }
-
-    public boolean isPassedEC() {
-        return passedEC;
-    }
-
-    public void setPassedEC(boolean passedEC) {
-        this.passedEC = passedEC;
-    }
-
-    public boolean isPassedEO() {
-        return passedEO;
-    }
-
-    public void setPassedEO(boolean passedEO) {
-        this.passedEO = passedEO;
-    }
-
-    public boolean isPassedPK() {
-        return passedPK;
-    }
-
-    public void setPassedPK(boolean passedPK) {
-        this.passedPK = passedPK;
-    }
-
-    public boolean isPassedUC() {
-        return passedUC;
-    }
-
-    public void setPassedUC(boolean passedUC) {
-        this.passedUC = passedUC;
-    }
-
-    public boolean isPassedWD() {
-        return passedWD;
-    }
-
-    public void setPassedWD(boolean passedWD) {
-        this.passedWD = passedWD;
+    public void setContentDataList(List contentDataList) {
+        this.contentDataList = contentDataList;
     }
 }

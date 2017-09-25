@@ -1,4 +1,4 @@
-package classifiers.Content;
+package classifier.Content;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

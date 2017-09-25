@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package classifiers.Content;
+package classifier.Content;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
@@ -54,8 +54,8 @@ public class CCClassifier extends ContentClassifier {
 //        System.out.println("Result is :" + ccClassifier.classify("", "1.txt"));
 //    }
 
-    public CCClassifier(String model) {
-        super(model);
+    public CCClassifier(String model,String name) {
+        super(model, name);
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
         } catch (Exception e) {
@@ -256,6 +256,29 @@ public class CCClassifier extends ContentClassifier {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public int getSensivityLevel(String post){
+        int creditCardNumberCount = extractCCNumberCount(post);
+        if ((creditCardNumberCount < 5 && creditCardNumberCount > 0)) {
+            return 1;
+        } else if ((creditCardNumberCount < 20) && (creditCardNumberCount > 5)) {
+            return 2;
+        } else if (creditCardNumberCount > 20) {
+            return 3;
+        }
+        return 0;
+    }
+
+
+    public int extractCCNumberCount(String post) {
+
+        ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
+
+        Matcher matcherCC = ccCardPattern.matcher(post);
+        int CC_Count = getMatchingCount(matcherCC);
+        return CC_Count;
     }
 
 
