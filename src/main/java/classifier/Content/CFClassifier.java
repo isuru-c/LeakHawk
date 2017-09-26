@@ -28,7 +28,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "CF", filePath = "./src/main/resources/CF.model")
+@ContentPattern(patternName = "Configuration files", filePath = "./src/main/resources/CF.model")
+//@ContentPattern(patternName = "Configuration files", filePath = "CF.model")
 public class CFClassifier extends ContentClassifier{
 
     private Pattern cfSymbalPattern;
@@ -39,9 +40,44 @@ public class CFClassifier extends ContentClassifier{
     private Pattern digitPattern;
     private Pattern alphaPattern;
     private Pattern alphDigitPattern;
+    private RandomForest tclassifier;
+    private String headingCF = "@relation CF\n" +
+            "\n" +
+            "@attribute $CF1 numeric\n" +
+            "@attribute $CF2 numeric\n" +
+            "@attribute $CF3 numeric\n" +
+            "@attribute $CF4 numeric\n" +
+            "@attribute $CF5 numeric\n" +
+            "@attribute $CF6 numeric\n" +
+            "@attribute $CF7 numeric\n" +
+            "@attribute $CF8 numeric\n" +
+            "@attribute $CF9 numeric\n" +
+            "@attribute $CF10 numeric\n" +
+            "@attribute $CF11 numeric\n" +
+            "@attribute $CF12 numeric\n" +
+            "@attribute $CF13 numeric\n" +
+            "@attribute $CF14 numeric\n" +
+            "@attribute $CF15 numeric\n" +
+            "@attribute $CF16 numeric\n" +
+            "@attribute $CF17 numeric\n" +
+            "@attribute $CF18 numeric\n" +
+            "@attribute $CF19 numeric\n" +
+            "@attribute $CF20 numeric\n" +
+            "@attribute $CF21 numeric\n" +
+            "@attribute $CF22 numeric\n" +
+            "@attribute $CF23 numeric\n" +
+            "@attribute $CF24 numeric\n" +
+            "@attribute @@class@@ {CF,non}\n" +
+            "\n" +
+            "@data\n";
 
     public CFClassifier(String model, String name) {
         super(model,name);
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("ip");
         unigramList.add("cisco");
@@ -92,7 +128,6 @@ public class CFClassifier extends ContentClassifier{
         }
     }
 
-    @Override
     public String createARFF(String text,String title) {
         String feature_list = "";
 
@@ -136,7 +171,6 @@ public class CFClassifier extends ContentClassifier{
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/CF.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

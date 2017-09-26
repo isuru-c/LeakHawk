@@ -46,11 +46,6 @@ import java.util.regex.Pattern;
 public class Synthesizer extends BaseRichBolt {
 
     private OutputCollector collector;
-    private static int count = 0;
-    private int creditCardNumberCount;
-    private int URLratio;
-    private int email_hash_count;
-    private Pattern ccCardPattern;
     private EvidenceModel evidenceModel;
     private ContentModel contentModel;
     private Connection connection;

@@ -28,7 +28,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "DB", filePath = "./src/main/resources/DB.model")
+@ContentPattern(patternName = "Database", filePath = "./src/main/resources/DB.model")
+//@ContentPattern(patternName = "Database", filePath = "DB.model")
 public class DBClassifier extends ContentClassifier {
     private Pattern symbalPattern;
     private ArrayList<Pattern> unigramPatternList;
@@ -38,10 +39,50 @@ public class DBClassifier extends ContentClassifier {
     private Pattern relatedPattern3;
     private Pattern relatedPattern4;
     private Pattern relatedPattern5;
+    private RandomForest tclassifier;
+
+    private String headingDB = "@relation DB\n" +
+            "\n" +
+            "@attribute $DB1 numeric\n" +
+            "@attribute $DB2 numeric\n" +
+            "@attribute $DB3 numeric\n" +
+            "@attribute $DB4 numeric\n" +
+            "@attribute $DB5 numeric\n" +
+            "@attribute $DB6 numeric\n" +
+            "@attribute $DB7 numeric\n" +
+            "@attribute $DB8 numeric\n" +
+            "@attribute $DB9 numeric\n" +
+            "@attribute $DB10 numeric\n" +
+            "@attribute $DB11 numeric\n" +
+            "@attribute $DB12 numeric\n" +
+            "@attribute $DB13 numeric\n" +
+            "@attribute $DB14 numeric\n" +
+            "@attribute $DB15 numeric\n" +
+            "@attribute $DB16 numeric\n" +
+            "@attribute $DB17 numeric\n" +
+            "@attribute $DB18 numeric\n" +
+            "@attribute $DB19 numeric\n" +
+            "@attribute $DB20 numeric\n" +
+            "@attribute $DB21 numeric\n" +
+            "@attribute $DB22 numeric\n" +
+            "@attribute $DB23 numeric\n" +
+            "@attribute $DB24 numeric\n" +
+            "@attribute $DB25 numeric\n" +
+            "@attribute @@class@@ {DB,non}\n" +
+            "\n" +
+            "@data\n";
 
 
     public DBClassifier(String model, String name) {
         super(model, name);
+
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("0|null|blank");
         unigramList.add("insert|update|create");
@@ -87,7 +128,6 @@ public class DBClassifier extends ContentClassifier {
 
     }
 
-    @Override
     public String createARFF(String text, String title) {
         String feature_list = "";
 
@@ -142,7 +182,6 @@ public class DBClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/DB.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

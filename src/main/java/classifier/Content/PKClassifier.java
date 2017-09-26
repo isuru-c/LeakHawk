@@ -28,7 +28,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "PK", filePath = "./src/main/resources/PK.model")
+@ContentPattern(patternName = "Private keys", filePath = "./src/main/resources/PK.model")
+//@ContentPattern(patternName = "Private keys", filePath = "PK.model")
 public class PKClassifier extends ContentClassifier {
 
     private ArrayList<Pattern> unigramPatternList;
@@ -39,9 +40,43 @@ public class PKClassifier extends ContentClassifier {
     private Pattern relatedPattern1;
     private Pattern relatedPattern2;
 
+    private RandomForest tclassifier;
+
+    private String headingPK = "@relation PK\n" +
+            "\n" +
+            "@attribute $PK1 numeric\n" +
+            "@attribute $PK2 numeric\n" +
+            "@attribute $PK3 numeric\n" +
+            "@attribute $PK4 numeric\n" +
+            "@attribute $PK5 numeric\n" +
+            "@attribute $PK6 numeric\n" +
+            "@attribute $PK7 numeric\n" +
+            "@attribute $PK8 numeric\n" +
+            "@attribute $PK9 numeric\n" +
+            "@attribute $PK10 numeric\n" +
+            "@attribute $PK11 numeric\n" +
+            "@attribute $PK12 numeric\n" +
+            "@attribute $PK13 numeric\n" +
+            "@attribute $PK14 numeric\n" +
+            "@attribute $PK15 numeric\n" +
+            "@attribute $PK16 numeric\n" +
+            "@attribute $PK17 numeric\n" +
+            "@attribute $PK18 numeric\n" +
+            "@attribute $PK19 numeric\n" +
+            "@attribute $PK20 numeric\n" +
+            "@attribute $PK21 numeric\n" +
+            "@attribute @@class@@ {PK,non}\n" +
+            "\n" +
+            "@data\n";
+
 
     public PKClassifier(String model, String name) {
         super(model, name);
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("PRIVATE");
         unigramList.add("KEY");
@@ -107,8 +142,6 @@ public class PKClassifier extends ContentClassifier {
         relatedPattern2 = getCorrectPatten("\\b"+"PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY"+"\\b", Pattern.CASE_INSENSITIVE);
     }
 
-
-    @Override
     public String createARFF(String text,String title) {
         String feature_list = "";
 
@@ -160,7 +193,6 @@ public class PKClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/PK.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

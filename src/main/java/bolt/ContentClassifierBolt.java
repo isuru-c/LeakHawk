@@ -37,11 +37,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Isuru Chandima on 7/28/17.
+ * This Bolt is for classify the content into the different sensitive classes
+ *
+ * @author Isuru Chandima
+ * @author Sugeesh Chandraweera
  */
 public class ContentClassifierBolt extends BaseRichBolt {
-
     private OutputCollector collector;
+
+    /**
+     * This classifierList will contain the custom classifier list load on the run time
+     */
     private ArrayList<ContentClassifier> classifierList;
 
 
@@ -49,9 +55,11 @@ public class ContentClassifierBolt extends BaseRichBolt {
         collector = outputCollector;
         classifierList = new ArrayList<ContentClassifier>();
 
+        // Load the all the ContentPatterns
         Reflections reflections = new Reflections("classifier.Content");
         Set<Class<?>> classifierCache = reflections.getTypesAnnotatedWith(ContentPattern.class);
 
+        // Create Objects from every ContentPattern
         for (Class<?> clazz : classifierCache) {
             final Constructor<?> ctor = clazz.getConstructors()[0];
             try {
@@ -76,40 +84,22 @@ public class ContentClassifierBolt extends BaseRichBolt {
         String postText = post.getPostText();
         ContentModel contentModel = new ContentModel();
         List<ContentData> contentDataList = new ArrayList();
+        contentModel.setContentDataList(contentDataList);
 
         try {
-
-//            for (ContentClassifier classifier : classifierList) {
-//                booleanList.add(classifier.classify(postText, title));
-//            }
-//
-//            boolean ccClassify = booleanList.get(0);
-//            boolean cfClassify = booleanList.get(1);
-//            boolean daClassify = booleanList.get(2);
-//            boolean dbClassify = booleanList.get(3);
-//            boolean ecClassify = booleanList.get(4);
-//            boolean eoClassify = booleanList.get(5);
-//            boolean pkClassify = booleanList.get(6);
-//
-//            contentModel.setPassedCC(ccClassify);
-//            contentModel.setPassedCF(cfClassify);
-//            contentModel.setPassedDA(daClassify);
-//            contentModel.setPassedDB(dbClassify);
-//            contentModel.setPassedEC(ecClassify);
-//            contentModel.setPassedEO(eoClassify);
-//            contentModel.setPassedPK(pkClassify);
-
+            /* Check post with each classifier and if it is match add the classifier type and
+            sensitivity to the contentDataList */
             for (ContentClassifier classifier : classifierList) {
                 if(classifier.classify(postText, title)) {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
                 }
             }
-
-            contentModel.setContentDataList(contentDataList);
-
         } catch (java.lang.StackOverflowError e) {
-            System.err.println("\n\n\n\n"+e.getMessage()+"\n\n\n\n");
+            /* If message is too long */
+            //TODO read only the first 20 lines
+            System.out.println("\n\n\n\n");
+            e.printStackTrace();
         }
 
         post.setContentClassifierPassed();

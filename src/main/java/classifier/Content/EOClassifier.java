@@ -27,26 +27,39 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "EO", filePath = "./src/main/resources/EO.model")
+@ContentPattern(patternName = "Email only", filePath = "./src/main/resources/EO.model")
+//@ContentPattern(patternName = "Email only", filePath = "EO.model")
 public class EOClassifier extends ContentClassifier {
 
     private Pattern relatedPattern1;
     private Pattern relatedPattern2;
-
     private Pattern emailPattern;
+    private RandomForest tclassifier;
 
+    private String headingEO = "@relation train\n" +
+            "\n" +
+            "@attribute $EO1 numeric\n" +
+            "@attribute $EO2 numeric\n" +
+            "@attribute $EO3 numeric\n" +
+            "@attribute $EO4 numeric\n" +
+            "@attribute $EO5 numeric\n" +
+            "@attribute @@class@@ {EO,non}\n" +
+            "\n" +
+            "@data\n";
 
     public EOClassifier(String model, String name) {
-
         super(model, name);
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         relatedPattern1 = Pattern.compile("email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         relatedPattern2 = Pattern.compile("leaked by|Emails LeakeD|domains hacked|leaked email list|email list leaked|leaked emails|leak of|email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
-
-
     }
 
-    @Override
+
     public String createARFF(String text, String title) {
         String feature_list = "";
 
@@ -94,7 +107,6 @@ public class EOClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/EO.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

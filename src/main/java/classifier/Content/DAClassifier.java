@@ -29,7 +29,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "DA", filePath = "./src/main/resources/DA.model")
+@ContentPattern(patternName = "DNS Attack", filePath = "./src/main/resources/DA.model")
+//@ContentPattern(patternName = "DNS Attack", filePath = "DA.model")
 public class DAClassifier extends ContentClassifier {
 
     private ArrayList<Pattern> unigramPatternList;
@@ -43,9 +44,44 @@ public class DAClassifier extends ContentClassifier {
     private Pattern relatedPattern5;
     private Pattern relatedPattern6;
     private Pattern relatedPattern7;
+    private RandomForest tclassifier;
+
+    private String headingDA = "@relation train\n" +
+            "\n" +
+            "@attribute $DA1 numeric\n" +
+            "@attribute $DA2 numeric\n" +
+            "@attribute $DA3 numeric\n" +
+            "@attribute $DA4 numeric\n" +
+            "@attribute $DA5 numeric\n" +
+            "@attribute $DA6 numeric\n" +
+            "@attribute $DA7 numeric\n" +
+            "@attribute $DA8 numeric\n" +
+            "@attribute $DA9 numeric\n" +
+            "@attribute $DA10 numeric\n" +
+            "@attribute $DA11 numeric\n" +
+            "@attribute $DA12 numeric\n" +
+            "@attribute $DA13 numeric\n" +
+            "@attribute $DA14 numeric\n" +
+            "@attribute $DA15 numeric\n" +
+            "@attribute $DA16 numeric\n" +
+            "@attribute $DA17 numeric\n" +
+            "@attribute $DA18 numeric\n" +
+            "@attribute $DA19 numeric\n" +
+            "@attribute @@class@@ {DA,non}\n" +
+            "\n" +
+            "@data\n";
+
 
     public DAClassifier(String model, String name) {
         super(model, name);
+
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("MX|NS|PTR|CNAME|SOA");
         unigramList.add("dns|record|host");
@@ -99,159 +135,6 @@ public class DAClassifier extends ContentClassifier {
         relatedPattern7 = Pattern.compile("\\b" +"\\[\\*\\]"+"\\b", Pattern.CASE_INSENSITIVE);
     }
 
-    /*public static void main(String[] args) {
-        DAClassifier daClassifier = new DAClassifier();
-        System.out.println("Result is :" + daClassifier.classify("//require modules\n" +
-                "import \"babel-core/register\"\n" +
-                "import \"babel-polyfill\"\n" +
-                "import Vue from 'vue'\n" +
-                "import VueRouter from 'vue-router'\n" +
-                "import notify from 'v-toaster'\n" +
-                "import Vuetify from 'vuetify'\n" +
-                "import VueCookies from 'vue-cookies'\n" +
-                "import Store from './store/index'\n" +
-                "import 'v-toaster/dist/v-toaster.css'\n" +
-                "\n" +
-                "// require components\n" +
-                "import Index from '../public/components/App.vue'\n" +
-                "import Authorization from './components/Authorization.vue'\n" +
-                "import Dashboard from './components/Dashboard.vue'\n" +
-                "\n" +
-                "const routes = [\n" +
-                "    { path: '/', component: Index},\n" +
-                "    { path: '/signin', component: Authorization},\n" +
-                "    { path: '/dashboard', component: Dashboard},\n" +
-                "];\n" +
-                "\n" +
-                "\n" +
-                "//Setup Vue\n" +
-                "Vue.use(VueRouter);\n" +
-                "Vue.use(notify, {timeout: 5000});\n" +
-                "Vue.use(Vuetify);\n" +
-                "Vue.use(VueCookies);\n" +
-                "\n" +
-                "const router = new VueRouter({\n" +
-                "    mode: 'history',\n" +
-                "    routes: routes\n" +
-                "});\n" +
-                "\n" +
-                "\n" +
-                "new Vue({\n" +
-                "    el: '#app',\n" +
-                "    router: router,\n" +
-                "    store: Store\n" +
-                "    //render: h => h(Index)\n" +
-                "\n" +
-                "\n" +
-                "});\n" +
-                "\t\n" +
-                "import Vue from 'vue'\n" +
-                "import Vuex from 'vuex'\n" +
-                "import axios from 'axios'\n" +
-                "\n" +
-                "Vue.use(Vuex);\n" +
-                "\n" +
-                "const store = new Vuex.Store({\n" +
-                "    state: {\n" +
-                "        login: false,\n" +
-                "\n" +
-                "    },\n" +
-                "\n" +
-                "    getters: {\n" +
-                "        login(state) {\n" +
-                "            return state.login;\n" +
-                "        },\n" +
-                "    },\n" +
-                "\n" +
-                "    mutations: {\n" +
-                "        login(state, {type, value}) {\n" +
-                "            state[type] = value;\n" +
-                "        },\n" +
-                "    },\n" +
-                "\n" +
-                "    actions: {\n" +
-                "\n" +
-                "        async checkLogin ({state, commit}) {\n" +
-                "            let res = await axios.post('/checkLogin');\n" +
-                "\n" +
-                "            const login = res.data;\n" +
-                "\n" +
-                "            login ? this.$toaster.info(\"Welcome\") : this.$toaster.info(\"Not authorized\");\n" +
-                "\n" +
-                "            commit('login', {type: 'login', value: login});\n" +
-                "        },\n" +
-                "    },\n" +
-                "\n" +
-                "\n" +
-                "\n" +
-                "});\n" +
-                "\t\n" +
-                "<script>\n" +
-                "    import axios from 'axios';\n" +
-                "\n" +
-                "\n" +
-                "    export default {\n" +
-                "        data() {\n" +
-                "            return {\n" +
-                "\n" +
-                "                email: null,\n" +
-                "                path: '/',\n" +
-                "                errors: [],\n" +
-                "                rules: [],\n" +
-                "            }\n" +
-                "        },\n" +
-                "\n" +
-                "        computed: {\n" +
-                "            login() {\n" +
-                "                let login = this.$store.getters.login;\n" +
-                "\n" +
-                "                if(!login)\n" +
-                "                    this.$toaster.error(\"Unauthorized\");\n" +
-                "                else if ( login )\n" +
-                "                    this.$router.push('/dashboard');\n" +
-                "                return login;\n" +
-                "            }\n" +
-                "        },\n" +
-                "\n" +
-                "        methods: {\n" +
-                "\n" +
-                "            SignIn: async function () {\n" +
-                "                let data = {email: this.email, password: this.password};\n" +
-                "\n" +
-                "                try {\n" +
-                "                    let signin = await axios.post('/login', data);\n" +
-                "\n" +
-                "                    this.setLogin(signin.data);\n" +
-                "\n" +
-                "                } catch(e) {\n" +
-                "                    this.errorHandler(e);\n" +
-                "                }\n" +
-                "            },\n" +
-                "\n" +
-                "            setLogin: function (value) {\n" +
-                "                this.$store.commit('login', {type: 'login', value: login});\n" +
-                "            },\n" +
-                "\n" +
-                "\n" +
-                "        }\n" +
-                "    }\n" +
-                "</script>\n" +
-                "\t\n" +
-                "computed: {\n" +
-                "     login() {\n" +
-                "         let login = this.$store.getters.login;\n" +
-                "\n" +
-                "         if(!login)\n" +
-                "             this.$toaster.error(\"Unauthorized\");\n" +
-                "                 else if ( login )\n" +
-                "             this.$router.push('/dashboard');\n" +
-                "                    return login;\n" +
-                "     }\n" +
-                "},", "1.txt","asas"));
-    }*/
-
-
-    @Override
     public String createARFF(String text,String title) {
         String feature_list = "";
 
@@ -314,7 +197,6 @@ public class DAClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/DA.model");
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

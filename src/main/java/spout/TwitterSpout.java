@@ -64,6 +64,8 @@ public class TwitterSpout extends BaseRichSpout {
         Utils.sleep(100);
         ConsumerRecords<String, String> records = consumer.poll(1000);
         for (ConsumerRecord<String, String> record : records) {
+
+
             collector.emit(new Values(record.value()));
         }
     }

@@ -30,7 +30,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "CC", filePath = "./src/main/resources/CC.model")
+@ContentPattern(patternName = "Credit Card", filePath = "./src/main/resources/CC.model")
+//@ContentPattern(patternName = "Credit Card", filePath = "CC.model")
 public class CCClassifier extends ContentClassifier {
 
     private Pattern ccCardPattern;
@@ -48,11 +49,51 @@ public class CCClassifier extends ContentClassifier {
     private Pattern alphaPattern;
     private Pattern alphDigitPattern;
     private RandomForest tclassifier;
-
-//    public static void main(String[] args) {
-//        CCClassifier ccClassifier = new CCClassifier();
-//        System.out.println("Result is :" + ccClassifier.classify("", "1.txt"));
-//    }
+    private String headingCC = "@relation CC\n" +
+            "\n" +
+            "@attribute $CC1 numeric\n" +
+            "@attribute $CC2 numeric\n" +
+            "@attribute $CC3 numeric\n" +
+            "@attribute $CC4 numeric\n" +
+            "@attribute $CC5 numeric\n" +
+            "@attribute $CC6 numeric\n" +
+            "@attribute $CC7 numeric\n" +
+            "@attribute $CC8 numeric\n" +
+            "@attribute $CC9 numeric\n" +
+            "@attribute $CC10 numeric\n" +
+            "@attribute $CC11 numeric\n" +
+            "@attribute $CC12 numeric\n" +
+            "@attribute $CC13 numeric\n" +
+            "@attribute $CC14 numeric\n" +
+            "@attribute $CC15 numeric\n" +
+            "@attribute $CC16 numeric\n" +
+            "@attribute $CC17 numeric\n" +
+            "@attribute $CC18 numeric\n" +
+            "@attribute $CC19 numeric\n" +
+            "@attribute $CC20 numeric\n" +
+            "@attribute $CC21 numeric\n" +
+            "@attribute $CC22 numeric\n" +
+            "@attribute $CC23 numeric\n" +
+            "@attribute $CC24 numeric\n" +
+            "@attribute $CC25 numeric\n" +
+            "@attribute $CC26 numeric\n" +
+            "@attribute $CC27 numeric\n" +
+            "@attribute $CC28 numeric\n" +
+            "@attribute $CC29 numeric\n" +
+            "@attribute $CC30 numeric\n" +
+            "@attribute $CC31 numeric\n" +
+            "@attribute $CC32 numeric\n" +
+            "@attribute $CC33 numeric\n" +
+            "@attribute $CC34 numeric\n" +
+            "@attribute $CC35 numeric\n" +
+            "@attribute #N numeric\n" +
+            "@attribute #L numeric\n" +
+            "@attribute #A numeric\n" +
+            "@attribute #NP numeric\n" +
+            "@attribute #CP numeric\n" +
+            "@attribute @@class@@ {CC,non}\n" +
+            "\n" +
+            "@data\n";
 
     public CCClassifier(String model,String name) {
         super(model, name);
@@ -125,11 +166,8 @@ public class CCClassifier extends ContentClassifier {
         digitPattern = Pattern.compile("(0|[1-9][0-9]*)");
         alphaPattern = Pattern.compile("[a-zA-Z]");
         alphDigitPattern = Pattern.compile("[a-zA-Z0-9]");
-
-
     }
 
-    @Override
     public String createARFF(String text, String title) {
         String feature_list = "";
         for (Pattern pattern : unigramPatternList) {
@@ -193,7 +231,6 @@ public class CCClassifier extends ContentClassifier {
             digitStr += matcher1.group();
         }
 
-
         Matcher matcher2 = alphaPattern.matcher(text);
         String alphaStr = "";
         while (matcher2.find()) {
@@ -235,7 +272,6 @@ public class CCClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";
@@ -245,11 +281,9 @@ public class CCClassifier extends ContentClassifier {
             labeled.instance(0).setClassValue(pred);
 
             String classLabel = unlabeled.classAttribute().value((int) pred);
-
             if("CC".equals(classLabel)){
                 return true;
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -273,9 +307,7 @@ public class CCClassifier extends ContentClassifier {
 
 
     public int extractCCNumberCount(String post) {
-
         ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
-
         Matcher matcherCC = ccCardPattern.matcher(post);
         int CC_Count = getMatchingCount(matcherCC);
         return CC_Count;

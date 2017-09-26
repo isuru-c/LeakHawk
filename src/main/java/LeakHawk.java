@@ -43,8 +43,10 @@ public class LeakHawk {
         pastebinSensor.start();
 
         /* Twitter sensor */
-//        TwitterSensor twitterSensor = new TwitterSensor();
-//        twitterSensor.start();
+/*
+        TwitterSensor twitterSensor = new TwitterSensor();
+        twitterSensor.start();
+*/
 
          /* Testing sensor */
 //        DumpSensor dumpSensor = new DumpSensor();

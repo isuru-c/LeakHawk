@@ -29,7 +29,8 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "EC", filePath = "./src/main/resources/EC.model")
+@ContentPattern(patternName = "Email conversation", filePath = "./src/main/resources/EC.model")
+//@ContentPattern(patternName = "Email conversation", filePath = "EC.model")
 public class ECClassifier extends ContentClassifier {
     private Pattern titlePattern;
     private ArrayList<Pattern> unigramPatternList;
@@ -41,9 +42,31 @@ public class ECClassifier extends ContentClassifier {
     private Pattern relatedPattern5;
     private Pattern relatedPattern6;
     private Pattern relatedPattern7;
+    private RandomForest tclassifier;
+
+    private String headingEC = "@relation train\n" +
+            "\n" +
+            "@attribute $EC1 numeric\n" +
+            "@attribute $EC2 numeric\n" +
+            "@attribute $EC3 numeric\n" +
+            "@attribute $EC4 numeric\n" +
+            "@attribute $EC5 numeric\n" +
+            "@attribute $EC6 numeric\n" +
+            "@attribute $EC7 numeric\n" +
+            "@attribute @@class@@ {EC,non}\n" +
+            "\n" +
+            "@data\n";
 
     public ECClassifier(String model, String name) {
         super(model, name);
+
+        try {
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("reply|forward");
         unigramList.add("subject");
@@ -63,7 +86,6 @@ public class ECClassifier extends ContentClassifier {
 
     }
 
-    @Override
     public String createARFF(String text, String title) {
         String feature_list = "";
 
@@ -101,7 +123,7 @@ public class ECClassifier extends ContentClassifier {
             // create copy
             Instances labeled = new Instances(unlabeled);
 
-            RandomForest tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/EC.model");
+
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";

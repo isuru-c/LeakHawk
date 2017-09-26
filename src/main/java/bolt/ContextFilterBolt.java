@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *     Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+package bolt;
 
 import model.Post;
 import net.didion.jwnl.JWNL;
@@ -46,7 +48,7 @@ public class ContextFilterBolt extends BaseRichBolt {
             "Mahinda Rajapaksa","Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
             "Velupillai Prabhakaran","Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence","hemas", "LTTE",
             "Colombo", "Kandy", "Kurunegala", "Gampaha"));
-    Dictionary dictionary ;
+    Dictionary dictionary;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -57,28 +59,10 @@ public class ContextFilterBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         Post post = (Post)tuple.getValue(0);
-
         //if context filter is passed forward the data to next bolt(Evidence classifier)
         if (isPassContextFilter(post.getPostText())) {
-
-            //pass to evidence classifier
             collector.emit(tuple, new Values(post));
-
-            //collector.emit("ContentClassifier-in", tuple, new Values(post));
-            //collector.emit("EvidenceClassifier-in", tuple, new Values(post));
-
-            //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered in by context filter ---\n");
-        } else {
-            //System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by context filter ---\n");
         }
-
-        collector.emit(tuple, new Values(post));
-
-        // Following lines are used to make Context and Evidence classifiers run parallel.
-        // collector.emit("ContentClassifier-in", tuple, new Values(post));
-        // collector.emit("EvidenceClassifier-in", tuple, new Values(post));
-
-
         collector.ack(tuple);
 
     }
@@ -88,12 +72,9 @@ public class ContextFilterBolt extends BaseRichBolt {
 
         try {
             input = new FileInputStream(new File("./src/main/resources/context.properties"));
-            // load a properties file
             properties.load(input);
             loadRegExpList(18);
-
             if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
-//            if (regExpressionMatched(entry)) {
                 return true;
             }
         } catch (IOException ex) {
