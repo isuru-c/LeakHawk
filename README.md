@@ -10,7 +10,7 @@ These instructions will guide you to install and start the leakhawk system in yo
 
 ### Prerequisites
 
-We need to start apache kafka server before getting start with the LeakHawk. 
+We need to start apache kafka server before getting started with LeakHawk. 
 ```
 * Download Apache Kafka (With zookeeper)
 
