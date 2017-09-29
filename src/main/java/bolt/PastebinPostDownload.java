@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class PostDownloadBolt extends BaseRichBolt {
+public class PastebinPostDownload extends BaseRichBolt {
 
     private OutputCollector collector;
     private JSONParser parser = null;

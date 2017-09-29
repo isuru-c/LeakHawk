@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class ContextFilterBolt extends BaseRichBolt {
+public class ContextFilter extends BaseRichBolt {
 
     private Properties properties = new Properties();
     private List<String> regExpHandlerList;

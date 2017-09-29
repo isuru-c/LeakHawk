@@ -48,7 +48,7 @@ import java.util.regex.Matcher;
 /**
  * Created by Isuru Chandima on 7/28/17.
  */
-public class EvidenceClassifierBolt extends BaseRichBolt {
+public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     private OutputCollector collector;
     private ArrayList<String> keyWordList1;
