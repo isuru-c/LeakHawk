@@ -111,9 +111,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
 
         collector.emit(tuple, new Values(post));
 
-        // Following line is used to make Context and Evidence classifiers run parallel.
-        //collector.emit("EvidenceClassifier-out", tuple, new Values(post));
-
         collector.ack(tuple);
 
     }
@@ -293,10 +290,6 @@ public class EvidenceClassifierBolt extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
         outputFieldsDeclarer.declare(new Fields("post"));
-
-        // Following line is used to make Context and Evidence classifiers run parallel.
-        // outputFieldsDeclarer.declareStream("EvidenceClassifier-out", new Fields("post"));
     }
 }

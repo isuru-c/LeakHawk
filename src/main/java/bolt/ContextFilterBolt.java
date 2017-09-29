@@ -21,7 +21,9 @@ import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.Dictionary;
+
 import java.io.FileInputStream;
+
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -40,15 +42,18 @@ import java.util.regex.Pattern;
  */
 public class ContextFilterBolt extends BaseRichBolt {
 
-    private  Properties properties = new Properties();
-    private  List<String> regExpHandlerList;
+    private Properties properties = new Properties();
+    private List<String> regExpHandlerList;
     private OutputCollector collector;
     private ArrayList<String> synonyms = new ArrayList<String>();
-    private static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala","South Asia", "Mathripala sirisena",
-            "Mahinda Rajapaksa","Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
-            "Velupillai Prabhakaran","Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence","hemas", "LTTE",
+    private static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala", "South Asia", "Mathripala sirisena",
+            "Mahinda Rajapaksa", "Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
+            "Velupillai Prabhakaran", "Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence", "hemas", "LTTE",
             "Colombo", "Kandy", "Kurunegala", "Gampaha"));
     Dictionary dictionary;
+
+    private String postTypePastebin = "pastebin-posts";
+    private String postTypeTweets = "tweets";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -58,10 +63,14 @@ public class ContextFilterBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
-        Post post = (Post)tuple.getValue(0);
+        Post post = (Post) tuple.getValue(0);
         //if context filter is passed forward the data to next bolt(Evidence classifier)
-        if (isPassContextFilter(post.getPostText())) {
-            collector.emit(tuple, new Values(post));
+        if(post.getPostType() == postTypePastebin) {
+            if (isPassContextFilter(post.getPostText())) {
+                collector.emit("pastebin-out", tuple, new Values(post));
+            }
+        }else if (post.getPostType().equals(postTypeTweets)){
+            collector.emit("tweets-out", tuple, new Values(post));
         }
         collector.ack(tuple);
 
@@ -120,11 +129,11 @@ public class ContextFilterBolt extends BaseRichBolt {
         return false;
     }
 
-    public boolean isWordsetMatched(String entry){
-        for(String s: wordset){
+    public boolean isWordsetMatched(String entry) {
+        for (String s : wordset) {
             getSynonyms(s);
         }
-        for (String s:synonyms) {
+        for (String s : synonyms) {
             if (entry.toUpperCase().contains(s.toUpperCase())) {
                 return true;
             }
@@ -132,34 +141,34 @@ public class ContextFilterBolt extends BaseRichBolt {
         return false;
     }
 
-    public void getSynonyms(String noun){
+    public void getSynonyms(String noun) {
         IndexWord indexWord1 = null;
         IndexWord indexWord2 = null;
         synonyms.add(noun);
         try {
-            indexWord1 = dictionary.lookupIndexWord(POS.NOUN,noun);
-            indexWord2 = dictionary.lookupIndexWord(POS.VERB,noun);
+            indexWord1 = dictionary.lookupIndexWord(POS.NOUN, noun);
+            indexWord2 = dictionary.lookupIndexWord(POS.VERB, noun);
         } catch (JWNLException e) {
             e.printStackTrace();
         }
 
         try {
-            if(indexWord1!=null){
-                for(Synset synset: indexWord1.getSenses()){
+            if (indexWord1 != null) {
+                for (Synset synset : indexWord1.getSenses()) {
                     Word[] words = synset.getWords();
-                    for(Word word: words){
-                        if(!synonyms.contains(word.getLemma())){
+                    for (Word word : words) {
+                        if (!synonyms.contains(word.getLemma())) {
 //                            System.out.println("\t"+word.getLemma());
                             synonyms.add(word.getLemma());
                         }
                     }
                 }
             }
-            if(indexWord2!=null){
-                for(Synset synset: indexWord2.getSenses()){
+            if (indexWord2 != null) {
+                for (Synset synset : indexWord2.getSenses()) {
                     Word[] words = synset.getWords();
-                    for(Word word: words){
-                        if(!synonyms.contains(word.getLemma())){
+                    for (Word word : words) {
+                        if (!synonyms.contains(word.getLemma())) {
 //                            System.out.println("\t"+word.getLemma());
                             synonyms.add(word.getLemma());
                         }
@@ -186,10 +195,7 @@ public class ContextFilterBolt extends BaseRichBolt {
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
 
-        outputFieldsDeclarer.declare(new Fields("post"));
-
-        // Following lines are used to make Context and Evidence classifiers run parallel.
-        //outputFieldsDeclarer.declareStream("ContentClassifier-in", new Fields("post"));
-        //outputFieldsDeclarer.declareStream("EvidenceClassifier-in", new Fields("post"));
+        outputFieldsDeclarer.declareStream("pastebin-out", new Fields("post"));
+        outputFieldsDeclarer.declareStream("tweets-out", new Fields("post"));
     }
 }

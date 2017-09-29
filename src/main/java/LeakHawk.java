@@ -39,16 +39,18 @@ public class LeakHawk {
     public static void main(String[] args) {
 
         /* Pastebin sensor */
+
         PastebinSensor pastebinSensor = new PastebinSensor();
         pastebinSensor.start();
 
         /* Twitter sensor */
-/*
+
         TwitterSensor twitterSensor = new TwitterSensor();
         twitterSensor.start();
-*/
+
 
          /* Testing sensor */
+
 //        DumpSensor dumpSensor = new DumpSensor();
 //        dumpSensor.start();
 
@@ -58,40 +60,46 @@ public class LeakHawk {
         config.setMessageTimeoutSecs(120);
         TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-        // Create Spout and connect to the topology
+        // Create pastebin Spout and connect to the topology
         SpoutDeclarer pastebinSpout = topologyBuilder.setSpout("pastebin-spout", new PastebinSpout(), 2);
-//        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 1);
-//        SpoutDeclarer twitterSpout = topologyBuilder.setSpout("twitter-spout", new TwitterSpout(), 1);
 
+        // Create twitter Spout and connect to the topology
+        SpoutDeclarer twitterSpout = topologyBuilder.setSpout("twitter-spout", new TwitterSpout(), 2);
 
-        // Create bolts and connect to the topology
+        // PostDownloadBolt is used to get the content of a pastebin post
         BoltDeclarer postDownloadBolt = topologyBuilder.setBolt("pastebin-post-download-bolt", new PostDownloadBolt() , 4);
         postDownloadBolt.shuffleGrouping("pastebin-spout");
 
+        // Both pastebin and twitter feeds are fed together to the pre-filter
         BoltDeclarer preFilterBolt = topologyBuilder.setBolt("pre-filter-bolt", new PreFilterBolt() , 3);
         preFilterBolt.shuffleGrouping("pastebin-post-download-bolt");
-//        preProcessorBolt.shuffleGrouping("dump-spout");
-//        preProcessorBolt.shuffleGrouping("twitter-spout");
+        preFilterBolt.shuffleGrouping("twitter-spout");
 
-
+        // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilterBolt = topologyBuilder.setBolt("context-filter-bolt", new ContextFilterBolt() , 2);
         contextFilterBolt.shuffleGrouping("pre-filter-bolt");
 
+        // Separate evidence classifier for pastebin posts
         BoltDeclarer evidenceClassifierBolt = topologyBuilder.setBolt("evidence-classifier-bolt", new EvidenceClassifierBolt() , 1);
-        evidenceClassifierBolt.shuffleGrouping("context-filter-bolt");
-        //evidenceClassifierBolt.shuffleGrouping("context-filter","EvidenceClassifier-in");
+        evidenceClassifierBolt.shuffleGrouping("context-filter-bolt", "pastebin-out");
 
+        // Separate evidence classifier for tweets
+        BoltDeclarer tweetEvidenceClassifierBolt = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier() , 1);
+        tweetEvidenceClassifierBolt.shuffleGrouping("context-filter-bolt", "tweets-out");
+
+        // Separate content classifier for pastebin posts
         BoltDeclarer contentClassifierBolt = topologyBuilder.setBolt("content-classifier-bolt", new ContentClassifierBolt() , 1);
         contentClassifierBolt.shuffleGrouping("evidence-classifier-bolt");
-        //contentClassifierBolt.shuffleGrouping("context-filter","ContentClassifier-in");
 
-        //BoltDeclarer evidenceContentJoinBolt = builder.setBolt("evidence-content-join", new bolt.EvidenceContentJoinBolt(), 1);
-        //evidenceContentJoinBolt.globalGrouping("evidence-classifier", "EvidenceClassifier-out");
-        //evidenceContentJoinBolt.globalGrouping("content-classifier", "ContentClassifier-out");
+        // Separate content classifier for tweets
+        BoltDeclarer tweetContentClassifierBolt = topologyBuilder.setBolt("tweets-content-classifier-bolt", new TweetContentClassifier() , 1);
+        tweetContentClassifierBolt.shuffleGrouping("tweets-evidence-classifier-bolt");
 
+        // Both pastebin and twitter feeds are going through same synthesizer
         BoltDeclarer synthesizerBolt = topologyBuilder.setBolt("synthesizer-bolt", new Synthesizer(), 1);
         synthesizerBolt.shuffleGrouping("content-classifier-bolt");
-        //synthesizerBolt.shuffleGrouping("evidence-content-join");
+        synthesizerBolt.shuffleGrouping("tweets-content-classifier-bolt");
+
 
         final LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());

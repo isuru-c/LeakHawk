@@ -43,6 +43,7 @@ import java.util.Set;
  * @author Sugeesh Chandraweera
  */
 public class ContentClassifierBolt extends BaseRichBolt {
+
     private OutputCollector collector;
 
     /**
