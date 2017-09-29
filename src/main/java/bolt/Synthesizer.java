@@ -16,11 +16,9 @@
 
 package bolt;
 
-import classifier.Content.ContentClassifier;
 import model.ContentData;
 import model.EvidenceModel;
 import model.ContentModel;
-import classifier.Predictor.SensitivityModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
@@ -30,18 +28,20 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import parameters.LeakHawkParameters;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Created by Isuru Chandima on 7/28/17.
+ * This class is used to predict the sensitive level and risk of a post by using
+ * classification done by previous content and evidence classifiers
+ *
+ * @author Isuru Chandima
+ * @author Sugeesh Chandraweera
  */
 public class Synthesizer extends BaseRichBolt {
 
@@ -64,6 +64,17 @@ public class Synthesizer extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         Post post = (Post) tuple.getValue(0);
+
+        if (post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
+            synthesizePastebinPosts(post);
+        } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
+            synthesizeTweets(post);
+        }
+
+        collector.ack(tuple);
+    }
+
+    public void synthesizePastebinPosts(Post post){
         evidenceModel = post.getEvidenceModel();
         contentModel = post.getContentModel();
 
@@ -116,7 +127,10 @@ public class Synthesizer extends BaseRichBolt {
             }
         }
 
-        collector.ack(tuple);
+    }
+
+    public void synthesizeTweets(Post post){
+
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {

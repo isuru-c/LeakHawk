@@ -31,6 +31,7 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import parameters.LeakHawkParameters;
 
 import java.io.*;
 import java.util.*;
@@ -52,8 +53,8 @@ public class ContextFilter extends BaseRichBolt {
             "Colombo", "Kandy", "Kurunegala", "Gampaha"));
     Dictionary dictionary;
 
-    private String postTypePastebin = "pastebin-posts";
-    private String postTypeTweets = "tweets";
+    private String pastebinOut = "pastebin-out";
+    private String tweetsOut = "tweets-out";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
@@ -64,16 +65,16 @@ public class ContextFilter extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         Post post = (Post) tuple.getValue(0);
-        //if context filter is passed forward the data to next bolt(Evidence classifier)
-        if(post.getPostType() == postTypePastebin) {
-            if (isPassContextFilter(post.getPostText())) {
-                collector.emit("pastebin-out", tuple, new Values(post));
-            }
-        }else if (post.getPostType().equals(postTypeTweets)){
-            collector.emit("tweets-out", tuple, new Values(post));
-        }
-        collector.ack(tuple);
 
+        if(post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
+            if (isPassContextFilter(post.getPostText())) {
+                collector.emit(pastebinOut, tuple, new Values(post));
+            }
+        }else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)){
+            collector.emit(tweetsOut, tuple, new Values(post));
+        }
+
+        collector.ack(tuple);
     }
 
     public boolean isPassContextFilter(String entry) {
@@ -194,8 +195,7 @@ public class ContextFilter extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
-        outputFieldsDeclarer.declareStream("pastebin-out", new Fields("post"));
-        outputFieldsDeclarer.declareStream("tweets-out", new Fields("post"));
+        outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
+        outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
     }
 }
