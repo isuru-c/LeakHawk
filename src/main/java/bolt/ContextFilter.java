@@ -39,7 +39,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Isuru Chandima on 7/3/17.
+ * This Bolt is to filter in the domain related posts
+ *
+ * @author Isuru Chandima
+ * @author Warunika Amali
  */
 public class ContextFilter extends BaseRichBolt {
 
@@ -47,18 +50,20 @@ public class ContextFilter extends BaseRichBolt {
     private List<String> regExpHandlerList;
     private OutputCollector collector;
     private ArrayList<String> synonyms = new ArrayList<String>();
-    private static ArrayList<String> wordset = new ArrayList<String>(Arrays.asList("Sri Lanka", "bank", "Sinhala", "South Asia", "Mathripala sirisena",
-            "Mahinda Rajapaksa", "Ranil Wickramasinghe", "Chandrika Kumaratunga", "Sarath Fonseka", "Gotabhaya Rajapaksa", "Shavendra Silva",
-            "Velupillai Prabhakaran", "Vinayagamoorthy Muralitharan", "Karuna Amman", "Cargills", "keels", "aitken spence", "hemas", "LTTE",
-            "Colombo", "Kandy", "Kurunegala", "Gampaha"));
+    private static ArrayList<String> wordset = new ArrayList<String>();
     Dictionary dictionary;
+    private int rgexpCount=18;
 
     private String pastebinOut = "pastebin-out";
     private String tweetsOut = "tweets-out";
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
-        configureWordNet();
+        try {
+            configureWordNet();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dictionary = Dictionary.getInstance();
     }
 
@@ -77,13 +82,17 @@ public class ContextFilter extends BaseRichBolt {
         collector.ack(tuple);
     }
 
-    public boolean isPassContextFilter(String entry) {
+    private boolean isPassContextFilter(String entry) {
         InputStream input = null;
 
         try {
             input = new FileInputStream(new File("./src/main/resources/context.properties"));
             properties.load(input);
-            loadRegExpList(18);
+            regExpHandlerList = new ArrayList<String>();
+            for (int i = 1; i <= rgexpCount; i++) {
+                regExpHandlerList.add(properties.getProperty("regexp" + i));
+                //System.out.println(regExpHandlerList);
+            }
             if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
                 return true;
             }
@@ -99,14 +108,6 @@ public class ContextFilter extends BaseRichBolt {
             }
         }
         return false;
-    }
-
-    public void loadRegExpList(int rgexpCount) {
-        regExpHandlerList = new ArrayList<String>();
-        for (int i = 1; i <= rgexpCount; i++) {
-            regExpHandlerList.add(properties.getProperty("regexp" + i));
-            //System.out.println(regExpHandlerList);
-        }
     }
 
     private boolean regExpressionMatched(String input) {
@@ -130,9 +131,19 @@ public class ContextFilter extends BaseRichBolt {
         return false;
     }
 
-    public boolean isWordsetMatched(String entry) {
+    private boolean isWordsetMatched(String entry) {
         for (String s : wordset) {
-            getSynonyms(s);
+            IndexWord indexWord1 = null;
+            IndexWord indexWord2 = null;
+            synonyms.add(s);
+            try {
+                indexWord1 = dictionary.lookupIndexWord(POS.NOUN, s);
+                indexWord2 = dictionary.lookupIndexWord(POS.VERB, s);
+            } catch (JWNLException e) {
+                e.printStackTrace();
+            }
+            matchSynonyms(indexWord1);
+            matchSynonyms(indexWord2);
         }
         for (String s : synonyms) {
             if (entry.toUpperCase().contains(s.toUpperCase())) {
@@ -142,48 +153,24 @@ public class ContextFilter extends BaseRichBolt {
         return false;
     }
 
-    public void getSynonyms(String noun) {
-        IndexWord indexWord1 = null;
-        IndexWord indexWord2 = null;
-        synonyms.add(noun);
-        try {
-            indexWord1 = dictionary.lookupIndexWord(POS.NOUN, noun);
-            indexWord2 = dictionary.lookupIndexWord(POS.VERB, noun);
-        } catch (JWNLException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (indexWord1 != null) {
-                for (Synset synset : indexWord1.getSenses()) {
+    private void matchSynonyms(IndexWord indexWord){
+        if (indexWord != null) {
+            try {
+                for (Synset synset : indexWord.getSenses()) {
                     Word[] words = synset.getWords();
                     for (Word word : words) {
                         if (!synonyms.contains(word.getLemma())) {
-//                            System.out.println("\t"+word.getLemma());
                             synonyms.add(word.getLemma());
                         }
                     }
                 }
+            } catch (JWNLException e) {
+                e.printStackTrace();
             }
-            if (indexWord2 != null) {
-                for (Synset synset : indexWord2.getSenses()) {
-                    Word[] words = synset.getWords();
-                    for (Word word : words) {
-                        if (!synonyms.contains(word.getLemma())) {
-//                            System.out.println("\t"+word.getLemma());
-                            synonyms.add(word.getLemma());
-                        }
-                    }
-                }
-            }
-
-
-        } catch (JWNLException e) {
-            e.printStackTrace();
         }
     }
 
-    public static void configureWordNet() {
+    private static void configureWordNet() throws IOException {
         try {
             // initialize JWNL (this must be done before JWNL can be used)
             // See the JWordnet documentation for details on the properties file
@@ -192,6 +179,16 @@ public class ContextFilter extends BaseRichBolt {
             ex.printStackTrace();
             System.exit(-1);
         }
+
+        FileInputStream fstream = new FileInputStream("./src/main/resources/SriLanka.txt");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+        String strLine;
+
+        while ((strLine = br.readLine()) != null)   {
+            wordset.add(strLine);
+        }
+        br.close();
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
