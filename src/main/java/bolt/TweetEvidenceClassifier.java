@@ -1,4 +1,4 @@
-package bolt;/*
+/*
  * Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@ package bolt;/*
  *    limitations under the License.
  */
 
+package bolt;
+
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -26,27 +28,30 @@ import org.apache.storm.tuple.Values;
 import java.util.Map;
 
 /**
- * Created by Isuru Chandima on 8/20/17.
+ *
+ * This class is used to classify tweets according to evidences of hacking attacks or data breaches
+ *
+ * @author Isuru Chandima
  */
-public class EvidenceContentJoinBolt extends BaseRichBolt {
+public class TweetEvidenceClassifier  extends BaseRichBolt {
 
     private OutputCollector collector;
 
+    @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
     }
 
+    @Override
     public void execute(Tuple tuple) {
-
         Post post = (Post)tuple.getValue(0);
 
-        if(post.isEvidenceClassifierPassed() && post.isContentClassifierPassed()) {
-            collector.emit(tuple, new Values(post));
-        }
-        collector.ack(tuple);
+        collector.emit(tuple, new Values(post));
 
+        collector.ack(tuple);
     }
 
+    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("post"));
     }

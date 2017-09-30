@@ -42,7 +42,8 @@ import java.util.Set;
  * @author Isuru Chandima
  * @author Sugeesh Chandraweera
  */
-public class ContentClassifierBolt extends BaseRichBolt {
+public class PastebinContentClassifier extends BaseRichBolt {
+
     private OutputCollector collector;
 
     /**
