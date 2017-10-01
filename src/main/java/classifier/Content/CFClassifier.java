@@ -67,7 +67,7 @@ public class CFClassifier extends ContentClassifier{
             "@attribute $CF22 numeric\n" +
             "@attribute $CF23 numeric\n" +
             "@attribute $CF24 numeric\n" +
-            "@attribute @@class@@ {CF,non}\n" +
+            "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
 

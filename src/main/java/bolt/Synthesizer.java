@@ -85,7 +85,7 @@ public class Synthesizer extends BaseRichBolt {
             for (Object contentDataObj : contentDataList) {
                 ContentData contentData = (ContentData) contentDataObj;
                 if (contentData.getLevel() > highestLevel) {
-                    highestLevel = contentData.getLevel();
+                   highestLevel = contentData.getLevel();
                 }
             }
 
