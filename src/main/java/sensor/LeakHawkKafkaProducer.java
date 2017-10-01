@@ -23,7 +23,10 @@ import java.util.Properties;
 
 
 /**
- * Created by Isuru Chandima on 9/17/17.
+ * Kafka producer is required for each Sensor to put new posts to the kafka broker
+ * This class can be used to create new kafka producer for each sensor.
+ *
+ * @author Isuru Chandima
  */
 public class LeakHawkKafkaProducer {
 
@@ -46,8 +49,6 @@ public class LeakHawkKafkaProducer {
         properties.put("buffer.memory", 33554432);
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
-        //Producer<String, String> producer = new KafkaProducer<String, String>(properties);
 
     }
 

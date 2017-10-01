@@ -25,72 +25,52 @@ import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import parameters.LeakHawkParameters;
 
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
- * This get the data from twitter api and send them to the kafka
+ * This sensor connects the twitter stream API to the LeakHawk
+ * Given the parameters consumer key, consumer secret, token and token secret
+ * it can connect to the stream API and continuously fetch tweets from the
+ * twitter and feed them to the kafka broker with the topic defined as in
+ * LeakHawkParameters.postTypeTweets
  *
  * @author Isuru Chandima
  */
-public class TwitterSensor extends Thread{
+public class TwitterSensor extends Thread {
 
+    // Required parameters to connect to the twitter stream API
     private String consumerKey = "";
     private String consumerSecret = "";
     private String token = "";
     private String tokenSecret = "";
-    private LeakHawkKafkaProducer leakHawkKafkaProducer;
-    private Producer<String, String> pastebinProducer;
 
-    public TwitterSensor(){
-        consumerKey = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
-        consumerSecret = "9jXaU9kTDHh2pLGDyQc69AI9YhHmj2Huf2AbYcaWKgE8M3Jmzy";
-        token = "1627974024-AmWhRjy2pThPIpc1nwEhTmhws1U0AYPHkukUZrc";
-        tokenSecret = "HC7Vq3VSsOLuQ1QjZ3NihpwCymWi00pbvT10kelCtS29t";
-        leakHawkKafkaProducer = new LeakHawkKafkaProducer();
-        pastebinProducer = leakHawkKafkaProducer.getProducer();
+    // Kafka producer to feed tweets into kafka broker
+    private Producer<String, String> twitterProducer;
+
+    /**
+     * Set twitter API parameters and kafka producer for twitter sensor
+     */
+    public TwitterSensor() {
+
+        // Set the parameters for the twitter stream API
+        consumerKey = LeakHawkParameters.consumerKey;
+        consumerSecret = LeakHawkParameters.consumerSecret;
+        token = LeakHawkParameters.token;
+        tokenSecret = LeakHawkParameters.tokenSecret;
+
+        LeakHawkKafkaProducer leakHawkKafkaProducer = new LeakHawkKafkaProducer();
+        twitterProducer = leakHawkKafkaProducer.getProducer();
     }
 
-    public String getConsumerKey() {
-        return consumerKey;
-    }
+    public void run() {
 
-    public void setConsumerKey(String consumerKey) {
-        this.consumerKey = consumerKey;
-    }
-
-    public String getConsumerSecret() {
-        return consumerSecret;
-    }
-
-    public void setConsumerSecret(String consumerSecret) {
-        this.consumerSecret = consumerSecret;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getTokenSecret() {
-        return tokenSecret;
-    }
-
-    public void setTokenSecret(String tokenSecret) {
-        this.tokenSecret = tokenSecret;
-    }
-
-    public void run(){
         // Create tweeter connection
         BlockingQueue<String> queue = new LinkedBlockingQueue<String>(100);
         Hosts hosts = new HttpHosts(Constants.STREAM_HOST);
@@ -103,26 +83,21 @@ public class TwitterSensor extends Thread{
         Authentication auth = new OAuth1(consumerKey, consumerSecret, token, tokenSecret);
 
         ClientBuilder builder = new ClientBuilder()
-                .hosts(hosts)
-                .authentication(auth)
-                .endpoint(endpoint)
-                .processor(new StringDelimitedProcessor(queue));
+                .hosts(hosts).authentication(auth)
+                .endpoint(endpoint).processor(new StringDelimitedProcessor(queue));
 
         Client client = builder.build();
         client.connect();
 
-        String topic = "tweets";
-
-        for (int msgRead = 0; true; msgRead++) {
+        // Fed tweets continuously and put into kafka broker
+        while (true) {
             ProducerRecord<String, String> message = null;
             try {
-                message = new ProducerRecord<String, String>(topic, queue.take());
+                message = new ProducerRecord<String, String>(LeakHawkParameters.postTypeTweets, queue.take());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            pastebinProducer.send(message);
+            twitterProducer.send(message);
         }
-//        pastebinProducer.close();
-//        client.stop();
     }
 }

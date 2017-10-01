@@ -23,6 +23,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import parameters.LeakHawkParameters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,29 +34,47 @@ import java.net.URL;
 
 
 /**
- * This Sensor will put the pastebin files getting from the pastebin api to the kafka
+ * This Sensor will be connected to the pastebin API and fetch posts in every
+ * LeakHawkParameters.pastebinSensorSleepTime. In each request
+ * LeakHawkParameters.pastebinPostLimit number of latest posts will be fetched.
+ * The sensor required to find only the new posts which were not in previous
+ * reply and feed those posts to the kafka broker (LeakHawk)
+ *
+ * In pastebin scraping API only the list of keys of the pastebin post are given.
+ * LeakHawk needs aditional mechanisam to fetch each individual post later
+ *
+ * It is essential to whitelist the IP of the machine which runiing pastebin client
+ * before starting to fetch posts. Otherwise it will not work.
+ *
+ * For that https://pastebin.com/api_scaping_faq URL can be used
  *
  * @author Isuru Chandima
  */
 public class PastebinSensor extends Thread {
 
-    private LeakHawkKafkaProducer leakHawkKafkaProducer;
+    // Kafka producer to feed tweets into kafka broke
     private Producer<String, String> pastebinProducer;
-    private String topic = "pastebin-posts";
 
+    /**
+     * Set kafka producer for pastebin sensor
+     */
     public PastebinSensor() {
-        leakHawkKafkaProducer = new LeakHawkKafkaProducer();
+
+        LeakHawkKafkaProducer leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         pastebinProducer = leakHawkKafkaProducer.getProducer();
     }
 
     public void run() {
 
         ProducerRecord<String, String> message = null;
+
         try {
-            int postLimit = 100;
-            URL my_url = new URL("http://pastebin.com/api_scraping.php?limit=" + postLimit);
+            URL my_url = new URL(LeakHawkParameters.pastebinScapingURL + LeakHawkParameters.pastebinPostLimit);
+
             String lastKey = "";
+
             boolean pastebinSensorRunning = true;
+
             while (pastebinSensorRunning) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url.openStream()));
                 StringBuilder webPageContent = new StringBuilder();
@@ -79,14 +98,12 @@ public class PastebinSensor extends Thread {
                         lastKeyFound = true;
                         continue;
                     } else {
-                        //System.out.println("Last key: " + lastKey + "\tCurrent key: " + key);
                         continue;
                     }
-                    //System.out.println("Current key: " + key);
-                    message = new ProducerRecord<String, String>(topic, post);
+                    message = new ProducerRecord<String, String>(LeakHawkParameters.postTypePastebin, post);
                     pastebinProducer.send(message);
                 }
-                sleep(10000);
+                sleep(LeakHawkParameters.pastebinSensorSleepTime);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

@@ -29,6 +29,23 @@ public class LeakHawkParameters {
     // These keywords are used to define the topics from and into kafka broker
     public static String postTypePastebin = "pastebin-posts";
     public static String postTypeTweets = "tweets";
+    public static String postTypeDump = "dump-posts";
+
+    // Path for the dump post folder
+    public  static String dumpFolderPath = "./posts";
+
+    // Parameters needs to connect to the twitter stream API
+    public static String consumerKey = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
+    public static String consumerSecret = "9jXaU9kTDHh2pLGDyQc69AI9YhHmj2Huf2AbYcaWKgE8M3Jmzy";
+    public static String token = "1627974024-AmWhRjy2pThPIpc1nwEhTmhws1U0AYPHkukUZrc";
+    public static String tokenSecret = "HC7Vq3VSsOLuQ1QjZ3NihpwCymWi00pbvT10kelCtS29t";
+
+    // Pastebin scraping URL and post limit per request
+    public static String pastebinScapingURL = "http://pastebin.com/api_scraping.php?limit=";
+    public static int pastebinPostLimit = 100;
+
+    // Pastebin sensor sleep time
+    public static int pastebinSensorSleepTime = 10000;
 
     // Store the keyword list for the twitter pre filter
     public static ArrayList<String> twitterPreFilterKeywordList;
