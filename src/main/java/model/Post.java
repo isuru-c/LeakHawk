@@ -31,6 +31,7 @@ public class Post implements Serializable{
     private String user;
     private String syntax;
     private String postText;
+    private String language;
 
     private ContentModel contentModel = null;
     private EvidenceModel evidenceModel = null;
@@ -65,6 +66,10 @@ public class Post implements Serializable{
 
     public void setPostText(String postText) {
         this.postText = postText;
+    }
+
+    public void setLanguage(String language){
+        this.language = language;
     }
 
     public void setContentModel(ContentModel contentModel) {
@@ -102,6 +107,10 @@ public class Post implements Serializable{
 
     public String getPostText() {
         return postText;
+    }
+
+    public String getLanguage(){
+        return language;
     }
 
     public ContentModel getContentModel() {

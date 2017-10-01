@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Created by Isuru Chandima on 7/3/17.
  */
-public class PreFilter extends BaseRichBolt {
+public class PastebinPreFilter extends BaseRichBolt {
 
     private OutputCollector collector;
     private ArrayList keyWordList;
@@ -40,16 +40,19 @@ public class PreFilter extends BaseRichBolt {
         collector = outputCollector;
 
         keyWordList = new ArrayList<String>();
-        keyWordList.add("Game");
-        keyWordList.add("Sports");
-        keyWordList.add("Porn");
-        keyWordList.add("Sex");
-        keyWordList.add("XXX");
+        keyWordList.add("game");
+        keyWordList.add("sports");
+        keyWordList.add("porn");
+        keyWordList.add("sex");
+        keyWordList.add("xxx");
     }
 
     public void execute(Tuple tuple) {
 
         Post post = (Post)tuple.getValue(0);
+
+        // Convert the pastebin post to the lower case
+        post.setPostText(post.getPostText().toLowerCase());
 
         //if pre filter is passed forward the model to next bolt(context filter)
         if(!isContainKeyWord(post.getPostText())) {
@@ -66,7 +69,7 @@ public class PreFilter extends BaseRichBolt {
         try {
 
             for (int i=0;i<keyWordList.size();i++) {
-                if (post.toUpperCase().contains(keyWordList.get(i).toString().toUpperCase())) {
+                if (post.contains(keyWordList.get(i).toString())) {
                     //exit after the first successful hit
                     return true;
                 }

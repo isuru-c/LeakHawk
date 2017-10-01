@@ -86,6 +86,7 @@ public class TwitterSpout extends BaseRichSpout {
                 post.setKey((String) postDetails.get("id_str"));
                 post.setDate((String) postDetails.get("created_at"));
                 post.setPostText((String) postDetails.get("text"));
+                post.setLanguage((String) postDetails.get("lang"));
 
                 post.setUser((String) usr.get("name"));
 
