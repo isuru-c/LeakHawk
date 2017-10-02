@@ -57,6 +57,7 @@ public class ContextFilter extends BaseRichBolt {
     private String pastebinOut = "pastebin-out";
     private String tweetsOut = "tweets-out";
 
+    @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
         try {
@@ -67,6 +68,7 @@ public class ContextFilter extends BaseRichBolt {
         dictionary = Dictionary.getInstance();
     }
 
+    @Override
     public void execute(Tuple tuple) {
 
         Post post = (Post) tuple.getValue(0);
@@ -81,6 +83,12 @@ public class ContextFilter extends BaseRichBolt {
 
         collector.ack(tuple);
     }
+
+    /**
+     * Checking whether context filter is passed
+     * @param entry
+     * @return
+     */
 
     private boolean isPassContextFilter(String entry) {
         InputStream input = null;
@@ -131,6 +139,11 @@ public class ContextFilter extends BaseRichBolt {
         return false;
     }
 
+    /**
+     * Checking whether the post has matching words
+     * @param entry
+     * @return
+     */
     private boolean isWordsetMatched(String entry) {
         for (String s : wordset) {
             IndexWord indexWord1 = null;
@@ -153,6 +166,11 @@ public class ContextFilter extends BaseRichBolt {
         return false;
     }
 
+    /**
+     * Matching the synonyms from wordnet
+     * @param indexWord
+     */
+
     private void matchSynonyms(IndexWord indexWord){
         if (indexWord != null) {
             try {
@@ -170,6 +188,10 @@ public class ContextFilter extends BaseRichBolt {
         }
     }
 
+    /**
+     * Configuring Wordnet and loading the domain names
+     * @throws IOException
+     */
     private static void configureWordNet() throws IOException {
         try {
             // initialize JWNL (this must be done before JWNL can be used)
@@ -191,6 +213,7 @@ public class ContextFilter extends BaseRichBolt {
         br.close();
     }
 
+    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
