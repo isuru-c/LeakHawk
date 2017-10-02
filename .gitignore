@@ -5,3 +5,7 @@ leakhawk.iml
 leakhawk-app.iml
 dict/*
 posts/*
+leakhawk-core/leakhawk-core.iml
+leakhawk-core/target/*
+leakhawk-monitor/leakhawk-monitor.iml
+leakhawk-monitor/target/*
