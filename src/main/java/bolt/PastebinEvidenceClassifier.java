@@ -47,11 +47,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Isuru Chandima on 7/28/17.
+ * @author Udehsika Sewwandi
  */
 public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     private OutputCollector collector;
+    /**
+     * Lists used to create attributes in arff file
+     */
     private ArrayList<String> keyWordList1;
     private ArrayList<String> keyWordList2;
     //private ArrayList<String> keyWordList3;
@@ -61,16 +64,18 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
     //private ArrayList<Pattern> securityVulnerabilityPatternList;
     private ArrayList<Pattern> hackerPatternList;
     private Pattern relatedPattern1;
+    /**
+     * Database connection
+     */
     private Connection connection;
-    /* private TextDirectoryLoader loader;
-     private Instances dataRaw;
-     private StringToWordVector filter;
-     private Instances dataFiltered;
-     private List<String> stopWordList;
-     private String regex;
-     private String regex1;*/
+    /**
+     * ML model load using serialzed classifer
+     */
     private static SerializedClassifier sclassifier;
 
+    /**
+     * Attributes of arff file
+     */
     private String headingEvidenceClassifier = "@relation EC\n" +
             "@attribute $EC1 numeric\n" +
             "@attribute $EC2 numeric\n" +
@@ -256,6 +261,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             "@data\n";
 
     public PastebinEvidenceClassifier(){
+        //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
             sclassifier.setModelFile(new File("./src/resources/EviC.model"));
@@ -325,6 +331,14 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     }
 
+    /**
+     * Checks whether post passes Evidence classifer
+     * @param user
+     * @param title
+     * @param post
+     * @param evidenceModel
+     * @return
+     */
     private boolean isPassedEvidenceClassifier(String user, String title, String post, EvidenceModel evidenceModel) {
 
         title = title.toLowerCase();
@@ -363,6 +377,12 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
         return evidenceFound;
     }
 
+    /**
+     * Classifes unseen instances
+     * @param text
+     * @param title
+     * @return
+     */
     public boolean isEvidenceFound(String text, String title){
         try{
             // convert String into InputStream
@@ -408,7 +428,12 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
         return false;
     }
 
-    //create arff file for the predicting text and the title
+    /**
+     * create arff file for the predicting text and the title
+     * @param text
+     * @param title
+     * @return
+     */
     public String createARFF(String text, String title) {
         String feature_list = "";
 
@@ -455,89 +480,6 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             count++;
         return count;
     }
-
-   /* private void buildClassifier() {
-        try{
-            loader.setDirectory(new File("~/IdeaProjects/LeakHawk/dataset/"));
-            dataRaw = loader.getDataSet();
-
-            filter = new StringToWordVector();
-
-            StopwordsHandler stopwordsHandler = new StopwordsHandler() {
-                Matcher matcher;
-
-                //@Override
-                public boolean isStopword(String s) {
-                    if(stopWordList.contains(s) || s.length()<3 || s.matches(regex1) || s.matches(regex)) //matcher == p.matcher(s)
-                        return true;
-                    else return false;
-                }
-            };
-
-            filter.setStopwordsHandler(stopwordsHandler);
-            SnowballStemmer stemmer = new SnowballStemmer();
-            filter.setStemmer(stemmer);
-            filter.setLowerCaseTokens(true);
-            filter.setTFTransform(true);
-            filter.setIDFTransform(true);
-            filter.setInputFormat(dataRaw);
-
-            dataFiltered = Filter.useFilter(dataRaw, filter);
-            System.out.println("\n\nFiltered data:\n\n" + dataFiltered);
-
-            NaiveBayesMultinomial classifier = new NaiveBayesMultinomial();
-            classifier.buildClassifier(dataFiltered);
-            //System.out.println("\n\nClassifier model:\n\n" + classifier);
-
-            Evaluation evaluation = new Evaluation(dataFiltered);
-            evaluation.crossValidateModel(classifier,dataFiltered,10,new Random());
-            System.out.println(evaluation.toSummaryString()+evaluation.toMatrixString());
-
-            // generate curve
-           /* ThresholdCurve tc = new ThresholdCurve();
-            int classIndex = 0;
-            Instances result = tc.getCurve(evaluation.predictions(), classIndex);
-
-            // plot curve
-            ThresholdVisualizePanel vmc = new ThresholdVisualizePanel();
-            vmc.setROCString("(Area under ROC = " +
-                    Utils.doubleToString(tc.getROCArea(result), 4) + ")");
-            vmc.setName(result.relationName());
-            PlotData2D tempd = new PlotData2D(result);
-            tempd.setPlotName(result.relationName());
-            tempd.addInstanceNumberAttribute();
-            // specify which points are connected
-            boolean[] cp = new boolean[result.numInstances()];
-            for (int n = 1; n < cp.length; n++)
-                cp[n] = true;
-            tempd.setConnectPoints(cp);
-            // add plot
-            vmc.addPlot(tempd);
-
-            // display curve
-            String plotName = vmc.getName();
-            final javax.swing.JFrame jf =
-                    new javax.swing.JFrame("Weka Classifier Visualize: "+plotName);
-            jf.setSize(500,400);
-            jf.getContentPane().setLayout(new BorderLayout());
-            jf.getContentPane().add(vmc, BorderLayout.CENTER);
-            jf.addWindowListener(new java.awt.event.WindowAdapter() {
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    jf.dispose();
-                }
-            });
-            jf.setVisible(true);
-
-
-
-        }
-        catch (IOException ex){
-            System.out.println("IOException");
-        }catch(Exception ex1){
-
-        }
-
-    }*/
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("post"));
