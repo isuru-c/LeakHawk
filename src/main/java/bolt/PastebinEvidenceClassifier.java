@@ -47,7 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author Udehsika Sewwandi
+ * @author sewwandi
  */
 public class PastebinEvidenceClassifier extends BaseRichBolt {
 

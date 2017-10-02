@@ -19,33 +19,33 @@ package model;
 import java.io.Serializable;
 
 /**
- * Created by Isuru Chandima on 8/13/17.
+ * @author sewwandi
  */
 public class EvidenceModel implements Serializable{
 
     private boolean evidenceFound;
     private boolean userExists;
     private boolean classifier1Passed;
-    private boolean classifier2Passed;
+   /* private boolean classifier2Passed;
     private boolean classifier3Passed;
     private boolean classifier4Passed;
     private boolean classifier5Passed;
     private boolean classifier6Passed;
     private boolean classifier7Passed;
-    private boolean classifier8Passed;
+    private boolean classifier8Passed;*/
 
     public EvidenceModel(){
 
         evidenceFound = false;
         userExists = false;
         classifier1Passed = false;
-        classifier2Passed = false;
+        /*classifier2Passed = false;
         classifier3Passed = false;
         classifier4Passed = false;
         classifier5Passed = false;
         classifier6Passed = false;
         classifier7Passed = false;
-        classifier8Passed = false;
+        classifier8Passed = false;*/
     }
 
     public boolean isEvidenceFound() {
@@ -60,7 +60,7 @@ public class EvidenceModel implements Serializable{
         return classifier1Passed;
     }
 
-    public boolean isClassifier2Passed() {
+   /* public boolean isClassifier2Passed() {
         return classifier2Passed;
     }
 
@@ -86,7 +86,7 @@ public class EvidenceModel implements Serializable{
 
     public boolean isClassifier8Passed() {
         return classifier8Passed;
-    }
+    }*/
 
     public void setEvidenceFound(boolean evidenceFound) {
         this.evidenceFound = evidenceFound;
@@ -100,7 +100,7 @@ public class EvidenceModel implements Serializable{
         this.classifier1Passed = classifier1Passed;
     }
 
-    public void setClassifier2Passed(boolean classifier2Passed) {
+    /*public void setClassifier2Passed(boolean classifier2Passed) {
         this.classifier2Passed = classifier2Passed;
     }
 
@@ -127,5 +127,5 @@ public class EvidenceModel implements Serializable{
     public void setClassifier8Passed(boolean classifier8Passed) {
         this.classifier8Passed = classifier8Passed;
     }
-
+*/
 }
