@@ -18,12 +18,19 @@ package sensor;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import parameters.LeakHawkParameters;
 
 import java.io.*;
 
 
 /**
- * This Sensor will add files to the kafka getting from post folder
+ * This Sensor is used for testing purposes. It can be used to check the
+ * functionality of the LeakHawk by using dump posts without getting real time
+ * posts from pastebin or social media.
+ * <p>
+ * It reads files from the post folder in the root folder of the project and fed
+ * posts in those files as real posts to the LeakHawk so all other functionality
+ * can be tested. Any post can be put as text file in the post folder.
  *
  * @author Isuru Chandima
  */
@@ -31,7 +38,6 @@ public class DumpSensor extends Thread {
 
     private LeakHawkKafkaProducer leakHawkKafkaProducer;
     private Producer<String, String> dumpProducer;
-    private String topic = "dump-posts";
 
     public DumpSensor() {
         leakHawkKafkaProducer = new LeakHawkKafkaProducer();
@@ -39,10 +45,14 @@ public class DumpSensor extends Thread {
     }
 
     public void run() {
-        ProducerRecord<String, String> message = null;
+
         try {
-            File folder = new File("./posts");
+
+            // Get the list of files from the dump post folder
+            File folder = new File(LeakHawkParameters.dumpFolderPath);
             File[] listOfFiles = folder.listFiles();
+
+            // Read the each file and feed the content of the file as a post to the LeakHawk
             for (File file : listOfFiles) {
                 try {
                     if (file.isFile()) {
@@ -57,7 +67,7 @@ public class DumpSensor extends Thread {
 
                         String post = sb.toString();
 
-                        message = new ProducerRecord<String, String>(topic, post);
+                        ProducerRecord<String, String> message = new ProducerRecord<String, String>(LeakHawkParameters.postTypeDump, post);
                         dumpProducer.send(message);
 
                         br.close();

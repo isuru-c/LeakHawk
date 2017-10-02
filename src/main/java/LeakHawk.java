@@ -68,14 +68,18 @@ public class LeakHawk {
         BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload() , 4);
         pastebinPostDownload.shuffleGrouping("pastebin-spout");
 
-        // Both pastebin and twitter feeds are fed together to the pre-filter
-        BoltDeclarer preFilter = topologyBuilder.setBolt("pre-filter-bolt", new PreFilter() , 3);
-        preFilter.shuffleGrouping("pastebin-post-download-bolt");
-        preFilter.shuffleGrouping("twitter-spout");
+        // Separate pre filter for pastebin posts
+        BoltDeclarer patebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter() , 3);
+        patebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
+
+        // Separate pre filter for tweets
+        BoltDeclarer twitterPreFilter = topologyBuilder.setBolt("twitter-pre-filter", new TwitterPreFilter(), 3);
+        twitterPreFilter.shuffleGrouping("twitter-spout");
 
         // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter() , 2);
-        contextFilter.shuffleGrouping("pre-filter-bolt");
+        contextFilter.shuffleGrouping("pastebin-pre-filter-bolt");
+        contextFilter.shuffleGrouping("twitter-pre-filter");
 
         // Separate evidence classifier for pastebin posts
         BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier() , 1);

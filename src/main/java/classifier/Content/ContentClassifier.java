@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
  *
  * @author Sugeesh Chandraweera
  */
-
 public abstract class ContentClassifier {
 
     /**
@@ -86,6 +85,16 @@ public abstract class ContentClassifier {
         return compile;
     }
 
+    /**
+     * This method will return the sensitivity level of the data
+     * @param post text post of the post
+     *             1 - Low
+     *             2 - High
+     *             3 - Critical
+     * @return sensitivity level of the data
+     */
+    public abstract int getSensivityLevel(String post);
+
     public String getModel() {
         return model;
     }
@@ -102,5 +111,4 @@ public abstract class ContentClassifier {
         this.name = name;
     }
 
-    public abstract int getSensivityLevel(String post);
 }
