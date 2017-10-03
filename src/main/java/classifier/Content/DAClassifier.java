@@ -103,25 +103,25 @@ public class DAClassifier extends ContentClassifier {
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
 
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
             if(word.equals("MX 10|MX 20|MX 30|MX 40|MX 50|MX 60")) {
-                bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
             }else {
-                bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b"));
+                bigramPatternList.add(getCorrectPatten(word));
             }
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
             if(word.equals("Trying zone transfer")) {
-                trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
             }else {
-                trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b"));
+                trigramPatternList.add(getCorrectPatten(word));
             }
 
         }

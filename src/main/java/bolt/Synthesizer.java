@@ -50,6 +50,7 @@ public class Synthesizer extends BaseRichBolt {
     private ContentModel contentModel;
     private Connection connection;
 
+    @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
         try {
@@ -61,6 +62,7 @@ public class Synthesizer extends BaseRichBolt {
         }
     }
 
+    @Override
     public void execute(Tuple tuple) {
 
         Post post = (Post) tuple.getValue(0);
@@ -97,7 +99,6 @@ public class Synthesizer extends BaseRichBolt {
                 }
             }
 
-
             String classString = "";
             for (int i = 0; i < highestContent.size(); i++) {
                 classString += highestContent.get(i).getContentType();
@@ -131,8 +132,10 @@ public class Synthesizer extends BaseRichBolt {
 
     public void synthesizeTweets(Post post){
 
+
     }
 
+    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("no-no"));
     }

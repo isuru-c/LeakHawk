@@ -119,27 +119,27 @@ public class PKClassifier extends ContentClassifier {
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
 
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(getCorrectPatten( word, Pattern.CASE_INSENSITIVE));
         }
 
         fourgramPatternList = new ArrayList<Pattern>();
         for (String word : fourgramList) {
-            fourgramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            fourgramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
         relatedPattern1 = Pattern.compile("[-]{5}[A-Za-z0-9 ]+[-]{5}");
-        relatedPattern2 = getCorrectPatten("\\b"+"PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY"+"\\b", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = getCorrectPatten("PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY", Pattern.CASE_INSENSITIVE);
     }
 
     public String createARFF(String text,String title) {

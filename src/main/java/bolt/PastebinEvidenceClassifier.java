@@ -30,6 +30,7 @@ import org.apache.storm.tuple.Values;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.classifiers.misc.SerializedClassifier;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.TextDirectoryLoader;
 import weka.core.stemmers.SnowballStemmer;
@@ -264,7 +265,8 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
         //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
-            sclassifier.setModelFile(new File("./src/resources/EviC.model"));
+            sclassifier.setModelFile(new File("./src/main/resources/EviC.model"));
+
 
         } catch (Exception e) {
             e.printStackTrace();

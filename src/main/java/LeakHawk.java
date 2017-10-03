@@ -20,8 +20,10 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
+import sensor.DumpSensor;
 import sensor.PastebinSensor;
 import sensor.TwitterSensor;
+import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
 
@@ -38,8 +40,8 @@ public class LeakHawk {
 
         /* Pastebin sensor */
 
-        PastebinSensor pastebinSensor = new PastebinSensor();
-        pastebinSensor.start();
+//        PastebinSensor pastebinSensor = new PastebinSensor();
+//        pastebinSensor.start();
 
         /* Twitter sensor */
 
@@ -49,8 +51,8 @@ public class LeakHawk {
 
          /* Testing sensor */
 
-//        DumpSensor dumpSensor = new DumpSensor();
-//        dumpSensor.start();
+        DumpSensor dumpSensor = new DumpSensor();
+        dumpSensor.start();
 
         // Create topology
         final String TOPOLOGY_NAME = "LeakHawk-topology";
@@ -64,17 +66,22 @@ public class LeakHawk {
         // Create twitter Spout and connect to the topology
         SpoutDeclarer twitterSpout = topologyBuilder.setSpout("twitter-spout", new TwitterSpout(), 2);
 
+        // Create twitter Spout and connect to the topology
+        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 2);
+
         // PastebinPostDownload is used to get the content of a pastebin post
         BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload() , 4);
         pastebinPostDownload.shuffleGrouping("pastebin-spout");
 
-        // Separate pre filter for pastebin posts
-        BoltDeclarer patebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter() , 3);
-        patebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
+        // Separate pre filter for pastebin posts [ also the dump posts]
+        BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter() , 3);
+        pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
+        pastebinPreFilter.shuffleGrouping("dump-spout");
 
         // Separate pre filter for tweets
         BoltDeclarer twitterPreFilter = topologyBuilder.setBolt("twitter-pre-filter", new TwitterPreFilter(), 3);
         twitterPreFilter.shuffleGrouping("twitter-spout");
+
 
         // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter() , 2);

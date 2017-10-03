@@ -43,7 +43,7 @@ import java.util.Map;
  * This class is used to classify tweets according to evidences of hacking attacks or data breaches
  *
  * @author Isuru Chandima
- * @author Udeshika Sewwandi
+ * @author Warunika Amali
  *
  */
 public class TweetEvidenceClassifier extends BaseRichBolt {

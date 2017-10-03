@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "Credit Card", filePath = "./src/main/resources/CC.model")
-//@ContentPattern(patternName = "Credit Card", filePath = "CC.model")
 public class CCClassifier extends ContentClassifier {
 
     private Pattern ccCardPattern;
@@ -140,20 +139,20 @@ public class CCClassifier extends ContentClassifier {
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
             if (word.equals("CC")) {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b"));
+                unigramPatternList.add(getCorrectPatten(word));
             } else {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
             }
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
         relatedTerms1Pattern = Pattern.compile("Expiry Date|Expire|Exp.Date|Expiration|Exp. month|Exp. Years|expyear|expmonth|(exp)|ExpDate|ExpD[m/y]|Date D'expiration", Pattern.CASE_INSENSITIVE);

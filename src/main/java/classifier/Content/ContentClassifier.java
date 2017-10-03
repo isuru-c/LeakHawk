@@ -71,7 +71,7 @@ public abstract class ContentClassifier {
      * @return Pattern Object
      */
     Pattern getCorrectPatten(String word, int type) {
-        Pattern compile = Pattern.compile(word.replaceAll("\\|", "\b|\b"), type);
+        Pattern compile = Pattern.compile(word, type);
         return compile;
     }
 
@@ -81,7 +81,7 @@ public abstract class ContentClassifier {
      * @return Pattern Object
      */
     Pattern getCorrectPatten(String word) {
-        Pattern compile = Pattern.compile(word.replaceAll("\\|", "\b|\b"));
+        Pattern compile = Pattern.compile(word);
         return compile;
     }
 
