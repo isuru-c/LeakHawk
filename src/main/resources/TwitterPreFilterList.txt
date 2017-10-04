@@ -37,12 +37,9 @@ arena
 athlete
 athletics
 badminton
-ball
-base
+boxing
 baseball
 basketball
-bat
-boxing
 bronze medal
 gold medal
 silver medal
@@ -52,16 +49,13 @@ cricket
 field
 fielder
 fielding
+football
 gym
 gymnast
 gymnastics
 gymnasium
 goalie
 olympics
-paintball
-race
-racer
-racing
 racket
 relay
 ride

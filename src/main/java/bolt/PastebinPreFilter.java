@@ -25,11 +25,13 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import weka.classifiers.misc.SerializedClassifier;
+import weka.core.Instances;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -50,7 +52,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     private ArrayList<Pattern> sportsWordsPatternList;
     private ArrayList<Pattern> pornWordsPatternList;
     private ArrayList<Pattern> greetingsWordsPatternList;
-    Pattern relatedPattern1;
+    private Pattern relatedPattern1;
     //private Connection connection;
    /* private TextDirectoryLoader loader;
     private Instances dataRaw;
@@ -60,7 +62,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     private String regex;
     private String regex1;*/
     //private RandomForest classifier;
-    SerializedClassifier sclassifier;
+    private static SerializedClassifier sclassifier;
 
     String headingPreFilter ="@relation PF\n" +
             "\n" +
@@ -352,10 +354,6 @@ public class PastebinPreFilter extends BaseRichBolt {
             "@attribute $PF286 numeric\n" +
             "@attribute $PF287 numeric\n" +
             "@attribute $PF288 numeric\n" +
-            "@attribute $PF289 numeric\n" +
-            "@attribute $PF290 numeric\n" +
-            "@attribute $PF291 numeric\n" +
-            "@attribute $PF292 numeric" +
             "\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
@@ -376,13 +374,14 @@ public class PastebinPreFilter extends BaseRichBolt {
         pornWordsPatternList = new ArrayList<>();
         greetingsWordsPatternList = new ArrayList<>();
 
-        codeWordsList = new ArrayList(Arrays.asList("Java","Abstract","Boolean","Byte","Char","Else","extends","Float","Implements","Import","Int","Interface","if","new","Package","private","protected","Public","Return","Static","Super","Switch","Synchronized","This","Throw|Throws","Void","Volatile","While","C++","Bool","Compl","#define","Delete","exit","False","Namespace","Operator","Sizeof","Struct","Xor","C#","Foreach","Null","Object","Override","Using",
+        codeWordsList = new ArrayList(Arrays.asList("java","abstract","boolean","byte","char","else","extends","float","if","implements","import","int","interface","new","package","private","protected","public","return","static","super","switch","synchronized","this","throw|throws","void","volatile","while",
+                "C++","bool","compl","#define","delete","exit","false","namespace","operator","sizeof","struct","xor","C#","foreach","null","object","override","using",
                 "<html>|</html>|html","<head>|</head>|head","<title>|</title>|title","<body>|</body>|body","<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>","<img>|</img>","<link>|link","<br>","<a>|</a>","<p>|</p>","<style>|</style>","<script>|</script>","<div>|</div>",
-                "Php","Declare","Echo","Elseif","Function","Global","Include_once","Insteadof","Isset","Require_once","Use","Var","Python","Lambda","None","def","Del","Elif","var"));
-        gameWordsList = new ArrayList(Arrays.asList("torrent","pokemon","Wolfenstein", "game|games","clash of clans", "The New Colossus", "Assassin's Creed", "Middle-earth", "Destiny", "Call of Duty", "Dishonored", "Death of the Outsider", "Dusk", "Lawbreakers", "Vanquish", "PlayerUnknown's Battlegrounds", "Friday the 13th", "Game", "The Signal From Tolva", "Ghost Recon", "Wildlands", "Prey", "Resident Evil", "Biohazard", "Bulletstorm", "Rising Storm", "Sea of Thieves", "World at war", "Black ops", "Ghosts", "Warfare", "Xbox one"));
-        sportsWordsList = new ArrayList(Arrays.asList("arena", "athlete|Athletics", "badminton", "boxing", "bronze medal|gold medal|silver medal", "Cricket", "Gym|gymnast|gymnastics|gymnasium", "goalie", "Olympics", "relay", "rugby", "Swim|swimmer|swimming", "football",  "Umpire", "World Cup|World Series", "Sports"));
-        pornWordsList = new ArrayList(Arrays.asList("Intercouse", "Loved|lover|love|loves", "Kiss", "Hug|hugs", "Womb", "Virgin", "Homo|homo sexual", "Vagina", "Gay", "Lesbian", "Sex", "Seduce", "Rape,rapist", "Erection|erectile|erect|erotic", "Dick", "Prostitute|prostate", "Cuddle", "Pregnant", "Condom|condoms", "Butt|butts", "Penis", "Breast|breasts", "Nipple", "Aroused", "porn", "Naked|nude", "Lust", "Makeout", "Abortion", "Fingering", "Horny", "Orgasm", "Ass|anus|anal", "Boob", "Tit|tits", "Cocks|cock", "Pussy", "Slut", "Pornography", "Foreplay"));
-        greetingsWordsList = new ArrayList(Arrays.asList("Blessings", "Greetings", "Gratitude", "Celebrate|celebration", "Happiness|joy|pleasure|laughter", "Health", "Peace", "Prosperity", "Season", "Success|fortune", "Wishes|best wishes", "New year|coming year", "Chritmas", "Easter|Eid Mubarak|Eid"));
+                "php","declare","echo","elseif","function","global","include_once","insteadof","isset","require_once","use","var","python","lambda","none","def","del","elif","var"));
+        gameWordsList = new ArrayList(Arrays.asList("Wolfenstein","game|games","The New Colossus","Assassin's Creed","Middle-earth","Shadow of War","Destiny","Call of Duty","Dishonored","Death of the Outsider","Dusk","Lawbreakers","Vanquish","PlayerUnknown's Battlegrounds","Friday the 13th","Game","The Signal From Tolva","Ghost Recon","Wildlands","Prey","Resident Evil","Biohazard","Bulletstorm","Sniper Elite ","Strafe","Desync","Rising Storm","Sea of Thieves","Metal Gear Survive","World at war","Black ops","Ghosts","Warfare","Xbox one"));
+        sportsWordsList = new ArrayList(Arrays.asList("arena","athlete|Athletics" ,"badminton","ball","base","baseball","basketball","bat","boxing","bronze medal|gold medal|silver medal","competitor","crew","Cricket","field|fielder|fielding\n","Gym|gymnast|gymnastics|gymnasium","goal","goalie","Olympics","Paintball","race|racer|racing","Racket","relay","Ride|riding","rugby","Run|runner|running","Swim|swimmer|swimming","table tennis|tennis","taekwondo","Team|teammate","tetherball","Throw,throwing","Umpire","volley ball","Weightlifter|weightlifting|weights","Rafting","winner|winning","World Cup|World Series","Wrestler|wrestling","Surfing","Sports\n"));
+        pornWordsList = new ArrayList(Arrays.asList("Intercouse","Loved|lover|love|loves","Kiss","Hug|hugs","Womb","Virgin","Homo|homo sexual","Vagina","Gay","Lesbian","Sex","Seduce","Rape,rapist","Erection|erectile|erect|erotic","Pubic","Dick","Prostitute|prostate","Cuddle","Genital","Pregnant","Condom|condoms","Butt|butts","Penis","Breast|breasts","Nipple","Aroused","porn","Naked|nude","Lust","Makeout","Abortion","Fingering","Horny","Orgasm","Ass|anus|anal","Boob","Fuck|fucked|fucking|fucker","Tit|tits","Cocks|cock","Pussy","Slut","Pornography","Foreplay"));
+        greetingsWordsList = new ArrayList(Arrays.asList("Blessings","Greetings","Gratitude","Celebrate,celebration","Happiness|joy|pleasure|laughter","Health","Peace","Prosperity","Season","Rejoice","Success|fortune","Wishes|best wishes","New year|coming year","Chritmas","Good luck","fantastic"));
 
         for(String word:codeWordsList){
             codeWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
@@ -425,7 +424,7 @@ public class PastebinPreFilter extends BaseRichBolt {
         post.setPostText(post.getPostText().toLowerCase());
 
         //if pre filter is passed forward the model to next bolt(context filter)
-        if(!isContainKeyWord(post.getPostText())) {
+        if(isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
         }else{
 //            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
@@ -434,21 +433,154 @@ public class PastebinPreFilter extends BaseRichBolt {
 
     }
 
-    private boolean isContainKeyWord(String post) {
+    private boolean isPassedPrefilter(String title, String post) {
 
-        try {
+        title = title.toLowerCase();
+        post = post.toLowerCase();
 
-            for (int i=0;i<keyWordList.size();i++) {
-                if (post.contains(keyWordList.get(i).toString())) {
-                    //exit after the first successful hit
-                    return true;
-                }
+        boolean isPrefilterPassed = false;
+        boolean isPostEmpty;
+        boolean isPostTest = false;
+        boolean isPostEnglish = false;
+
+        //check whether the post is empty
+        if(isPostEmpty = post.isEmpty()){
+            isPrefilterPassed = false;
+        }
+        else if(isPostTest = ( post.contains("test") || title.contains("test"))){
+            isPrefilterPassed = false;
+        }
+        else if(isPostEnglish = isPostEnglish(title,post)){
+            isPrefilterPassed = true;
+        }
+
+
+        if(!isPostEmpty && !isPostTest && isPostEnglish){
+            isPrefilterPassed = isNotFilteredOut(post,title);
+        }
+
+        System.out.println(isPrefilterPassed);
+        return isPrefilterPassed;
+    }
+
+    private boolean isPostEnglish(String title, String text){
+        String[] textWords= text.split(" ");
+        String[] titleWords = title.split("");
+        boolean isPostEnglish = false;
+
+        char[] textCharArr = textWords[0].toCharArray();
+        char[] titleCharArr = titleWords[0].toCharArray();
+
+        for(char c:textCharArr){
+            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+        }
+
+        for(char c:titleCharArr){
+            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+        }
+
+        return isPostEnglish;
+    }
+
+    private boolean isNotFilteredOut(String text, String title){
+        try{
+            // convert String into InputStream
+            String result = createARFF(text,title);
+            //System.out.println(result);
+            InputStream is = new ByteArrayInputStream(result.getBytes());
+
+            // wrap it with buffered reader
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+            //convert into a set of instances
+            Instances unlabeled = new Instances(reader);
+            reader.close();
+            //set the class index to last value of the instance
+            unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+
+            // create copy
+            Instances labeled = new Instances(unlabeled);
+
+            //set options for the classifier
+            String[] options = new String[2];
+            options[0] = "-P";
+            options[1] = "0";
+            sclassifier.setOptions(options);
+
+            //predict class for the unseen text
+            double pred = sclassifier.classifyInstance(unlabeled.instance(0));
+            labeled.instance(0).setClassValue(pred);
+
+            System.out.println(text);
+            System.out.println("pred:"+pred);
+            //get the predicted class value
+            String classLabel = unlabeled.classAttribute().value((int) pred);
+
+            //if class is pos there's an evidence found
+            if("pos".equals(classLabel)){
+                return true;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
+
+    //create arff file for the predicting text and the title
+    private String createARFF(String text, String title) {
+        String feature_list = "";
+
+        //check the pattern match for text and title for all the cases
+        for (Pattern pattern : codeWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : gameWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : gameWordsPatternList) {
+            Matcher matcher = pattern.matcher(title);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : sportsWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : pornWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : pornWordsPatternList) {
+            Matcher matcher = pattern.matcher(title);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : greetingsWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        //add unknown class for the feature vector
+        feature_list +=  "?";
+        return headingPreFilter + feature_list;
+    }
+
+    public int getMatchingCount(Matcher matcher) {
+        int count = 0;
+        while (matcher.find())
+            count++;
+        return count;
+    }
+
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("post"));
