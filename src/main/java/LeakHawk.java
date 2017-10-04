@@ -40,13 +40,13 @@ public class LeakHawk {
 
         /* Pastebin sensor */
 
-//        PastebinSensor pastebinSensor = new PastebinSensor();
-//        pastebinSensor.start();
+        //PastebinSensor pastebinSensor = new PastebinSensor();
+        //pastebinSensor.start();
 
         /* Twitter sensor */
 
-//        TwitterSensor twitterSensor = new TwitterSensor();
-//        twitterSensor.start();
+        //TwitterSensor twitterSensor = new TwitterSensor();
+        //twitterSensor.start();
 
 
          /* Testing sensor */
@@ -76,12 +76,12 @@ public class LeakHawk {
         // Separate pre filter for pastebin posts [ also the dump posts]
         BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter() , 3);
         pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
-        //pastebinPreFilter.shuffleGrouping("dump-spout");
+        pastebinPreFilter.shuffleGrouping("dump-spout");
 
         // Separate pre filter for tweets
         BoltDeclarer twitterPreFilter = topologyBuilder.setBolt("twitter-pre-filter", new TwitterPreFilter(), 3);
         twitterPreFilter.shuffleGrouping("twitter-spout");
-        twitterPreFilter.shuffleGrouping("dump-spout");
+        //twitterPreFilter.shuffleGrouping("dump-spout");
 
         // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter() , 2);
@@ -90,25 +90,31 @@ public class LeakHawk {
 
         // Separate evidence classifier for pastebin posts
         BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier() , 1);
-        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", "pastebin-out");
+        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-pastebin-out");
 
         // Separate evidence classifier for tweets
         BoltDeclarer tweetEvidenceClassifier = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier() , 1);
-        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", "tweets-out");
+        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-tweets-out");
+
+        // Url Processor for both pastebin posts and tweets
+        BoltDeclarer urlProcessor = topologyBuilder.setBolt("url-processor", new UrlProcessor(), 3);
+        urlProcessor.shuffleGrouping("pastebin-evidence-classifier-bolt", "pastebin-url-flow");
+        urlProcessor.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-url-flow");
 
         // Separate content classifier for pastebin posts
         BoltDeclarer pastebinContentClassifier = topologyBuilder.setBolt("pastebin-content-classifier-bolt", new PastebinContentClassifier() , 1);
-        pastebinContentClassifier.shuffleGrouping("pastebin-evidence-classifier-bolt");
+        pastebinContentClassifier.shuffleGrouping("pastebin-evidence-classifier-bolt", "pastebin-normal-flow");
+        pastebinContentClassifier.shuffleGrouping("url-processor", "url-processor-pastebin-out");
 
         // Separate content classifier for tweets
         BoltDeclarer tweetContentClassifier = topologyBuilder.setBolt("tweets-content-classifier-bolt", new TweetContentClassifier() , 1);
-        tweetContentClassifier.shuffleGrouping("tweets-evidence-classifier-bolt");
+        tweetContentClassifier.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-normal-flow");
+        tweetContentClassifier.shuffleGrouping("url-processor","url-processor-tweets-out");
 
         // Both pastebin and twitter feeds are going through same synthesizer
         BoltDeclarer synthesizer = topologyBuilder.setBolt("synthesizer-bolt", new Synthesizer(), 1);
         synthesizer.shuffleGrouping("pastebin-content-classifier-bolt");
         synthesizer.shuffleGrouping("tweets-content-classifier-bolt");
-
 
         final LocalCluster cluster = new LocalCluster();
         cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());

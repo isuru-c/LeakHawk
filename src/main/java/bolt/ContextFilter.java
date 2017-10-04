@@ -51,8 +51,8 @@ public class ContextFilter extends BaseRichBolt {
     private List<String> regularExpressionList;
     private ArrayList<String> synonyms;
 
-    private String pastebinOut = "pastebin-out";
-    private String tweetsOut = "tweets-out";
+    private String pastebinOut = "context-filter-pastebin-out";
+    private String tweetsOut = "context-filter-tweets-out";
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {

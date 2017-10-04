@@ -17,6 +17,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by Isuru Chandima on 8/13/17.
@@ -36,9 +37,8 @@ public class Post implements Serializable{
     private ContentModel contentModel = null;
     private EvidenceModel evidenceModel = null;
 
-    private boolean evidenceClassifierPassed = false;
-    private boolean contentClassifierPassed = false;
-    private boolean evidenceFinderPassed = false;
+    // List of urls inside the post
+    private ArrayList<String> urlList = new ArrayList<>();
 
     public void setPostType(String postType) {
         this.postType = postType;
@@ -80,6 +80,10 @@ public class Post implements Serializable{
         this.evidenceModel = evidenceModel;
     }
 
+    public void addUrl(String url){
+        this.urlList.add(url);
+    }
+
     public String getPostType() {
 
         return postType;
@@ -113,6 +117,10 @@ public class Post implements Serializable{
         return language;
     }
 
+    public ArrayList<String> getUrlList(){
+        return urlList;
+    }
+
     public ContentModel getContentModel() {
         return contentModel;
     }
@@ -121,27 +129,4 @@ public class Post implements Serializable{
         return evidenceModel;
     }
 
-    public void setEvidenceClassifierPassed() {
-        this.evidenceClassifierPassed = true;
-    }
-
-    public void setContentClassifierPassed() {
-        this.contentClassifierPassed = true;
-    }
-
-    public boolean isEvidenceClassifierPassed() {
-        return evidenceClassifierPassed;
-    }
-
-    public boolean isContentClassifierPassed() {
-        return contentClassifierPassed;
-    }
-
-    public boolean isEvidenceFinderPassed() {
-        return evidenceFinderPassed;
-    }
-
-    public void setEvidenceFinderPassed(boolean evidenceFinderPassed) {
-        this.evidenceFinderPassed = evidenceFinderPassed;
-    }
 }
