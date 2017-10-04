@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "Credit Card", filePath = "./src/main/resources/CC.model")
-//@ContentPattern(patternName = "Credit Card", filePath = "CC.model")
 public class CCClassifier extends ContentClassifier {
 
     private Pattern ccCardPattern;
@@ -110,25 +109,25 @@ public class CCClassifier extends ContentClassifier {
         unigramList.add("CC");
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("Name On");
+        bigramList.add("name on");
         bigramList.add("card number");
         bigramList.add("credit card");
-        bigramList.add("Expiration Date | exp date");
+        bigramList.add("expiration date | exp date");
         bigramList.add("Maiden Name");
         bigramList.add("zip code");
         bigramList.add("account number");
         bigramList.add("card type");
         bigramList.add("card information");
-        bigramList.add("CC number");
+        bigramList.add("cc number");
         bigramList.add("card hack");
-        bigramList.add("ATM pin");
+        bigramList.add("atm pin");
         bigramList.add("account information");
         bigramList.add("mother maiden|mothers maiden|mother's maiden");
 
         ArrayList<String> trigramList = new ArrayList<String>();
-        trigramList.add("Date of Birth");
-        trigramList.add("Credit Card Number");
-        trigramList.add("Credit Card Information");
+        trigramList.add("date of birth");
+        trigramList.add("credit card number");
+        trigramList.add("credit card information");
         trigramList.add("name on card");
         trigramList.add("card verification code");
         trigramList.add("card verification number");
@@ -137,35 +136,31 @@ public class CCClassifier extends ContentClassifier {
 
         ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
 
-        unigramPatternList = new ArrayList<Pattern>();
+        unigramPatternList = new ArrayList<>();
         for (String word : unigramList) {
-            if (word.equals("CC")) {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b"));
-            } else {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
-            }
+            unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
-        bigramPatternList = new ArrayList<Pattern>();
+        bigramPatternList = new ArrayList<>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
-        trigramPatternList = new ArrayList<Pattern>();
+        trigramPatternList = new ArrayList<>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
-        relatedTerms1Pattern = Pattern.compile("Expiry Date|Expire|Exp.Date|Expiration|Exp. month|Exp. Years|expyear|expmonth|(exp)|ExpDate|ExpD[m/y]|Date D'expiration", Pattern.CASE_INSENSITIVE);
-        relatedTerms2Pattern = Pattern.compile("CVV |card verification number| CVV2|CCV2|CVC|CVC2|verification code|CID|CAV2", Pattern.CASE_INSENSITIVE);
+        relatedTerms1Pattern = Pattern.compile("expiry date|expire|exp.date|expiration|exp. month|exp. years|expyear|expmonth|(exp)|expdate|expd[m/y]|date d'expiration", Pattern.CASE_INSENSITIVE);
+        relatedTerms2Pattern = Pattern.compile("cvv |card verification number| cvv2|ccv2|cvc|cvc2|verification code|cid|cav2", Pattern.CASE_INSENSITIVE);
         relatedTerms3Pattern = Pattern.compile("credit_card|card_dump|working_card|cc_dump|skimmed|card_hack", Pattern.CASE_INSENSITIVE);
-        relatedTerms4Pattern = Pattern.compile("CVV2|CVV|CVC2|CAV2");
-        relatedTerms5Pattern = Pattern.compile("VISA|Mastercard|JCB|AMEX|american express|Discover|Diners Club", Pattern.CASE_INSENSITIVE);
-        relatedTerms6Pattern = Pattern.compile("Debit or credit card number|Credit Card Number|credit_number|Card Number|cardnum|Primary Account Number|CC Number", Pattern.CASE_INSENSITIVE);
+        relatedTerms4Pattern = Pattern.compile("cvv2|cvv|cvc2|cav2");
+        relatedTerms5Pattern = Pattern.compile("visa|mastercard|jcb|amex|american express|discover|diners club", Pattern.CASE_INSENSITIVE);
+        relatedTerms6Pattern = Pattern.compile("debit or credit card number|credit card number|credit_number|card number|cardnum|primary account number|cc number", Pattern.CASE_INSENSITIVE);
 
         digitPattern = Pattern.compile("(0|[1-9][0-9]*)");
-        alphaPattern = Pattern.compile("[a-zA-Z]");
-        alphDigitPattern = Pattern.compile("[a-zA-Z0-9]");
+        alphaPattern = Pattern.compile("[a-z]");
+        alphDigitPattern = Pattern.compile("[a-z0-9]");
     }
 
     public String createARFF(String text, String title) {

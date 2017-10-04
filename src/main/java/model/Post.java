@@ -38,7 +38,7 @@ public class Post implements Serializable{
     private EvidenceModel evidenceModel = null;
 
     // List of urls inside the post
-    private ArrayList<String> urlList;
+    private ArrayList<String> urlList = new ArrayList<>();
 
     public void setPostType(String postType) {
         this.postType = postType;

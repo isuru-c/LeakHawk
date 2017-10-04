@@ -46,26 +46,22 @@ import java.util.regex.Pattern;
  */
 public class ContextFilter extends BaseRichBolt {
 
-    private Properties properties = new Properties();
-    private List<String> regExpHandlerList;
     private OutputCollector collector;
-    private ArrayList<String> synonyms = new ArrayList<String>();
-    private static ArrayList<String> wordset = new ArrayList<String>();
-    Dictionary dictionary;
-    private int rgexpCount=18;
+
+    private List<String> regularExpressionList;
+    private ArrayList<String> synonyms;
 
     private String pastebinOut = "context-filter-pastebin-out";
     private String tweetsOut = "context-filter-tweets-out";
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+
         collector = outputCollector;
-        try {
-            configureWordNet();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        dictionary = Dictionary.getInstance();
+
+        createRegularExpressionList();
+        createSynonyms();
+
     }
 
     @Override
@@ -73,12 +69,17 @@ public class ContextFilter extends BaseRichBolt {
 
         Post post = (Post) tuple.getValue(0);
 
-        if(post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
-            if (isPassContextFilter(post.getPostText())) {
+        String postText = post.getPostText();
+
+        if (isContextFilterPassed(postText)) {
+            if (post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
+                collector.emit(pastebinOut, tuple, new Values(post));
+            } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
+                collector.emit(tweetsOut, tuple, new Values(post));
+            } else if (post.getPostType().equals(LeakHawkParameters.postTypeDump)) {
+                // Dump posts are emit as pastebin posts
                 collector.emit(pastebinOut, tuple, new Values(post));
             }
-        }else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)){
-            collector.emit(tweetsOut, tuple, new Values(post));
         }
 
         collector.ack(tuple);
@@ -86,99 +87,141 @@ public class ContextFilter extends BaseRichBolt {
 
     /**
      * Checking whether context filter is passed
-     * @param entry
+     *
+     * @param postText
      * @return
      */
+    private boolean isContextFilterPassed(String postText) {
 
-    private boolean isPassContextFilter(String entry) {
-        InputStream input = null;
-
-        try {
-            input = new FileInputStream(new File("./src/main/resources/context.properties"));
-            properties.load(input);
-            regExpHandlerList = new ArrayList<String>();
-            for (int i = 1; i <= rgexpCount; i++) {
-                regExpHandlerList.add(properties.getProperty("regexp" + i));
-                //System.out.println(regExpHandlerList);
-            }
-            if (regExpressionMatched(entry) || isWordsetMatched(entry)) {
-                return true;
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (isRegularExpressionMatched(postText) || isSynonymsMatched(postText)) {
+            return true;
+        }else {
+            return false;
         }
-        return false;
+
     }
 
-    private boolean regExpressionMatched(String input) {
+    /**
+     * matching the posts with regular expressions
+     *
+     * @param postText
+     * @return
+     */
+    private boolean isRegularExpressionMatched(String postText) {
+
         boolean found = false;
         try {
-            for (String pattern : regExpHandlerList) {
-                Pattern p = Pattern.compile(String.valueOf(pattern));
-                Matcher m = p.matcher(input);
-                if (m.find()) {
+            for (String stringPattern : regularExpressionList) {
+
+                Pattern pattern = Pattern.compile(String.valueOf(stringPattern));
+                Matcher matcher = pattern.matcher(postText);
+
+                if (matcher.find()) {
                     found = true;
-                }
-                if (found) {
                     break;
                 }
             }
-            if (found)
-                return true;
         } catch (Exception ex) {
 
         }
-        return false;
+        return found;
     }
 
     /**
      * Checking whether the post has matching words
-     * @param entry
+     *
+     * @param postText
      * @return
      */
-    private boolean isWordsetMatched(String entry) {
-        for (String s : wordset) {
-            IndexWord indexWord1 = null;
-            IndexWord indexWord2 = null;
-            synonyms.add(s);
-            try {
-                indexWord1 = dictionary.lookupIndexWord(POS.NOUN, s);
-                indexWord2 = dictionary.lookupIndexWord(POS.VERB, s);
-            } catch (JWNLException e) {
-                e.printStackTrace();
-            }
-            matchSynonyms(indexWord1);
-            matchSynonyms(indexWord2);
-        }
-        for (String s : synonyms) {
-            if (entry.toUpperCase().contains(s.toUpperCase())) {
+    private boolean isSynonymsMatched(String postText) {
+
+        // Check if the postText contains synonyms generated before
+        for (String synonym : synonyms) {
+            if (postText.contains(synonym)) {
                 return true;
             }
         }
+
         return false;
+    }
+
+    private void createRegularExpressionList() {
+
+        try {
+            InputStream input = new FileInputStream(new File("./src/main/resources/context.properties"));
+            Properties properties = new Properties();
+            properties.load(input);
+            regularExpressionList = new ArrayList<String>();
+
+            for (int i = 0; i < properties.size(); i++) {
+                regularExpressionList.add(properties.getProperty("regexp" + (i + 1)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSynonyms() {
+
+        synonyms = new ArrayList<>();
+        ArrayList<String> wordSet = new ArrayList<>();
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream("./src/main/resources/SriLanka.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
+
+            String strLine;
+
+            while ((strLine = br.readLine()) != null) {
+                wordSet.add(strLine);
+            }
+            br.close();
+
+            // initialize JWNL (this must be done before JWNL can be used)
+            // See the JWordnet documentation for details on the properties file
+            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        Dictionary dictionary = Dictionary.getInstance();
+
+        // Create the list of synonyms using given list of words
+        for (String word : wordSet) {
+
+            IndexWord connectedNouns = null;
+            IndexWord connectedVerbs = null;
+
+            synonyms.add(word.toLowerCase());
+
+            try {
+                connectedNouns = dictionary.lookupIndexWord(POS.NOUN, word);
+                connectedVerbs = dictionary.lookupIndexWord(POS.VERB, word);
+            } catch (JWNLException e) {
+                e.printStackTrace();
+            }
+
+            matchSynonyms(connectedNouns);
+            matchSynonyms(connectedVerbs);
+        }
     }
 
     /**
      * Matching the synonyms from wordnet
+     *
      * @param indexWord
      */
-
-    private void matchSynonyms(IndexWord indexWord){
+    private void matchSynonyms(IndexWord indexWord) {
         if (indexWord != null) {
             try {
                 for (Synset synset : indexWord.getSenses()) {
                     Word[] words = synset.getWords();
                     for (Word word : words) {
                         if (!synonyms.contains(word.getLemma())) {
-                            synonyms.add(word.getLemma());
+                            synonyms.add(word.getLemma().toLowerCase());
                         }
                     }
                 }
@@ -186,31 +229,6 @@ public class ContextFilter extends BaseRichBolt {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Configuring Wordnet and loading the domain names
-     * @throws IOException
-     */
-    private static void configureWordNet() throws IOException {
-        try {
-            // initialize JWNL (this must be done before JWNL can be used)
-            // See the JWordnet documentation for details on the properties file
-            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
-
-        FileInputStream fstream = new FileInputStream("./src/main/resources/SriLanka.txt");
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-
-        String strLine;
-
-        while ((strLine = br.readLine()) != null)   {
-            wordset.add(strLine);
-        }
-        br.close();
     }
 
     @Override

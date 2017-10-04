@@ -89,7 +89,7 @@ public class CFClassifier extends ContentClassifier{
 
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("interface FastEthernet[0-9]|interface Serial[0-9]");
+        bigramList.add("interface fastethernet[0-9]|interface serial[0-9]");
         bigramList.add("speed auto|duplex auto");
         bigramList.add("0 line");
         bigramList.add("line vty|line aux|line con\"");
@@ -113,18 +113,18 @@ public class CFClassifier extends ContentClassifier{
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
 
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
         }
     }
 

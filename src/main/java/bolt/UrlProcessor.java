@@ -32,18 +32,18 @@ import java.util.regex.Pattern;
 
 /**
  * This bolt is used to process urls within posts
- *
+ * <p>
  * When evidence test is passed for any post, the post is checked if it contains
  * any url in the post body. If so, those set of urls are added to a list is
  * Post data structure and emit the post to UrlProcessor instead of emitting to the
  * content classifier.
- *
+ * <p>
  * After the set of urls examined, the posts are put to their original flow again.
  * [To the pastebin posts flow or tweets flow]
  *
  * @author Isuru Chandima
  */
-public class UrlProcessor extends BaseRichBolt{
+public class UrlProcessor extends BaseRichBolt {
 
     private OutputCollector collector;
 
@@ -79,14 +79,14 @@ public class UrlProcessor extends BaseRichBolt{
             urlFound = true;
         }
 
-        if(urlFound){
+        if (urlFound) {
             // Url is found within the post.
 
         }
 
-        if(post.getPostType().equals(LeakHawkParameters.postTypePastebin)){
+        if (post.getPostType().equals(LeakHawkParameters.postTypePastebin) || post.getPostType().equals(LeakHawkParameters.postTypeDump)) {
             collector.emit(pastebinOut, tuple, new Values(post));
-        }else if(post.getPostType().equals(LeakHawkParameters.postTypeTweets)){
+        } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
             collector.emit(tweetsOut, tuple, new Values(post));
         }
 

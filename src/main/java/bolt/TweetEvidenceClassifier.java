@@ -44,6 +44,7 @@ import java.util.Map;
  *
  * @author Isuru Chandima
  * @author Udeshika Sewwandi
+ * @author Warunika Amali
  */
 public class TweetEvidenceClassifier extends BaseRichBolt {
 
@@ -269,7 +270,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
         evidenceModel.setEvidenceFound(evidenceFound);
 
-        if (!evidenceFound) {
+        if (evidenceFound) {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
             collector.emit(tweetsUrlFlow, tuple, new Values(post));
