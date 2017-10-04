@@ -352,10 +352,6 @@ public class PastebinPreFilter extends BaseRichBolt {
             "@attribute $PF286 numeric\n" +
             "@attribute $PF287 numeric\n" +
             "@attribute $PF288 numeric\n" +
-            "@attribute $PF289 numeric\n" +
-            "@attribute $PF290 numeric\n" +
-            "@attribute $PF291 numeric\n" +
-            "@attribute $PF292 numeric" +
             "\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
@@ -376,13 +372,14 @@ public class PastebinPreFilter extends BaseRichBolt {
         pornWordsPatternList = new ArrayList<>();
         greetingsWordsPatternList = new ArrayList<>();
 
-        codeWordsList = new ArrayList(Arrays.asList("Java","Abstract","Boolean","Byte","Char","Else","extends","Float","Implements","Import","Int","Interface","if","new","Package","private","protected","Public","Return","Static","Super","Switch","Synchronized","This","Throw|Throws","Void","Volatile","While","C++","Bool","Compl","#define","Delete","exit","False","Namespace","Operator","Sizeof","Struct","Xor","C#","Foreach","Null","Object","Override","Using",
+        codeWordsList = new ArrayList(Arrays.asList("java","abstract","boolean","byte","char","else","extends","float","if","implements","import","int","interface","new","package","private","protected","public","return","static","super","switch","synchronized","this","throw|throws","void","volatile","while",
+                "C++","bool","compl","#define","delete","exit","false","namespace","operator","sizeof","struct","xor","C#","foreach","null","object","override","using",
                 "<html>|</html>|html","<head>|</head>|head","<title>|</title>|title","<body>|</body>|body","<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>","<img>|</img>","<link>|link","<br>","<a>|</a>","<p>|</p>","<style>|</style>","<script>|</script>","<div>|</div>",
-                "Php","Declare","Echo","Elseif","Function","Global","Include_once","Insteadof","Isset","Require_once","Use","Var","Python","Lambda","None","def","Del","Elif","var"));
-        gameWordsList = new ArrayList(Arrays.asList("torrent","pokemon","Wolfenstein", "game|games","clash of clans", "The New Colossus", "Assassin's Creed", "Middle-earth", "Destiny", "Call of Duty", "Dishonored", "Death of the Outsider", "Dusk", "Lawbreakers", "Vanquish", "PlayerUnknown's Battlegrounds", "Friday the 13th", "Game", "The Signal From Tolva", "Ghost Recon", "Wildlands", "Prey", "Resident Evil", "Biohazard", "Bulletstorm", "Rising Storm", "Sea of Thieves", "World at war", "Black ops", "Ghosts", "Warfare", "Xbox one"));
-        sportsWordsList = new ArrayList(Arrays.asList("arena", "athlete|Athletics", "badminton", "boxing", "bronze medal|gold medal|silver medal", "Cricket", "Gym|gymnast|gymnastics|gymnasium", "goalie", "Olympics", "relay", "rugby", "Swim|swimmer|swimming", "football",  "Umpire", "World Cup|World Series", "Sports"));
-        pornWordsList = new ArrayList(Arrays.asList("Intercouse", "Loved|lover|love|loves", "Kiss", "Hug|hugs", "Womb", "Virgin", "Homo|homo sexual", "Vagina", "Gay", "Lesbian", "Sex", "Seduce", "Rape,rapist", "Erection|erectile|erect|erotic", "Dick", "Prostitute|prostate", "Cuddle", "Pregnant", "Condom|condoms", "Butt|butts", "Penis", "Breast|breasts", "Nipple", "Aroused", "porn", "Naked|nude", "Lust", "Makeout", "Abortion", "Fingering", "Horny", "Orgasm", "Ass|anus|anal", "Boob", "Tit|tits", "Cocks|cock", "Pussy", "Slut", "Pornography", "Foreplay"));
-        greetingsWordsList = new ArrayList(Arrays.asList("Blessings", "Greetings", "Gratitude", "Celebrate|celebration", "Happiness|joy|pleasure|laughter", "Health", "Peace", "Prosperity", "Season", "Success|fortune", "Wishes|best wishes", "New year|coming year", "Chritmas", "Easter|Eid Mubarak|Eid"));
+                "php","declare","echo","elseif","function","global","include_once","insteadof","isset","require_once","use","var","python","lambda","none","def","del","elif","var"));
+        gameWordsList = new ArrayList(Arrays.asList("Wolfenstein","game|games","The New Colossus","Assassin's Creed","Middle-earth","Shadow of War","Destiny","Call of Duty","Dishonored","Death of the Outsider","Dusk","Lawbreakers","Vanquish","PlayerUnknown's Battlegrounds","Friday the 13th","Game","The Signal From Tolva","Ghost Recon","Wildlands","Prey","Resident Evil","Biohazard","Bulletstorm","Sniper Elite ","Strafe","Desync","Rising Storm","Sea of Thieves","Metal Gear Survive","World at war","Black ops","Ghosts","Warfare","Xbox one"));
+        sportsWordsList = new ArrayList(Arrays.asList("arena","athlete|Athletics" ,"badminton","ball","base","baseball","basketball","bat","boxing","bronze medal|gold medal|silver medal","competitor","crew","Cricket","field|fielder|fielding\n","Gym|gymnast|gymnastics|gymnasium","goal","goalie","Olympics","Paintball","race|racer|racing","Racket","relay","Ride|riding","rugby","Run|runner|running","Swim|swimmer|swimming","table tennis|tennis","taekwondo","Team|teammate","tetherball","Throw,throwing","Umpire","volley ball","Weightlifter|weightlifting|weights","Rafting","winner|winning","World Cup|World Series","Wrestler|wrestling","Surfing","Sports\n"));
+        pornWordsList = new ArrayList(Arrays.asList("Intercouse","Loved|lover|love|loves","Kiss","Hug|hugs","Womb","Virgin","Homo|homo sexual","Vagina","Gay","Lesbian","Sex","Seduce","Rape,rapist","Erection|erectile|erect|erotic","Pubic","Dick","Prostitute|prostate","Cuddle","Genital","Pregnant","Condom|condoms","Butt|butts","Penis","Breast|breasts","Nipple","Aroused","porn","Naked|nude","Lust","Makeout","Abortion","Fingering","Horny","Orgasm","Ass|anus|anal","Boob","Fuck|fucked|fucking|fucker","Tit|tits","Cocks|cock","Pussy","Slut","Pornography","Foreplay"));
+        greetingsWordsList = new ArrayList(Arrays.asList("Blessings","Greetings","Gratitude","Celebrate,celebration","Happiness|joy|pleasure|laughter","Health","Peace","Prosperity","Season","Rejoice","Success|fortune","Wishes|best wishes","New year|coming year","Chritmas","Good luck","fantastic"));
 
         for(String word:codeWordsList){
             codeWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
