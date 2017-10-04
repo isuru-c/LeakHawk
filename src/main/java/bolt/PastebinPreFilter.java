@@ -25,11 +25,13 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import weka.classifiers.misc.SerializedClassifier;
+import weka.core.Instances;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -50,7 +52,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     private ArrayList<Pattern> sportsWordsPatternList;
     private ArrayList<Pattern> pornWordsPatternList;
     private ArrayList<Pattern> greetingsWordsPatternList;
-    Pattern relatedPattern1;
+    private Pattern relatedPattern1;
     //private Connection connection;
    /* private TextDirectoryLoader loader;
     private Instances dataRaw;
@@ -60,7 +62,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     private String regex;
     private String regex1;*/
     //private RandomForest classifier;
-    SerializedClassifier sclassifier;
+    private static SerializedClassifier sclassifier;
 
     String headingPreFilter ="@relation PF\n" +
             "\n" +
@@ -422,7 +424,7 @@ public class PastebinPreFilter extends BaseRichBolt {
         post.setPostText(post.getPostText().toLowerCase());
 
         //if pre filter is passed forward the model to next bolt(context filter)
-        if(!isPassedPrefilter(post.getTitle(), post.getPostText())) {
+        if(isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
         }else{
 //            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
@@ -448,22 +450,114 @@ public class PastebinPreFilter extends BaseRichBolt {
             isPrefilterPassed = false;
         }
 
-        if(!isPostEmpty && !isPostTest){
-            try {
 
-                for (int i=0;i<keyWordList.size();i++) {
-                    if (post.contains(keyWordList.get(i).toString())) {
-                        //exit after the first successful hit
-                        return true;
-                    }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        if(!isPostEmpty && !isPostTest){
+            isPrefilterPassed = isNotFilteredOut(post,title);
         }
 
+        System.out.println(isPrefilterPassed);
         return isPrefilterPassed;
     }
+
+    public boolean isNotFilteredOut(String text, String title){
+        try{
+            // convert String into InputStream
+            String result = createARFF(text,title);
+            //System.out.println(result);
+            InputStream is = new ByteArrayInputStream(result.getBytes());
+
+            // wrap it with buffered reader
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+            //convert into a set of instances
+            Instances unlabeled = new Instances(reader);
+            reader.close();
+            //set the class index to last value of the instance
+            unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+
+            // create copy
+            Instances labeled = new Instances(unlabeled);
+
+            //set options for the classifier
+            String[] options = new String[2];
+            options[0] = "-P";
+            options[1] = "0";
+            sclassifier.setOptions(options);
+
+            //predict class for the unseen text
+            double pred = sclassifier.classifyInstance(unlabeled.instance(0));
+            labeled.instance(0).setClassValue(pred);
+
+            System.out.println(text);
+            System.out.println("pred:"+pred);
+            //get the predicted class value
+            String classLabel = unlabeled.classAttribute().value((int) pred);
+
+            //if class is pos there's an evidence found
+            if("pos".equals(classLabel)){
+                return true;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //create arff file for the predicting text and the title
+    public String createARFF(String text, String title) {
+        String feature_list = "";
+
+        //check the pattern match for text and title for all the cases
+        for (Pattern pattern : codeWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : gameWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : gameWordsPatternList) {
+            Matcher matcher = pattern.matcher(title);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : sportsWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : pornWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : pornWordsPatternList) {
+            Matcher matcher = pattern.matcher(title);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        for (Pattern pattern : greetingsWordsPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        //add unknown class for the feature vector
+        feature_list +=  "?";
+        return headingPreFilter + feature_list;
+    }
+
+    public int getMatchingCount(Matcher matcher) {
+        int count = 0;
+        while (matcher.find())
+            count++;
+        return count;
+    }
+
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields("post"));
