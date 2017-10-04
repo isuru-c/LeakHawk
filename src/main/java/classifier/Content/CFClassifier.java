@@ -89,7 +89,7 @@ public class CFClassifier extends ContentClassifier{
 
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("interface FastEthernet[0-9]|interface Serial[0-9]");
+        bigramList.add("interface fastethernet[0-9]|interface serial[0-9]");
         bigramList.add("speed auto|duplex auto");
         bigramList.add("0 line");
         bigramList.add("line vty|line aux|line con\"");

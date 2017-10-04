@@ -89,25 +89,25 @@ public class DBClassifier extends ContentClassifier {
         unigramList.add("database");
         unigramList.add("Database:");
         unigramList.add("table");
-        unigramList.add("| NULL");
+        unigramList.add("| null");
         unigramList.add("insert|update|create");
         unigramList.add("table|schema|database|db");
-        unigramList.add("PostgreSQL|mysql|mssql|oracle db|db2|MySQL");
-        unigramList.add("DBMS|database|Database:|table:|data base:|DB Detection:|Data Bases: ");
+        unigramList.add("postgresql|mysql|mssql|oracle db|db2|MySQL");
+        unigramList.add("dbms|database|Database:|table:|data base:|db detection:|data bases: ");
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("database dump|DB User :|DB Version :");
+        bigramList.add("database dump|db user :|db Version :");
         bigramList.add("hacked database");
-        bigramList.add("LEAKED DATABASE | Database leaked");
+        bigramList.add("leaked database | database leaked");
         bigramList.add("db leak");
-        bigramList.add("Dumped from|dumped by");
-        bigramList.add("CREATE TABLE|ALTER TABLE");
-        bigramList.add("INSERT INTO");
+        bigramList.add("dumped from|dumped by");
+        bigramList.add("create table|alter table");
+        bigramList.add("insert into");
         bigramList.add("\\) values");
-        bigramList.add("Found :");
-        bigramList.add("Data found");
-        bigramList.add("NOT NULL");
-        bigramList.add("INTO users");
+        bigramList.add("found :");
+        bigramList.add("data found");
+        bigramList.add("not null");
+        bigramList.add("into users");
         bigramList.add("database dump|database dumped|db dumped|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump");
         bigramList.add("available databases");
         bigramList.add("db dump");
@@ -126,10 +126,10 @@ public class DBClassifier extends ContentClassifier {
 
 //        symbalPattern = Pattern.compile("\\-|\\+|\\|");
 
-        relatedPattern1 = getCorrectPatten("SQL Injection|SQLi|SQL-i|Blind SQL-i", Pattern.CASE_INSENSITIVE);
-        relatedPattern2 = getCorrectPatten("PRIMARY KEY|ALTER TABLE|TABLE FOUND", Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = getCorrectPatten("sql injection|sqli|sql-i|blind sql-i", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = getCorrectPatten("primary key|alter table|table found", Pattern.CASE_INSENSITIVE);
         relatedPattern3 = Pattern.compile( "sqlmap" , Pattern.CASE_INSENSITIVE);
-        relatedPattern4 = Pattern.compile( "SQL Injection|SQLi|SQL-i|Blind SQL-i|database dump|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump" , Pattern.CASE_INSENSITIVE);
+        relatedPattern4 = Pattern.compile( "sql injection|sqli|sql-i|blind sql-i|database dump|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump" , Pattern.CASE_INSENSITIVE);
         relatedPattern5 = getCorrectPatten("\\[\\*\\]" , Pattern.CASE_INSENSITIVE);
 
     }
