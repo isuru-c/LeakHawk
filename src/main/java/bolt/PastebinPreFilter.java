@@ -438,9 +438,10 @@ public class PastebinPreFilter extends BaseRichBolt {
         title = title.toLowerCase();
         post = post.toLowerCase();
 
-        boolean isPrefilterPassed = true;
+        boolean isPrefilterPassed = false;
         boolean isPostEmpty;
         boolean isPostTest = false;
+        boolean isPostEnglish = false;
 
         //check whether the post is empty
         if(isPostEmpty = post.isEmpty()){
@@ -449,9 +450,12 @@ public class PastebinPreFilter extends BaseRichBolt {
         else if(isPostTest = ( post.contains("test") || title.contains("test"))){
             isPrefilterPassed = false;
         }
+        else if(isPostEnglish = isPostEnglish(title,post)){
+            isPrefilterPassed = true;
+        }
 
 
-        if(!isPostEmpty && !isPostTest){
+        if(!isPostEmpty && !isPostTest && isPostEnglish){
             isPrefilterPassed = isNotFilteredOut(post,title);
         }
 
@@ -459,7 +463,26 @@ public class PastebinPreFilter extends BaseRichBolt {
         return isPrefilterPassed;
     }
 
-    public boolean isNotFilteredOut(String text, String title){
+    private boolean isPostEnglish(String title, String text){
+        String[] textWords= text.split(" ");
+        String[] titleWords = title.split("");
+        boolean isPostEnglish = false;
+
+        char[] textCharArr = textWords[0].toCharArray();
+        char[] titleCharArr = titleWords[0].toCharArray();
+
+        for(char c:textCharArr){
+            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+        }
+
+        for(char c:titleCharArr){
+            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+        }
+
+        return isPostEnglish;
+    }
+
+    private boolean isNotFilteredOut(String text, String title){
         try{
             // convert String into InputStream
             String result = createARFF(text,title);
@@ -507,7 +530,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     }
 
     //create arff file for the predicting text and the title
-    public String createARFF(String text, String title) {
+    private String createARFF(String text, String title) {
         String feature_list = "";
 
         //check the pattern match for text and title for all the cases
