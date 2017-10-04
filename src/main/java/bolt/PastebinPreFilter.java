@@ -422,7 +422,7 @@ public class PastebinPreFilter extends BaseRichBolt {
         post.setPostText(post.getPostText().toLowerCase());
 
         //if pre filter is passed forward the model to next bolt(context filter)
-        if(!isContainKeyWord(post.getPostText())) {
+        if(!isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
         }else{
 //            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
@@ -431,20 +431,38 @@ public class PastebinPreFilter extends BaseRichBolt {
 
     }
 
-    private boolean isContainKeyWord(String post) {
+    private boolean isPassedPrefilter(String title, String post) {
 
-        try {
+        title = title.toLowerCase();
+        post = post.toLowerCase();
 
-            for (int i=0;i<keyWordList.size();i++) {
-                if (post.contains(keyWordList.get(i).toString())) {
-                    //exit after the first successful hit
-                    return true;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        boolean isPrefilterPassed = true;
+        boolean isPostEmpty;
+        boolean isPostTest = false;
+
+        //check whether the post is empty
+        if(isPostEmpty = post.isEmpty()){
+            isPrefilterPassed = false;
         }
-        return false;
+        else if(isPostTest = ( post.contains("test") || title.contains("test"))){
+            isPrefilterPassed = false;
+        }
+
+        if(!isPostEmpty && !isPostTest){
+            try {
+
+                for (int i=0;i<keyWordList.size();i++) {
+                    if (post.contains(keyWordList.get(i).toString())) {
+                        //exit after the first successful hit
+                        return true;
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return isPrefilterPassed;
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
