@@ -103,7 +103,6 @@ public class PastebinContentClassifier extends BaseRichBolt {
             e.printStackTrace();
         }
 
-        post.setContentClassifierPassed();
         post.setContentModel(contentModel);
         collector.emit(tuple, new Values(post));
         collector.ack(tuple);

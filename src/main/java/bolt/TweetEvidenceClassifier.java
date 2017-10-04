@@ -29,6 +29,7 @@ import db.DBConnection;
 import db.DBHandle;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,16 +40,18 @@ import java.util.regex.Pattern;
 import java.util.Map;
 
 /**
- *
  * This class is used to classify tweets according to evidences of hacking attacks or data breaches
  *
  * @author Isuru Chandima
  * @author Udeshika Sewwandi
- *
  */
 public class TweetEvidenceClassifier extends BaseRichBolt {
 
     private OutputCollector collector;
+
+    private String tweetsNormalFlow = "tweets-normal-flow";
+    private String tweetsUrlFlow = "tweets-url-flow";
+
     private RandomForest tclassifier;
 
     /**
@@ -139,7 +142,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
             "\n" +
             "@data\n";
 
-    public TweetEvidenceClassifier(){
+    public TweetEvidenceClassifier() {
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/Twitter_EV.model");
         } catch (Exception e) {
@@ -217,7 +220,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
         trigramList.add("site hacked by");
         trigramList.add("model base leak");
 
-        relatedPattern1 = Pattern.compile("SQL_Injection|SQLi|SQL-i|Blind SQL-i|SQL",Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = Pattern.compile("SQL_Injection|SQLi|SQL-i|Blind SQL-i|SQL", Pattern.CASE_INSENSITIVE);
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
@@ -257,18 +260,30 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        Post post = (Post)tuple.getValue(0);
+        Post post = (Post) tuple.getValue(0);
+
         EvidenceModel evidenceModel = new EvidenceModel();
         post.setEvidenceModel(evidenceModel);
-        Boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
+
+        boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
+
         evidenceModel.setEvidenceFound(evidenceFound);
-        post.setEvidenceClassifierPassed();
-        collector.emit(tuple, new Values(post));
+
+        if (!evidenceFound) {
+            // If an evidence found in the post, check if it contains any other links. (urls)
+            // For that process, send the post to another bolt for further processes
+            collector.emit(tweetsUrlFlow, tuple, new Values(post));
+        }else {
+            // No evidence found, send the post through the normal flow
+            collector.emit(tweetsNormalFlow, tuple, new Values(post));
+        }
+
         collector.ack(tuple);
     }
 
     /**
      * Finds whether there's an evidence of hacking attack or not
+     *
      * @param user
      * @param post
      * @param evidenceModel
@@ -295,7 +310,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
         try {
             ResultSet data = DBHandle.getData(connection, "SELECT user FROM Incident");
-            while(data.next()){
+            while (data.next()) {
                 String userFromDB = data.getString("user");
                 //check user of the tweet.
                 if (user.equals(userFromDB.toLowerCase())) {
@@ -312,11 +327,12 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     /**
      * Classify the new tweets
+     *
      * @param text
      * @return
      */
-    public boolean isEvidenceFound(String text){
-        try{
+    public boolean isEvidenceFound(String text) {
+        try {
             // convert String into InputStream
             String result = createARFF(text);
             InputStream is = new ByteArrayInputStream(result.getBytes());
@@ -347,7 +363,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
             //if class is pos there's an evidence found
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
@@ -361,6 +377,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     /**
      * Create arff file for the predicting text and the title
+     *
      * @param text
      * @return
      */
@@ -386,7 +403,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
         Matcher matcherCF = relatedPattern1.matcher(text);
         feature_list += getMatchingCount(matcherCF) + ",";
         //add unknown class for the feature vector
-        feature_list +=  "?";
+        feature_list += "?";
         return headingEvidenceClassifier + feature_list;
     }
 
@@ -399,6 +416,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream(tweetsNormalFlow, new Fields("post"));
+        outputFieldsDeclarer.declareStream(tweetsUrlFlow, new Fields("post"));
     }
 }

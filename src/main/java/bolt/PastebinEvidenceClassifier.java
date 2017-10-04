@@ -52,6 +52,10 @@ import java.util.regex.Pattern;
 public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     private OutputCollector collector;
+
+    private String pastebinNormalFlow = "pastebin-normal-flow";
+    private String pastebinUrlFlow = "pastebin-url-flow";
+
     /**
      * Lists used to create attributes in arff file
      */
@@ -260,7 +264,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             "\n" +
             "@data\n";
 
-    public PastebinEvidenceClassifier(){
+    public PastebinEvidenceClassifier() {
         //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
@@ -270,25 +274,25 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             e.printStackTrace();
         }
 
-        keyWordList1 = new ArrayList(Arrays.asList("hacked", "leaked","hack", "leak","exploit","exploits","attack","attacked", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db_dump", "db leak", "model base dump", "model base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak|email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email|leaked emails", "email_hack"));
+        keyWordList1 = new ArrayList(Arrays.asList("hacked", "leaked", "hack", "leak", "exploit", "exploits", "attack", "attacked", "Pwned by", "Doxed", "Ow3ned", "pawned by", "Server Rootéd", "#opSriLanka", "#OPlanka", "#anonymous", "Private key", "Password leak", "password dump", "credential leak", "credential dump", "Credit card", "Card dump ", " cc dump ", " credit_card", "card_dump", "working_card", "cc_dump", "skimmed", "card_hack", "sited hacked by", "websited hacked by", "website hacked by", "site hacked by", "websited hacked", "domain hack", "defaced", "leaked by", "site deface", "mass deface", "database dump", "database dumped", "db dumped", "db_dump", "db leak", "model base dump", "model base leak", "database hack", "db hack", "login dump", "DNS LeAkEd", "DNS fuck3d", "zone transfer", "DNS Enumeration", "Enumeration Attack", "cache snooping", "cache poisoning", "email hack", "emails hack", "emails leak|email leak", "email dump", "emails dump", "email dumps", "email-list", "leaked email|leaked emails", "email_hack"));
         keyWordList2 = new ArrayList(Arrays.asList("dns-brute", "dnsrecon", "fierce", "Dnsdict6", "axfr", "SQLmap"));
-        keyWordList4 = new ArrayList(Arrays.asList("UGLegion", "RetrOHacK","Anonhack", "Anonymous", "AnonSec", "AnonGhost", "ANONYMOUSSRILANKA", "W3BD3F4C3R", "SLCYBERARMY", "DAVYJONES", "BLACKHATANON", "ANUARLINUX", "UGLEGION", "HUSSEIN98D", "We_Are_Anonymous", "We_do_not_Forget", "We_do_not_Forgive", "Laughing_at_your_security_since_2012", "AnonGhost_is_Everywhere"));
-        relatedPattern1 = Pattern.compile("SQL_Injection|SQLi|SQL-i|Blind SQL-i|SQL",Pattern.CASE_INSENSITIVE);
+        keyWordList4 = new ArrayList(Arrays.asList("UGLegion", "RetrOHacK", "Anonhack", "Anonymous", "AnonSec", "AnonGhost", "ANONYMOUSSRILANKA", "W3BD3F4C3R", "SLCYBERARMY", "DAVYJONES", "BLACKHATANON", "ANUARLINUX", "UGLEGION", "HUSSEIN98D", "We_Are_Anonymous", "We_do_not_Forget", "We_do_not_Forgive", "Laughing_at_your_security_since_2012", "AnonGhost_is_Everywhere"));
+        relatedPattern1 = Pattern.compile("SQL_Injection|SQLi|SQL-i|Blind SQL-i|SQL", Pattern.CASE_INSENSITIVE);
 
         hackingAttackPatternList = new ArrayList<>();
         securityToolPatternList = new ArrayList<>();
         hackerPatternList = new ArrayList<>();
 
-        for(String word:keyWordList1){
-            hackingAttackPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : keyWordList1) {
+            hackingAttackPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:keyWordList2){
-            securityToolPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : keyWordList2) {
+            securityToolPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:keyWordList4){
-            hackerPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : keyWordList4) {
+            hackerPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
 
@@ -314,18 +318,23 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
-        Post post = (Post)tuple.getValue(0);
+        Post post = (Post) tuple.getValue(0);
 
         EvidenceModel evidenceModel = new EvidenceModel();
         post.setEvidenceModel(evidenceModel);
 
-        Boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getTitle(), post.getPostText(), evidenceModel);
+        boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getTitle(), post.getPostText(), evidenceModel);
 
         evidenceModel.setEvidenceFound(evidenceFound);
 
-        post.setEvidenceClassifierPassed();
-
-        collector.emit(tuple, new Values(post));
+        if (evidenceFound) {
+            // If an evidence found in the post, check if it contains any other links. (urls)
+            // For that process, send the post to another bolt for further processes
+            collector.emit(pastebinUrlFlow, tuple, new Values(post));
+        }else {
+            // No evidence found, send the post through the normal flow
+            collector.emit(pastebinNormalFlow, tuple, new Values(post));
+        }
 
         collector.ack(tuple);
 
@@ -333,6 +342,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     /**
      * Checks whether post passes Evidence classifer
+     *
      * @param user
      * @param title
      * @param post
@@ -359,7 +369,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
         //#E8	BODY:	Are there any signs of security vulnerability in the body text?
         try {
             ResultSet data = DBHandle.getData(connection, "SELECT user FROM Incident");
-            while(data.next()){
+            while (data.next()) {
                 String userFromDB = data.getString("user");
                 if (title.contains(userFromDB.toLowerCase())) {
                     evidenceModel.setClassifier1Passed(true);
@@ -370,8 +380,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             e.printStackTrace();
         }
 
-        evidenceFound = isEvidenceFound(post,title);
-
+        evidenceFound = isEvidenceFound(post, title);
 
 
         return evidenceFound;
@@ -379,14 +388,15 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     /**
      * Classifes unseen instances
+     *
      * @param text
      * @param title
      * @return
      */
-    public boolean isEvidenceFound(String text, String title){
-        try{
+    public boolean isEvidenceFound(String text, String title) {
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             //System.out.println(result);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
@@ -416,7 +426,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
             //if class is pos there's an evidence found
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
@@ -430,6 +440,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
 
     /**
      * create arff file for the predicting text and the title
+     *
      * @param text
      * @param title
      * @return
@@ -470,7 +481,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
         feature_list += getMatchingCount(matcherEC) + ",";
 
         //add unknown class for the feature vector
-        feature_list +=  "?";
+        feature_list += "?";
         return headingEvidenceClassifier + feature_list;
     }
 
@@ -482,6 +493,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream(pastebinNormalFlow, new Fields("post"));
+        outputFieldsDeclarer.declareStream(pastebinUrlFlow, new Fields("post"));
     }
 }

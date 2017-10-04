@@ -54,8 +54,8 @@ public class ContextFilter extends BaseRichBolt {
     Dictionary dictionary;
     private int rgexpCount=18;
 
-    private String pastebinOut = "pastebin-out";
-    private String tweetsOut = "tweets-out";
+    private String pastebinOut = "context-filter-pastebin-out";
+    private String tweetsOut = "context-filter-tweets-out";
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
