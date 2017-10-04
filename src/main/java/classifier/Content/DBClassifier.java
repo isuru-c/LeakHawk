@@ -31,14 +31,15 @@ import java.util.regex.Pattern;
 @ContentPattern(patternName = "Database", filePath = "./src/main/resources/DB.model")
 //@ContentPattern(patternName = "Database", filePath = "DB.model")
 public class DBClassifier extends ContentClassifier {
-    private Pattern symbalPattern;
+
+    private ArrayList<String> unigrams;
+    private ArrayList<String> bigrams;
     private ArrayList<Pattern> unigramPatternList;
     private ArrayList<Pattern> bigramPatternList;
     private Pattern relatedPattern1;
     private Pattern relatedPattern2;
     private Pattern relatedPattern3;
     private Pattern relatedPattern4;
-    private Pattern relatedPattern5;
     private RandomForest tclassifier;
 
     private String headingDB = "@relation DB\n" +
@@ -68,12 +69,10 @@ public class DBClassifier extends ContentClassifier {
             "@attribute $DB23 numeric\n" +
             "@attribute $DB24 numeric\n" +
             "@attribute $DB25 numeric\n" +
-            "@attribute $DB26 numeric\n" +
-            "@attribute $DB27 numeric\n" +
-            "@attribute $DB28 numeric\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
+
 
 
     public DBClassifier(String model, String name) {
@@ -85,52 +84,45 @@ public class DBClassifier extends ContentClassifier {
             e.printStackTrace();
         }
 
-        ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("database");
-        unigramList.add("Database:");
-        unigramList.add("table");
-        unigramList.add("| null");
-        unigramList.add("insert|update|create");
-        unigramList.add("table|schema|database|db");
-        unigramList.add("postgresql|mysql|mssql|oracle db|db2|MySQL");
-        unigramList.add("dbms|database|Database:|table:|data base:|db detection:|data bases: ");
+        unigrams = new ArrayList<String>();
+        unigrams.add("database");
+        unigrams.add("table");
+        unigrams.add("schema|database|db");
+        unigrams.add("postgresql|mysql|mssql|oracle db|db2|MySQL");
+        unigrams.add("dbms|database|Database:|table:|data base:|db detection:|data bases: ");
 
-        ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("database dump|db user :|db Version :");
-        bigramList.add("hacked database");
-        bigramList.add("leaked database | database leaked");
-        bigramList.add("db leak");
-        bigramList.add("dumped from|dumped by");
-        bigramList.add("create table|alter table");
-        bigramList.add("insert into");
-        bigramList.add("\\) values");
-        bigramList.add("found :");
-        bigramList.add("data found");
-        bigramList.add("not null");
-        bigramList.add("into users");
-        bigramList.add("database dump|database dumped|db dumped|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump");
-        bigramList.add("available databases");
-        bigramList.add("db dump");
-
-
+        bigrams = new ArrayList<String>();
+        bigrams.add("database dump|db user :|db Version :");
+        bigrams.add("update table|create table");
+        bigrams.add("hacked database");
+        bigrams.add("leaked database | database leaked");
+        bigrams.add("db leak");
+        bigrams.add("dumped from|dumped by");
+        bigrams.add("create table|alter table");
+        bigrams.add("insert into");
+        bigrams.add("\\) values");
+        bigrams.add("found :");
+        bigrams.add("data found");
+        bigrams.add("not null");
+        bigrams.add("into users");
+        bigrams.add("database dump|database dumped|db dumped|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump");
+        bigrams.add("available databases");
+        bigrams.add("db dump");
 
         unigramPatternList = new ArrayList<Pattern>();
-        for (String word : unigramList) {
-            unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+        for (String word : unigrams) {
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         bigramPatternList = new ArrayList<Pattern>();
-        for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+        for (String word : bigrams) {
+            bigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-//        symbalPattern = Pattern.compile("\\-|\\+|\\|");
-
-        relatedPattern1 = getCorrectPatten("sql injection|sqli|sql-i|blind sql-i", Pattern.CASE_INSENSITIVE);
-        relatedPattern2 = getCorrectPatten("primary key|alter table|table found", Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = Pattern.compile("sql injection|sqli|sql-i|blind sql-i", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = Pattern.compile("primary key|alter table|table found", Pattern.CASE_INSENSITIVE);
         relatedPattern3 = Pattern.compile( "sqlmap" , Pattern.CASE_INSENSITIVE);
         relatedPattern4 = Pattern.compile( "sql injection|sqli|sql-i|blind sql-i|database dump|db dump|db leak|data base dump|data base leak|database hack|db hack|login dump" , Pattern.CASE_INSENSITIVE);
-        relatedPattern5 = getCorrectPatten("\\[\\*\\]" , Pattern.CASE_INSENSITIVE);
 
     }
 
@@ -160,10 +152,6 @@ public class DBClassifier extends ContentClassifier {
 
         matcherDB = relatedPattern4.matcher(title);
         feature_list += getMatchingCount(matcherDB) + ",";
-
-        matcherDB = relatedPattern5.matcher(text);
-        feature_list += getMatchingCount(matcherDB) + ",";
-
 
         feature_list += "?";
         return headingDB + feature_list;

@@ -33,16 +33,17 @@ import java.util.regex.Pattern;
 //@ContentPattern(patternName = "DNS Attack", filePath = "DA.model")
 public class DAClassifier extends ContentClassifier {
 
+    private ArrayList<String> unigrams;
+    private ArrayList<String> bigrams;
+    private ArrayList<String> trigrams;
     private ArrayList<Pattern> unigramPatternList;
     private ArrayList<Pattern> bigramPatternList;
     private ArrayList<Pattern> trigramPatternList;
 
     private Pattern relatedPattern1;
-    private Pattern relatedPattern2;
     private Pattern relatedPattern3;
     private Pattern relatedPattern4;
     private Pattern relatedPattern5;
-    private Pattern relatedPattern7;
     private RandomForest tclassifier;
 
     private String headingDA = "@relation train\n" +
@@ -62,8 +63,6 @@ public class DAClassifier extends ContentClassifier {
             "@attribute $DA13 numeric\n" +
             "@attribute $DA14 numeric\n" +
             "@attribute $DA15 numeric\n" +
-            "@attribute $DA16 numeric\n" +
-            "@attribute $DA17 numeric\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
@@ -78,47 +77,43 @@ public class DAClassifier extends ContentClassifier {
             e.printStackTrace();
         }
 
+        unigrams= new ArrayList<String>();
+        unigrams.add(" mx | ns | ptr | cname | soa ");
+        unigrams.add("dns|record|host");
+        unigrams.add("snoop|axfr|brute|poisoning");
 
-        ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("mx|ns|ptr|cname|soa");
-        unigramList.add("dns|record|host");
-        unigramList.add("snoop|axfr|brute|poisoning");
+        bigrams = new ArrayList<String>();
+        bigrams.add("43200 in|10800 in|86400 in|3600 in");
+        bigrams.add("in a|in mx|in ns|in cname");
+        bigrams.add("no ptr");
+        bigrams.add("hostnames found");
+        bigrams.add("zone transfer");
+        bigrams.add("mx 10|mx 20|mx 30|mx 40|mx 50|mx 60");
 
-        ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("43200 in|10800 in|86400 in|3600 in");
-        bigramList.add("in a|in mx|in ns|in cname");
-        bigramList.add("no ptr");
-        bigramList.add("hostnames found");
-        bigramList.add("zone transfer");
-        bigramList.add("mx 10|mx 20|mx 30|mx 40|mx 50|mx 60");
-
-        ArrayList<String> trigramList = new ArrayList<String>();
-        trigramList.add("transfer not allowed");
-        trigramList.add("Trying zone transfer");
-
+        trigrams = new ArrayList<String>();
+        trigrams.add("transfer not allowed");
+        trigrams.add("Trying zone transfer");
 
         unigramPatternList = new ArrayList<Pattern>();
-        for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
-
+        for (String word : unigrams) {
+            unigramPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
         }
 
         bigramPatternList = new ArrayList<Pattern>();
-        for (String word : bigramList) {
-                bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+        for (String word : bigrams) {
+            bigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
-        for (String word : trigramList) {
-                trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+        for (String word : trigrams) {
+            trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        relatedPattern1 = getCorrectPatten("dns-brute|dnsrecon|fierce|tsunami|dnsdict6|axfr", Pattern.CASE_INSENSITIVE);
-        relatedPattern2 = Pattern.compile("dns-brute|dnsrecon|fierce|tsunami|dnsdict6|axfr", Pattern.CASE_INSENSITIVE);
-        relatedPattern3 = getCorrectPatten("dns leaked|dns fuck3d|zone transfer|dns|enumeration_attack" , Pattern.CASE_INSENSITIVE);
+        relatedPattern1 = Pattern.compile("dns-brute|dnsrecon|fierce|tsunami|dnsdict6|axfr", Pattern.CASE_INSENSITIVE);
+        relatedPattern3 = Pattern.compile("dns leaked|dns fuck3d|zone transfer|dns|enumeration_attack" , Pattern.CASE_INSENSITIVE);
         relatedPattern4 = Pattern.compile("dns_enumeration", Pattern.CASE_INSENSITIVE);
-        relatedPattern5 = getCorrectPatten("dns enumeration attack|dns enumeration|misconfigured dns|dns cache snooping", Pattern.CASE_INSENSITIVE);
-        relatedPattern7 = Pattern.compile("\\[\\*\\]", Pattern.CASE_INSENSITIVE);
+        relatedPattern5 = Pattern.compile("dns enumeration attack|dns enumeration|misconfigured dns|dns cache snooping", Pattern.CASE_INSENSITIVE);
+
     }
 
     public String createARFF(String text,String title) {
@@ -142,8 +137,6 @@ public class DAClassifier extends ContentClassifier {
         Matcher matcher = relatedPattern1.matcher(text);
         feature_list += getMatchingCount(matcher) + ",";
 
-        matcher = relatedPattern2.matcher(title);
-        feature_list += getMatchingCount(matcher) + ",";
 
         matcher = relatedPattern3.matcher(text);
         feature_list += getMatchingCount(matcher) + ",";
@@ -152,9 +145,6 @@ public class DAClassifier extends ContentClassifier {
         feature_list += getMatchingCount(matcher) + ",";
 
         matcher = relatedPattern5.matcher(text);
-        feature_list += getMatchingCount(matcher) + ",";
-
-        matcher = relatedPattern7.matcher(text);
         feature_list += getMatchingCount(matcher) + ",";
 
         feature_list += "?";

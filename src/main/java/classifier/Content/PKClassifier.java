@@ -78,68 +78,56 @@ public class PKClassifier extends ContentClassifier {
             e.printStackTrace();
         }
         ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("PRIVATE");
-        unigramList.add("KEY");
-        unigramList.add("RSA");
-        unigramList.add("SSHRSA");
-        unigramList.add("KEY-----");
+        unigramList.add("private");
+        unigramList.add("key");
+        unigramList.add("rsa");
+        unigramList.add("sshrsa");
+        unigramList.add("key-----");
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("PRIVATE KEY");
-        bigramList.add("RSA PRIVATE");
-        bigramList.add("BEGIN CERTIFICATE");
-        bigramList.add("DSA PRIVATE");
-        bigramList.add("ENCRYPTED PRIVATE");
-        bigramList.add("BEGIN RSA");
+        bigramList.add("private key");
+        bigramList.add("rsa private");
+        bigramList.add("begin certificate");
+        bigramList.add("dsa private");
+        bigramList.add("encrypted private");
+        bigramList.add("begin rsa");
 
         ArrayList<String> trigramList = new ArrayList<String>();
-        trigramList.add("RSA PRIVATE KEY");
-        trigramList.add("DSA PRIVATE KEY");
-        trigramList.add("BEGIN RSA PRIVATE");
-        trigramList.add("END PRIVATE KEY");
-        trigramList.add("BEGIN PRIVATE KEY");
+        trigramList.add("rsa private key");
+        trigramList.add("dsa private key");
+        trigramList.add("begin rsa private");
+        trigramList.add("end private key");
+        trigramList.add("begin private key");
 
         ArrayList<String> fourgramList = new ArrayList<String>();
-        trigramList.add("BEGIN RSA PRIVATE KEY");
-        trigramList.add("BEGIN DSA PRIVATE KEY");
-        trigramList.add("END RSA PRIVATE KEY");
-
-
-        /*
-        *
-
-	PK20=$(grep -oE "[-]{5}[A-Za-z0-9 ]+[-]{5}" "$i"| wc -l);
-
-	#PK related terms
-	PK21=$(grep -owiE "PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY" "$i"| wc -l);
-
-        * */
-
-
+        fourgramList.add("begin rsa private key");
+        fourgramList.add("begin dsa private key");
+        fourgramList.add("end rsa private key");
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
 
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten( word, Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(Pattern.compile( word, Pattern.CASE_INSENSITIVE));
         }
 
         fourgramPatternList = new ArrayList<Pattern>();
         for (String word : fourgramList) {
-            fourgramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            fourgramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         relatedPattern1 = Pattern.compile("[-]{5}[A-Za-z0-9 ]+[-]{5}");
-        relatedPattern2 = getCorrectPatten("PRIVATE KEY|RSA PRIVATE|DSA PRIVATE|ENCRYPTED PRIVATE|BEGIN RSA|RSA PRIVATE KEY|DSA PRIVATE KEY|BEGIN RSA PRIVATE|END PRIVATE KEY|BEGIN PRIVATE KEY", Pattern.CASE_INSENSITIVE);
+        relatedPattern2 = Pattern.compile("public_key|private_key|private key|rsa private|dsa private|encrypted private|begin rsa|rsa private key|dsa private key|begin rsa private|end private key|begin private key", Pattern.CASE_INSENSITIVE);
+
     }
 
     public String createARFF(String text,String title) {

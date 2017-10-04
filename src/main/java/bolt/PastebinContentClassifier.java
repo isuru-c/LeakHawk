@@ -85,7 +85,7 @@ public class PastebinContentClassifier extends BaseRichBolt {
         String postText = post.getPostText();
         ContentModel contentModel = new ContentModel();
         List<ContentData> contentDataList = new ArrayList();
-        contentModel.setContentDataList(contentDataList);
+
 
         try {
             /* Check post with each classifier and if it is match add the classifier type and
@@ -94,6 +94,8 @@ public class PastebinContentClassifier extends BaseRichBolt {
                 if(classifier.classify(postText, title)) {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
+                    contentModel.setContentFound(true);
+
                 }
             }
         } catch (java.lang.StackOverflowError e) {
@@ -102,6 +104,7 @@ public class PastebinContentClassifier extends BaseRichBolt {
             System.out.println("\n\n\n\n");
             e.printStackTrace();
         }
+        contentModel.setContentDataList(contentDataList);
 
         post.setContentModel(contentModel);
         collector.emit(tuple, new Values(post));

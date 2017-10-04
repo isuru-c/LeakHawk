@@ -113,18 +113,18 @@ public class CFClassifier extends ContentClassifier{
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+                unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
 
         }
 
         bigramPatternList = new ArrayList<Pattern>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
     }
 

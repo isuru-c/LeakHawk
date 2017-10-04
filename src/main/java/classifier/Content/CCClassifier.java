@@ -138,17 +138,17 @@ public class CCClassifier extends ContentClassifier {
 
         unigramPatternList = new ArrayList<>();
         for (String word : unigramList) {
-            unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         bigramPatternList = new ArrayList<>();
         for (String word : bigramList) {
-            bigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            bigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         trigramPatternList = new ArrayList<>();
         for (String word : trigramList) {
-            trigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         relatedTerms1Pattern = Pattern.compile("expiry date|expire|exp.date|expiration|exp. month|exp. years|expyear|expmonth|(exp)|expdate|expd[m/y]|date d'expiration", Pattern.CASE_INSENSITIVE);

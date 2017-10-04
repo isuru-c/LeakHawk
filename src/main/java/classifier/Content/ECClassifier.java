@@ -32,16 +32,10 @@ import java.util.regex.Pattern;
 @ContentPattern(patternName = "Email conversation", filePath = "./src/main/resources/EC.model")
 //@ContentPattern(patternName = "Email conversation", filePath = "EC.model")
 public class ECClassifier extends ContentClassifier {
+    private ArrayList<String> unigrams;
     private Pattern titlePattern;
     private ArrayList<Pattern> unigramPatternList;
-
     private Pattern relatedPattern1;
-    private Pattern relatedPattern2;
-    private Pattern relatedPattern3;
-    private Pattern relatedPattern4;
-    private Pattern relatedPattern5;
-    private Pattern relatedPattern6;
-    private Pattern relatedPattern7;
     private RandomForest tclassifier;
 
     private String headingEC = "@relation train\n" +
@@ -57,6 +51,9 @@ public class ECClassifier extends ContentClassifier {
             "\n" +
             "@data\n";
 
+
+
+
     public ECClassifier(String model, String name) {
         super(model, name);
 
@@ -65,19 +62,17 @@ public class ECClassifier extends ContentClassifier {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("reply|forward");
-        unigramList.add("subject");
-        unigramList.add("mailed by");
-        unigramList.add("from:|wrote:|to:|subject:");
-        unigramList.add("regards");
+        unigrams = new ArrayList<String>();
+        unigrams.add("reply|forward");
+        unigrams.add("subject");
+        unigrams.add("mailed by");
+        unigrams.add("from:|wrote:|to:|subject:");
+        unigrams.add("regards|dear");
 
 
         unigramPatternList = new ArrayList<Pattern>();
-        for (String word : unigramList) {
-            unigramPatternList.add(getCorrectPatten(word, Pattern.CASE_INSENSITIVE));
+        for (String word : unigrams) {
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         titlePattern = Pattern.compile("conversation|email", Pattern.CASE_INSENSITIVE);
