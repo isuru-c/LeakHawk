@@ -37,9 +37,8 @@ import java.util.regex.Pattern;
 /**
  * @author sewwandi
  */
-public class PastebinPreFilter extends BaseRichBolt {
+public class PastebinPreFilter extends LeakHawkPreFilter {
 
-    private OutputCollector collector;
     private ArrayList keyWordList;
 
     private ArrayList<String> codeWordsList;
@@ -406,7 +405,7 @@ public class PastebinPreFilter extends BaseRichBolt {
     }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
 
         keyWordList = new ArrayList<String>();
         keyWordList.add("game");
@@ -582,10 +581,5 @@ public class PastebinPreFilter extends BaseRichBolt {
         while (matcher.find())
             count++;
         return count;
-    }
-
-
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

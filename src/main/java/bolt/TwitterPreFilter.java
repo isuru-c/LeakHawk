@@ -26,24 +26,23 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import parameters.LeakHawkParameters;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * This Bolt is used to filter out posts that does not contain any sensitive data like
- * game, movies, torrents and porn contents
+ * game, movies, torrents and porn contents in tweets.
+ * Extends the superclass LeakHawkPreFilter
  *
  * @author Isuru Chandima
  */
-public class TwitterPreFilter extends BaseRichBolt {
+public class TwitterPreFilter extends LeakHawkPreFilter {
 
-    private OutputCollector collector;
     private ArrayList<String> keywordList;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
         keywordList = LeakHawkParameters.getTwitterPreFilterKeywordList();
     }
 
@@ -77,7 +76,7 @@ public class TwitterPreFilter extends BaseRichBolt {
      * filter out from the LeakHawk engine.
      *
      * @param postText twitter post needs ot check for availability of a keyword
-     * @return
+     * @return true if the post contains any given words in keywordList, false otherwise
      */
     public boolean isContainKeyword(String postText) {
 
@@ -87,10 +86,5 @@ public class TwitterPreFilter extends BaseRichBolt {
         }
 
         return false;
-    }
-
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }
