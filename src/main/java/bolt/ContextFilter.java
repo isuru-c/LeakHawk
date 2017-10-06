@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkContextFilter;
 import model.Post;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -93,12 +94,7 @@ public class ContextFilter extends LeakHawkContextFilter {
      */
     private boolean isContextFilterPassed(String postText) {
 
-        if (isRegularExpressionMatched(postText) || isSynonymsMatched(postText)) {
-            return true;
-        }else {
-            return false;
-        }
-
+        return isRegularExpressionMatched(postText) || isSynonymsMatched(postText);
     }
 
     /**
@@ -122,7 +118,7 @@ public class ContextFilter extends LeakHawkContextFilter {
                 }
             }
         } catch (Exception ex) {
-
+            ex.printStackTrace();
         }
         return found;
     }
@@ -151,7 +147,7 @@ public class ContextFilter extends LeakHawkContextFilter {
             InputStream input = new FileInputStream(new File("./src/main/resources/context.properties"));
             Properties properties = new Properties();
             properties.load(input);
-            regularExpressionList = new ArrayList<String>();
+            regularExpressionList = new ArrayList<>();
 
             for (int i = 0; i < properties.size(); i++) {
                 regularExpressionList.add(properties.getProperty("regexp" + (i + 1)));
@@ -231,20 +227,19 @@ public class ContextFilter extends LeakHawkContextFilter {
         }
     }
 
+    /**
+     * In the current topology, output of the context filter is connected to two different
+     * bolts [evidence classifiers] depend on the type of the post. Hence two output streams
+     * are defined in here.
+     *
+     * pastebinOut - output stream for the PastebinEvidenceClassifier
+     * tweetsOut - output stream for the tweetsEvidenceClassifier
+     *
+     * These exact identifiers are needs to be used when creating the storm topology.
+     *
+     */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
-        /**
-         * In the current topology, output of the context filter is connected to two different
-         * bolts [evidence classifiers] depend on the type of the post. Hence two output streams
-         * are defined in here.
-         *
-         * pastebinOut - output stream for the PastebinEvidenceClassifier
-         * tweetsOut - output stream for the tweetsEvidenceClassifier
-         *
-         * These exact identifiers are needs to be used when creating the storm topology.
-         *
-         */
 
         outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));

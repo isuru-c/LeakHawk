@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkEvidenceClassifier;
 import model.EvidenceModel;
 import model.Post;
 import db.DBConnection;
@@ -387,7 +388,7 @@ public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
      * @param title
      * @return
      */
-    public boolean isEvidenceFound(String text, String title) {
+    private boolean isEvidenceFound(String text, String title) {
         try {
             // convert String into InputStream
             String result = createARFF(text, title);
@@ -479,28 +480,28 @@ public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
         return headingEvidenceClassifier + feature_list;
     }
 
-    int getMatchingCount(Matcher matcher) {
+    private int getMatchingCount(Matcher matcher) {
         int count = 0;
         while (matcher.find())
             count++;
         return count;
     }
 
+    /**
+     * In the current topology, output of the PastebinEvidenceClassifier is connected to two
+     * different bolts [PastebinContentClassifier and UrlProcessor] depend on the content
+     * of the post. {existence of evidence or not] Hence two output streams are defined in here.
+     *
+     * pastebinNormalFlow - when there is no evidence in the post, it is forwarded to
+     *                      PastebinContentClassier in the LeakHawk core topology
+     * pastebinUrlFlow - if it turns to be true in evidence classification, content is needed
+     *                  to check for urls. For that post is forwarded to UrlProcessor.
+     *
+     * These exact identifiers are needs to be used when creating the storm topology.
+     *
+     */
+    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
-        /**
-         * In the current topology, output of the PastebinEvidenceClassifier is connected to two
-         * different bolts [PastebinContentClassifier and UrlProcessor] depend on the content
-         * of the post. {existence of evidence or not] Hence two output streams are defined in here.
-         *
-         * pastebinNormalFlow - when there is no evidence in the post, it is forwarded to
-         *                      PastebinContentClassier in the LeakHawk core topology
-         * pastebinUrlFlow - if it turns to be true in evidence classification, content is needed
-         *                  to check for urls. For that post is forwarded to UrlProcessor.
-         *
-         * These exact identifiers are needs to be used when creating the storm topology.
-         *
-         */
 
         outputFieldsDeclarer.declareStream(pastebinNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(pastebinUrlFlow, new Fields("post"));

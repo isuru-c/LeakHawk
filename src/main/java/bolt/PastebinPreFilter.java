@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkPreFilter;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -60,7 +61,7 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
     //private RandomForest classifier;
     private static SerializedClassifier sclassifier;
 
-    String headingPreFilter ="@relation PF\n" +
+    private String headingPreFilter ="@relation PF\n" +
             "\n" +
             "@attribute $PF1 numeric\n" +
             "@attribute $PF2 numeric\n" +
@@ -422,8 +423,6 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         //if pre filter is passed forward the model to next bolt(context filter)
         if(isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
-        }else{
-//            System.out.println("\nUser: " + post.getUser() + "\nTitle: " + post.getTitle() + "\n" + post.getPostText() + "\n--- Filtered out by pre filter ---\n");
         }
         collector.ack(tuple);
 

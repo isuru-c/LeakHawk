@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *     Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.core;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -26,16 +26,16 @@ import org.apache.storm.tuple.Tuple;
 import java.util.Map;
 
 /**
- * Content Classifier classifies each textual input into a set of classes. Each class is
- * defined by a template comprised of multiple checkpoints that evaluate the content.
- * The set of classes is pre-defined, and the list is not exhaustive as the categorization of
- * sensitive content is not comprehensive.
+ * The Context filter is designed to let the administrator or the users of the monitoring
+ * platform, to configure the information domain which is used by the LeakHawk Core as the
+ * context. Context filter screens out the non-related information and extracts only the
+ * input documents related to the context the system is focused on.
  *
- * Extend this class to classify text from different sources.
+ * To define different context filters, LeakHawkContextFilter needs to be extended.
  *
  * @author Isuru Chandima
  */
-public abstract class LeakHawkContentClassifier extends BaseRichBolt{
+public abstract class LeakHawkContextFilter extends BaseRichBolt{
 
     protected OutputCollector collector;
 

@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkContentClassifier;
 import classifier.Content.*;
 import model.ContentData;
 import model.ContentModel;
@@ -49,7 +50,7 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         super.prepare(map, topologyContext, outputCollector);
 
-        classifierList = new ArrayList<ContentClassifier>();
+        classifierList = new ArrayList<>();
 
         // Load the all the ContentPatterns
         Reflections reflections = new Reflections("classifier.Content");

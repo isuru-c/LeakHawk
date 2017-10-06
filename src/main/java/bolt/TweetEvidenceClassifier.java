@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkEvidenceClassifier;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -64,7 +65,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
     private ArrayList<Pattern> bigramPatternList;
     private ArrayList<Pattern> trigramPatternList;
 
-    Pattern relatedPattern1;
+    private Pattern relatedPattern1;
     /**
      * Database connection
      */
@@ -151,7 +152,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
             e.printStackTrace();
         }
 
-        ArrayList<String> unigramList = new ArrayList<String>();
+        ArrayList<String> unigramList = new ArrayList<>();
         unigramList.add("Anonymous");
         unigramList.add("AnonSec");
         unigramList.add("AnonGhost");
@@ -181,7 +182,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
         unigramList.add("SQLmap");
         unigramList.add("card_dump");
 
-        ArrayList<String> bigramList = new ArrayList<String>();
+        ArrayList<String> bigramList = new ArrayList<>();
         bigramList.add("email dumps");
         bigramList.add("DNS fuck3d");
         bigramList.add("leaked email");
@@ -217,34 +218,33 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
         bigramList.add("email dump");
         bigramList.add("emails dump");
 
-        ArrayList<String> trigramList = new ArrayList<String>();
+        ArrayList<String> trigramList = new ArrayList<>();
         trigramList.add("website hacked by");
         trigramList.add("site hacked by");
         trigramList.add("model base leak");
 
         relatedPattern1 = Pattern.compile("SQL_Injection|SQLi|SQL-i|Blind SQL-i|SQL", Pattern.CASE_INSENSITIVE);
 
-        unigramPatternList = new ArrayList<Pattern>();
+        unigramPatternList = new ArrayList<>();
         for (String word : unigramList) {
             unigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
 
         }
 
-        bigramPatternList = new ArrayList<Pattern>();
+        bigramPatternList = new ArrayList<>();
         for (String word : bigramList) {
             bigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
-        trigramPatternList = new ArrayList<Pattern>();
+        trigramPatternList = new ArrayList<>();
         for (String word : trigramList) {
             trigramPatternList.add(getCorrectPatten("\\b" + word + "\\b", Pattern.CASE_INSENSITIVE));
         }
 
     }
 
-    Pattern getCorrectPatten(String word, int type) {
-        Pattern compile = Pattern.compile(word.replaceAll("\\|", "\b|\b"), type);
-        return compile;
+    private Pattern getCorrectPatten(String word, int type) {
+        return Pattern.compile(word.replaceAll("\\|", "\b|\b"), type);
     }
 
     @Override
@@ -295,7 +295,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
 
         post = post.toLowerCase();
         user = user.toLowerCase();
-        boolean evidenceFound = false;
+        boolean evidenceFound;
 
         //#U1-USER: Does the user, seems suspicious?
         //need to compare with the database - percentage
@@ -333,7 +333,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
      * @param text
      * @return
      */
-    public boolean isEvidenceFound(String text) {
+    private boolean isEvidenceFound(String text) {
         try {
             // convert String into InputStream
             String result = createARFF(text);
@@ -409,29 +409,28 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
         return headingEvidenceClassifier + feature_list;
     }
 
-    int getMatchingCount(Matcher matcher) {
+    private int getMatchingCount(Matcher matcher) {
         int count = 0;
         while (matcher.find())
             count++;
         return count;
     }
 
+    /**
+     * In the current topology, output of the TweetEvidenceClassifier is connected to two
+     * different bolts [TweetContentClassifier and UrlProcessor] depend on the content
+     * of the post. {existence of evidence or not] Hence two output streams are defined in here.
+     *
+     * tweetsNormalFlow - when there is no evidence in the post, it is forwarded to
+     *                      TweetContentClassier in the LeakHawk core topology
+     * tweetsUrlFlow - if it turns to be true in evidence classification, content is needed
+     *                  to check for urls. For that post is forwarded to UrlProcessor.
+     *
+     * These exact identifiers are needs to be used when creating the storm topology.
+     *
+     */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
-        /**
-         * In the current topology, output of the TweetEvidenceClassifier is connected to two
-         * different bolts [TweetContentClassifier and UrlProcessor] depend on the content
-         * of the post. {existence of evidence or not] Hence two output streams are defined in here.
-         *
-         * tweetsNormalFlow - when there is no evidence in the post, it is forwarded to
-         *                      TweetContentClassier in the LeakHawk core topology
-         * tweetsUrlFlow - if it turns to be true in evidence classification, content is needed
-         *                  to check for urls. For that post is forwarded to UrlProcessor.
-         *
-         * These exact identifiers are needs to be used when creating the storm topology.
-         *
-         */
 
         outputFieldsDeclarer.declareStream(tweetsNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsUrlFlow, new Fields("post"));

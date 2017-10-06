@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkContentClassifier;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -30,7 +31,7 @@ import java.util.Map;
  *
  * @author Isuru Chandima
  */
-public class TweetContentClassifier extends LeakHawkContentClassifier{
+public class TweetContentClassifier extends LeakHawkContentClassifier {
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {

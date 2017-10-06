@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.core;
 
 import model.Post;
 import org.apache.storm.task.OutputCollector;

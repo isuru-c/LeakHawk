@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkSynthesizer;
 import model.ContentData;
 import model.EvidenceModel;
 import model.ContentModel;
@@ -24,9 +25,6 @@ import db.DBConnection;
 import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import parameters.LeakHawkParameters;
 
@@ -75,7 +73,7 @@ public class Synthesizer extends LeakHawkSynthesizer {
         collector.ack(tuple);
     }
 
-    public void synthesizePastebinPosts(Post post){
+    private void synthesizePastebinPosts(Post post){
         evidenceModel = post.getEvidenceModel();
         contentModel = post.getContentModel();
 
@@ -129,7 +127,7 @@ public class Synthesizer extends LeakHawkSynthesizer {
 
     }
 
-    public void synthesizeTweets(Post post){
+    private void synthesizeTweets(Post post){
 
     }
 }

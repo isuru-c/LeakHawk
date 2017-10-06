@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkPreFilter;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -75,7 +76,7 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
      * @param postText twitter post needs ot check for availability of a keyword
      * @return true if the post contains any given words in keywordList, false otherwise
      */
-    public boolean isContainKeyword(String postText) {
+    private boolean isContainKeyword(String postText) {
 
         for (String keyword : keywordList) {
             if (postText.contains(keyword))
