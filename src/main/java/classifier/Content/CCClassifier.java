@@ -90,7 +90,7 @@ public class CCClassifier extends ContentClassifier {
             "@attribute #A numeric\n" +
             "@attribute #NP numeric\n" +
             "@attribute #CP numeric\n" +
-            "@attribute @@class@@ {CC,non}\n" +
+            "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
 
@@ -276,7 +276,7 @@ public class CCClassifier extends ContentClassifier {
             labeled.instance(0).setClassValue(pred);
 
             String classLabel = unlabeled.classAttribute().value((int) pred);
-            if("CC".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
         } catch (IOException e) {

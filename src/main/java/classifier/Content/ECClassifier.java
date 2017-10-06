@@ -47,7 +47,7 @@ public class ECClassifier extends ContentClassifier {
             "@attribute $EC5 numeric\n" +
             "@attribute $EC6 numeric\n" +
             "@attribute $EC7 numeric\n" +
-            "@attribute @@class@@ {EC,non}\n" +
+            "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
 
@@ -127,7 +127,7 @@ public class ECClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("EC".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
 

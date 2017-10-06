@@ -183,7 +183,7 @@ public class DBClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("DB".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
 

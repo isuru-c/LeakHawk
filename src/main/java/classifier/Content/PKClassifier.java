@@ -65,7 +65,7 @@ public class PKClassifier extends ContentClassifier {
             "@attribute $PK19 numeric\n" +
             "@attribute $PK20 numeric\n" +
             "@attribute $PK21 numeric\n" +
-            "@attribute @@class@@ {PK,non}\n" +
+            "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
 
@@ -189,7 +189,7 @@ public class PKClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("PK".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
 

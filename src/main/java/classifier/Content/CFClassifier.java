@@ -29,13 +29,13 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "Configuration files", filePath = "./src/main/resources/CF.model")
-//@ContentPattern(patternName = "Configuration files", filePath = "CF.model")
 public class CFClassifier extends ContentClassifier{
 
     private Pattern cfSymbalPattern;
     private ArrayList<Pattern> unigramPatternList;
     private ArrayList<Pattern> bigramPatternList;
     private ArrayList<Pattern> trigramPatternList;
+    private ArrayList<Pattern> ngramPatternList;
 
     private Pattern digitPattern;
     private Pattern alphaPattern;
@@ -67,6 +67,7 @@ public class CFClassifier extends ContentClassifier{
             "@attribute $CF22 numeric\n" +
             "@attribute $CF23 numeric\n" +
             "@attribute $CF24 numeric\n" +
+            "@attribute $CF25 numeric\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
@@ -79,41 +80,45 @@ public class CFClassifier extends ContentClassifier{
             e.printStackTrace();
         }
         ArrayList<String> unigramList = new ArrayList<String>();
-        unigramList.add("ip");
-        unigramList.add("cisco");
         unigramList.add("password-encryption");
-        unigramList.add("spanning-tree");
-        unigramList.add("domain-lookup");
-        unigramList.add("serial0/0/0");
-        unigramList.add("access-list");
+        unigramList.add("spanning-tree|domain-lookup");
+        unigramList.add("serial0/0/0|access-list|access-group");
+        unigramList.add("Switch(config)#|Router(config)#|Switch#|Switch>enable|Router#|Router>enable");
+        unigramList.add("passive-interface|crypto map");
 
 
         ArrayList<String> bigramList = new ArrayList<String>();
-        bigramList.add("interface fastethernet[0-9]|interface serial[0-9]");
+        bigramList.add("interface fastethernet[0-9]|interface ethernet[0-9]|interface serial[0-9]|interface Vlan1");
         bigramList.add("speed auto|duplex auto");
-        bigramList.add("0 line");
+        bigramList.add("spanning-tree mode");
         bigramList.add("line vty|line aux|line con\"");
         bigramList.add("service password");
-        bigramList.add("ip address");
+        bigramList.add("ip address|duplex auto|speed auto");
         bigramList.add("ip route");
         bigramList.add("banner motd");
         bigramList.add("no service");
         bigramList.add("clock rate");
         bigramList.add("ip cef|ipv6 cef");
         bigramList.add("service password-encryption");
+        bigramList.add("configure terminal|copy running-config|no shutdown");
 
         ArrayList<String> trigramList = new ArrayList<String>();
         trigramList.add("line vty 0|line con 0|line aux 0");
-        trigramList.add("no ip address");
+        trigramList.add("no ip address|no auto-summary");
+        trigramList.add("no service timestamps");
         trigramList.add("no ipv6 cef");
-        trigramList.add("switchport access vlan");
+        trigramList.add("switchport mode access|ip dhcp pool");
+
+        ArrayList<String> ngramList = new ArrayList<>();
+        ngramList.add("no service timestamps log datetime msec");
+        ngramList.add("no service timestamps debug datetime msec");
 
 
-        cfSymbalPattern = Pattern.compile("!");
+        //cfSymbalPattern = Pattern.compile("!");
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigramList) {
-                unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
 
         }
 
@@ -125,6 +130,11 @@ public class CFClassifier extends ContentClassifier{
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
             trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
+        }
+
+        ngramPatternList =new ArrayList<Pattern>();
+        for(String word: ngramList){
+            ngramPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
         }
     }
 
@@ -146,8 +156,13 @@ public class CFClassifier extends ContentClassifier{
             feature_list += getMatchingCount(matcher) + ",";
         }
 
-        Matcher matcherCF = cfSymbalPattern.matcher(text);
-        feature_list += getMatchingCount(matcherCF) + ",";
+        for (Pattern pattern : ngramPatternList) {
+            Matcher matcher = pattern.matcher(text);
+            feature_list += getMatchingCount(matcher) + ",";
+        }
+
+        //Matcher matcherCF = cfSymbalPattern.matcher(text);
+        //feature_list += getMatchingCount(matcherCF) + ",";
 
         feature_list += "?";
         return headingCF+feature_list;
@@ -180,7 +195,7 @@ public class CFClassifier extends ContentClassifier{
 
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("CF".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
 

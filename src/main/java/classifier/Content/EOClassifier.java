@@ -43,7 +43,7 @@ public class EOClassifier extends ContentClassifier {
             "@attribute $EO3 numeric\n" +
             "@attribute $EO4 numeric\n" +
             "@attribute $EO5 numeric\n" +
-            "@attribute @@class@@ {EO,non}\n" +
+            "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
 
@@ -115,7 +115,7 @@ public class EOClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("EO".equals(classLabel)){
+            if("pos".equals(classLabel)){
                 return true;
             }
 
