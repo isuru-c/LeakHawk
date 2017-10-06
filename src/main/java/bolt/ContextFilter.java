@@ -27,7 +27,6 @@ import java.io.FileInputStream;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
@@ -44,20 +43,21 @@ import java.util.regex.Pattern;
  * @author Isuru Chandima
  * @author Warunika Amali
  */
-public class ContextFilter extends BaseRichBolt {
+public class ContextFilter extends LeakHawkContextFilter {
 
-    private OutputCollector collector;
+    /**
+     * These identifiers are defined to identify output streams from context filter
+     * to the evidence classifiers
+     */
+    private String pastebinOut = "context-filter-pastebin-out";
+    private String tweetsOut = "context-filter-tweets-out";
 
     private List<String> regularExpressionList;
     private ArrayList<String> synonyms;
 
-    private String pastebinOut = "context-filter-pastebin-out";
-    private String tweetsOut = "context-filter-tweets-out";
-
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
 
         createRegularExpressionList();
         createSynonyms();
@@ -233,6 +233,19 @@ public class ContextFilter extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+
+        /**
+         * In the current topology, output of the context filter is connected to two different
+         * bolts [evidence classifiers] depend on the type of the post. Hence two output streams
+         * are defined in here.
+         *
+         * pastebinOut - output stream for the PastebinEvidenceClassifier
+         * tweetsOut - output stream for the tweetsEvidenceClassifier
+         *
+         * These exact identifiers are needs to be used when creating the storm topology.
+         *
+         */
+
         outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
     }

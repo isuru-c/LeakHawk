@@ -23,37 +23,29 @@ import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.classifiers.misc.SerializedClassifier;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
-import weka.core.converters.TextDirectoryLoader;
-import weka.core.stemmers.SnowballStemmer;
-import weka.core.stopwords.StopwordsHandler;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.StringToWordVector;
 
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author sewwandi
  */
-public class PastebinEvidenceClassifier extends BaseRichBolt {
+public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
 
-    private OutputCollector collector;
-
+    /**
+     * These identifiers are defined to identify output streams from PastebinEvidenceClassifier
+     * to the PastebinContentClassifier or to the UrlProcessor
+     */
     private String pastebinNormalFlow = "pastebin-normal-flow";
     private String pastebinUrlFlow = "pastebin-url-flow";
 
@@ -301,7 +293,7 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
     }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
 
         /*loader = new TextDirectoryLoader();
         stopWordList = Arrays.asList("a","about","above","after","again"," against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours","ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves");
@@ -495,6 +487,21 @@ public class PastebinEvidenceClassifier extends BaseRichBolt {
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+
+        /**
+         * In the current topology, output of the PastebinEvidenceClassifier is connected to two
+         * different bolts [PastebinContentClassifier and UrlProcessor] depend on the content
+         * of the post. {existence of evidence or not] Hence two output streams are defined in here.
+         *
+         * pastebinNormalFlow - when there is no evidence in the post, it is forwarded to
+         *                      PastebinContentClassier in the LeakHawk core topology
+         * pastebinUrlFlow - if it turns to be true in evidence classification, content is needed
+         *                  to check for urls. For that post is forwarded to UrlProcessor.
+         *
+         * These exact identifiers are needs to be used when creating the storm topology.
+         *
+         */
+
         outputFieldsDeclarer.declareStream(pastebinNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(pastebinUrlFlow, new Fields("post"));
     }

@@ -22,9 +22,6 @@ import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.reflections.Reflections;
@@ -42,18 +39,16 @@ import java.util.Set;
  * @author Isuru Chandima
  * @author Sugeesh Chandraweera
  */
-public class PastebinContentClassifier extends BaseRichBolt {
-
-    private OutputCollector collector;
+public class PastebinContentClassifier extends LeakHawkContentClassifier {
 
     /**
      * This classifierList will contain the custom classifier list load on the run time
      */
     private ArrayList<ContentClassifier> classifierList;
 
-
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
+
         classifierList = new ArrayList<ContentClassifier>();
 
         // Load the all the ContentPatterns
@@ -110,9 +105,5 @@ public class PastebinContentClassifier extends BaseRichBolt {
         collector.emit(tuple, new Values(post));
         collector.ack(tuple);
 
-    }
-
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

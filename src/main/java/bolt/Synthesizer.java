@@ -43,16 +43,15 @@ import java.util.Map;
  * @author Isuru Chandima
  * @author Sugeesh Chandraweera
  */
-public class Synthesizer extends BaseRichBolt {
+public class Synthesizer extends LeakHawkSynthesizer {
 
-    private OutputCollector collector;
     private EvidenceModel evidenceModel;
     private ContentModel contentModel;
     private Connection connection;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
@@ -132,12 +131,6 @@ public class Synthesizer extends BaseRichBolt {
 
     public void synthesizeTweets(Post post){
 
-
-    }
-
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("no-no"));
     }
 }
 

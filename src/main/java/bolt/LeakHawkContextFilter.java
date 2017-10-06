@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *     Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,32 +16,39 @@
 
 package bolt;
 
-import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
 /**
+ * The Context filter is designed to let the administrator or the users of the monitoring
+ * platform, to configure the information domain which is used by the LeakHawk Core as the
+ * context. Context filter screens out the non-related information and extracts only the
+ * input documents related to the context the system is focused on.
  *
- * This class is used to classify tweets into different sensitive classes
+ * To define different context filters, LeakHawkContextFilter needs to be extended.
  *
  * @author Isuru Chandima
  */
-public class TweetContentClassifier extends LeakHawkContentClassifier{
+public abstract class LeakHawkContextFilter extends BaseRichBolt{
+
+    protected OutputCollector collector;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
+        collector = outputCollector;
     }
 
     @Override
-    public void execute(Tuple tuple) {
-        Post post = (Post) tuple.getValue(0);
+    public abstract void execute(Tuple tuple);
 
-        collector.emit(tuple, new Values(post));
-        collector.ack(tuple);
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+        outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

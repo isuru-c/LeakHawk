@@ -20,7 +20,6 @@ import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
@@ -46,10 +45,12 @@ import java.util.Map;
  * @author Udeshika Sewwandi
  * @author Warunika Amali
  */
-public class TweetEvidenceClassifier extends BaseRichBolt {
+public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
 
-    private OutputCollector collector;
-
+    /**
+     * These identifiers are defined to identify output streams from TweetEvidenceClassifier
+     * to the TweetContentClassifier or to the UrlProcessor
+     */
     private String tweetsNormalFlow = "tweets-normal-flow";
     private String tweetsUrlFlow = "tweets-url-flow";
 
@@ -248,7 +249,7 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+        super.prepare(map, topologyContext, outputCollector);
 
         try {
             connection = DBConnection.getDBConnection().getConnection();
@@ -417,6 +418,21 @@ public class TweetEvidenceClassifier extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+
+        /**
+         * In the current topology, output of the TweetEvidenceClassifier is connected to two
+         * different bolts [TweetContentClassifier and UrlProcessor] depend on the content
+         * of the post. {existence of evidence or not] Hence two output streams are defined in here.
+         *
+         * tweetsNormalFlow - when there is no evidence in the post, it is forwarded to
+         *                      TweetContentClassier in the LeakHawk core topology
+         * tweetsUrlFlow - if it turns to be true in evidence classification, content is needed
+         *                  to check for urls. For that post is forwarded to UrlProcessor.
+         *
+         * These exact identifiers are needs to be used when creating the storm topology.
+         *
+         */
+
         outputFieldsDeclarer.declareStream(tweetsNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsUrlFlow, new Fields("post"));
     }
