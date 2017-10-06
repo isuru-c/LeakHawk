@@ -454,8 +454,12 @@ public class PastebinPreFilter extends BaseRichBolt {
             isPrefilterPassed = true;
         }
 
+        System.out.println(post);
+        if(isPostEmpty) System.out.println("post empty");
+        else if(isPostTest) System.out.println("test post");
+        //else if(!isPostEnglish) System.out.println("post is not in English");
 
-        if(!isPostEmpty && !isPostTest && isPostEnglish){
+        if(!isPostEmpty && !isPostTest){
             isPrefilterPassed = isNotFilteredOut(post,title);
         }
 
@@ -472,11 +476,11 @@ public class PastebinPreFilter extends BaseRichBolt {
         char[] titleCharArr = titleWords[0].toCharArray();
 
         for(char c:textCharArr){
-            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+            if(c>=0x0020 && c<=0x0060) isPostEnglish=true;
         }
 
         for(char c:titleCharArr){
-            if(c>=0x0040 && c<=0x0060) isPostEnglish=true;
+            if(c>=0x0020 && c<=0x0060) isPostEnglish=true;
         }
 
         return isPostEnglish;
@@ -511,7 +515,6 @@ public class PastebinPreFilter extends BaseRichBolt {
             double pred = sclassifier.classifyInstance(unlabeled.instance(0));
             labeled.instance(0).setClassValue(pred);
 
-            System.out.println(text);
             System.out.println("pred:"+pred);
             //get the predicted class value
             String classLabel = unlabeled.classAttribute().value((int) pred);
