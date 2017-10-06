@@ -57,18 +57,17 @@ public class TwitterPreFilter extends BaseRichBolt {
         post.setPostText(postText);
 
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
-//        if (postText.substring(0, 4).equals("rt @")) {
-//            // Drop this retweet, no further operations
-//        } else if (!post.getLanguage().equals("en")) {
-//            // Language is not English, drop the tweet
-//        } else if (!isContainKeyword(post.getPostText())) {
-//            // Filter in for the context filter
-//            collector.emit(tuple, new Values(post));
-//        } else{
-//            // Tweets contain the given keywords, drop them
-//        }
+        if (postText.substring(0, 4).equals("rt @")) {
+            // Drop this retweet, no further operations
+        } else if (!post.getLanguage().equals("en")) {
+            // Language is not English, drop the tweet
+        } else if (!isContainKeyword(post.getPostText())) {
+            // Filter in for the context filter
+            collector.emit(tuple, new Values(post));
+        } else{
+            // Tweets contain the given keywords, drop them
+        }
 
-        collector.emit(tuple, new Values(post));
         collector.ack(tuple);
     }
 
