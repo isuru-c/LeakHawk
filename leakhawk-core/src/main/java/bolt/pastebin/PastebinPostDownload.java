@@ -13,28 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package bolt;
+package bolt.pastebin;
 
 import bolt.core.LeakHawkUtility;
+import exception.LeakHawkDataStreamException;
+import exception.LeakHawkFilePathException;
+import exception.LeakHawkTopologyException;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 /**
  * When requesting for new posts from pastebin scrape_url, it only gives the set of keys
@@ -61,12 +61,10 @@ public class PastebinPostDownload extends LeakHawkUtility {
 
             Object obj = parser.parse(tuple.getString(0));
             JSONObject postDetails = (JSONObject) obj;
-
             Post post = new Post();
-
             String postUrl = (String) postDetails.get("scrape_url");
 
-            post.setPostType(LeakHawkParameters.postTypePastebin);
+            post.setPostType(LeakHawkParameters.POST_TYPE_PASTEBIN);
             post.setKey((String) postDetails.get("key"));
             post.setDate((String) postDetails.get("date"));
             post.setTitle((String) postDetails.get("title"));
@@ -74,24 +72,19 @@ public class PastebinPostDownload extends LeakHawkUtility {
             post.setSyntax((String) postDetails.get("syntax"));
 
             String postText = "";
-
             URL my_url2 = new URL(postUrl);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url2.openStream()));
-
             while (bufferedReader.ready()) {
                 postText += bufferedReader.readLine();
             }
-
             post.setPostText(postText);
-
             collector.emit(tuple, new Values(post));
-
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new LeakHawkTopologyException("Posts cannot reach PatebinPostDownload Bolt.",e);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Post Download failed, Provided URL is broken",e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Post Download failed, Paste reading failed.",e);
         }
     }
 

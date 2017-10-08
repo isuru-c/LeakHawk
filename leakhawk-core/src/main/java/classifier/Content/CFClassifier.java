@@ -16,6 +16,8 @@
 
 package classifier.Content;
 
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -30,7 +32,6 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "Configuration files", filePath = "./src/main/resources/CF.model")
 public class CFClassifier extends ContentClassifier{
-
     private Pattern cfSymbalPattern;
     private ArrayList<Pattern> unigramPatternList;
     private ArrayList<Pattern> bigramPatternList;
@@ -77,7 +78,7 @@ public class CFClassifier extends ContentClassifier{
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("CF.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("CF.model file loading error.", e);
         }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("password-encryption");
@@ -200,9 +201,9 @@ public class CFClassifier extends ContentClassifier{
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Post text error occured.", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("CF.model classification error.", e);
         }
         return false;
     }

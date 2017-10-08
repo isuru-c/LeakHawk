@@ -16,9 +16,11 @@
 
 package sensor;
 
+import exception.LeakHawkDataStreamException;
+import exception.LeakHawkFilePathException;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.io.*;
 
@@ -45,43 +47,32 @@ public class DumpSensor extends Thread {
     }
 
     public void run() {
+        // Get the list of files from the dump post folder
+        File folder = new File(LeakHawkParameters.DUMP_FOLDER_PATH);
+        File[] listOfFiles = folder.listFiles();
 
-        try {
-
-            // Get the list of files from the dump post folder
-            File folder = new File(LeakHawkParameters.dumpFolderPath);
-            File[] listOfFiles = folder.listFiles();
-
-            // Read the each file and feed the content of the file as a post to the LeakHawk
-            for (File file : listOfFiles) {
-                try {
-                    if (file.isFile()) {
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-
-                        StringBuilder sb = new StringBuilder();
-                        String line = br.readLine();
-                        while (line != null) {
-                            sb.append(line + "\n");
-                            line = br.readLine();
-                        }
-
-                        String post = sb.toString();
-
-                        ProducerRecord<String, String> message = new ProducerRecord<String, String>(LeakHawkParameters.postTypeDump, post);
-                        dumpProducer.send(message);
-
-                        br.close();
+        // Read the each file and feed the content of the file as a post to the LeakHawk
+        for (File file : listOfFiles) {
+            try {
+                if (file.isFile()) {
+                    BufferedReader br = new BufferedReader(new FileReader(file));
+                    StringBuilder sb = new StringBuilder();
+                    String line = br.readLine();
+                    while (line != null) {
+                        sb.append(line + "\n");
+                        line = br.readLine();
                     }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    String post = sb.toString();
+                    ProducerRecord<String, String> message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_DUMP, post);
+                    dumpProducer.send(message);
+                    br.close();
                 }
+            } catch (FileNotFoundException e) {
+                throw new LeakHawkFilePathException("Dump Sensor Invalid Folder Given.", e);
+            } catch (IOException e) {
+                throw new LeakHawkFilePathException("Loading Files Abort.", e);
             }
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
         }
-
         dumpProducer.close();
     }
 

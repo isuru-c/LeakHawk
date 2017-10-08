@@ -19,15 +19,12 @@ package bolt;
 import bolt.core.LeakHawkUtility;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,9 +79,10 @@ public class UrlProcessor extends LeakHawkUtility {
 
         }
 
-        if (post.getPostType().equals(LeakHawkParameters.postTypePastebin) || post.getPostType().equals(LeakHawkParameters.postTypeDump)) {
+        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN) ||
+                post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
             collector.emit(pastebinOut, tuple, new Values(post));
-        } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
+        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
             collector.emit(tweetsOut, tuple, new Values(post));
         }
     }

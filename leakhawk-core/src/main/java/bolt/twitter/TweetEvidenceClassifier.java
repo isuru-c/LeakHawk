@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.twitter;
 
 import bolt.core.LeakHawkEvidenceClassifier;
 import model.Post;

@@ -16,14 +16,20 @@
 
 package api;
 import bolt.*;
+import bolt.pastebin.PastebinContentClassifier;
+import bolt.pastebin.PastebinEvidenceClassifier;
+import bolt.pastebin.PastebinPostDownload;
+import bolt.pastebin.PastebinPreFilter;
+import bolt.twitter.TweetContentClassifier;
+import bolt.twitter.TweetEvidenceClassifier;
+import bolt.twitter.TwitterPreFilter;
+import exception.LeakHawkTopologyException;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensor.DumpSensor;
-import sensor.PastebinSensor;
-import sensor.TwitterSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
@@ -39,15 +45,14 @@ public class LeakHawk {
 
     public static void main(String[] args) {
         startLeakhawk();
-
     }
 
 
     public static void startLeakhawk(){
         /* Pastebin sensor */
 
-        PastebinSensor pastebinSensor = new PastebinSensor();
-        pastebinSensor.start();
+//        PastebinSensor pastebinSensor = new PastebinSensor();
+//        pastebinSensor.start();
 
         /* Twitter sensor */
 
@@ -123,7 +128,12 @@ public class LeakHawk {
         synthesizer.shuffleGrouping("tweets-content-classifier-bolt");
 
         final LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());
+
+        try {
+            cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());
+        }catch (Exception exception){
+            throw new LeakHawkTopologyException("Topology build failed",exception);
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

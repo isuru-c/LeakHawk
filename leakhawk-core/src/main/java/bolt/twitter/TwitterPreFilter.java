@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.twitter;
 
 import bolt.core.LeakHawkPreFilter;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.util.ArrayList;
 

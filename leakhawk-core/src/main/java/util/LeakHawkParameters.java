@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package parameters;
+package util;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,29 +27,30 @@ import java.util.ArrayList;
 public class LeakHawkParameters {
 
     // These keywords are used to define the topics from and into kafka broker
-    public static String postTypePastebin = "pastebin-posts";
-    public static String postTypeTweets = "tweets";
-    public static String postTypeDump = "dump-posts";
+    public static String POST_TYPE_PASTEBIN = "pastebin-posts";
+    public static String POST_TYPE_TWEETS = "tweets";
+    public static String POST_TYPE_DUMP = "dump-posts";
 
     // Path for the dump post folder
-    public  static String dumpFolderPath = "./posts";
+    public  static String DUMP_FOLDER_PATH = "./posts";
 
     // Parameters needs to connect to the twitter stream API
-    public static String consumerKey = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
-    public static String consumerSecret = "9jXaU9kTDHh2pLGDyQc69AI9YhHmj2Huf2AbYcaWKgE8M3Jmzy";
-    public static String token = "1627974024-AmWhRjy2pThPIpc1nwEhTmhws1U0AYPHkukUZrc";
-    public static String tokenSecret = "HC7Vq3VSsOLuQ1QjZ3NihpwCymWi00pbvT10kelCtS29t";
+    public static String CONSUMER_KEY = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
+    public static String CONSUMER_SECRET = "9jXaU9kTDHh2pLGDyQc69AI9YhHmj2Huf2AbYcaWKgE8M3Jmzy";
+    public static String TOKEN = "1627974024-AmWhRjy2pThPIpc1nwEhTmhws1U0AYPHkukUZrc";
+    public static String TOKEN_SECRET = "HC7Vq3VSsOLuQ1QjZ3NihpwCymWi00pbvT10kelCtS29t";
 
     // Pastebin scraping URL and post limit per request
-    public static String pastebinScapingURL = "http://pastebin.com/api_scraping.php?limit=";
-    public static int pastebinPostLimit = 100;
+    public static String PASTEBIN_SCAPING_URL = "http://pastebin.com/api_scraping.php?limit=";
+    public static int PASTEBIN_POST_LIMIT = 100;
 
     // Pastebin sensor sleep time
-    public static int pastebinSensorSleepTime = 10000;
+    public static int PASTEBIN_SENSOR_SLEEP_TIME = 10000;
 
     // Store the keyword list for the twitter pre filter
-    public static ArrayList<String> twitterPreFilterKeywordList;
-    public static boolean twitterPreFilterKeywordListSet = false;
+    public static ArrayList<String> TWITTER_PRE_FILTER_KEYWORD_LIST;
+
+    public static boolean TWITTER_PRE_FILTER_KEYWORD_LIST_SET = false;
 
     /**
      * Read the file TwitterPreFilterList and create a array list for the pre filter
@@ -58,8 +59,8 @@ public class LeakHawkParameters {
      */
     public ArrayList<String> getTwitterPreFilterKeywordList() {
 
-        if (twitterPreFilterKeywordListSet) {
-            return twitterPreFilterKeywordList;
+        if (TWITTER_PRE_FILTER_KEYWORD_LIST_SET) {
+            return TWITTER_PRE_FILTER_KEYWORD_LIST;
         } else {
             try {
                 InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
@@ -75,10 +76,10 @@ public class LeakHawkParameters {
 
                 bufferedReader.close();
 
-                twitterPreFilterKeywordList = keywordList;
-                twitterPreFilterKeywordListSet = true;
+                TWITTER_PRE_FILTER_KEYWORD_LIST = keywordList;
+                TWITTER_PRE_FILTER_KEYWORD_LIST_SET = true;
 
-                return twitterPreFilterKeywordList;
+                return TWITTER_PRE_FILTER_KEYWORD_LIST;
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -87,6 +88,6 @@ public class LeakHawkParameters {
             }
         }
 
-        return twitterPreFilterKeywordList;
+        return TWITTER_PRE_FILTER_KEYWORD_LIST;
     }
 }

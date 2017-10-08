@@ -14,10 +14,11 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.pastebin;
 
 import bolt.core.LeakHawkContentClassifier;
 import classifier.Content.*;
+import exception.LeakHawkClassifierLoadingException;
 import model.ContentData;
 import model.ContentModel;
 import model.Post;
@@ -61,11 +62,11 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
                         new Object[]{clazz.getAnnotation(ContentPattern.class).filePath(),
                                 clazz.getAnnotation(ContentPattern.class).patternName()})));
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                throw new LeakHawkClassifierLoadingException("Content Classifier loading failed.", e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                throw new LeakHawkClassifierLoadingException("Content Classifier loading failed.", e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                throw new LeakHawkClassifierLoadingException("Content Classifier loading failed.", e);
             }
         }
     }
@@ -76,25 +77,27 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
         String postText = post.getPostText();
         List<ContentData> contentDataList = new ArrayList();
 
-        try {
-            /* Check post with each classifier and if it is match add the classifier type and
-            sensitivity to the contentDataList */
-            for (ContentClassifier classifier : classifierList) {
+
+        /* Check post with each classifier and if it is match add the classifier type and
+           sensitivity to the contentDataList */
+        for (ContentClassifier classifier : classifierList) {
+            try {
                 if (classifier.classify(postText, title)) {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
                     contentModel.setContentFound(true);
-
+                }
+            } catch (java.lang.StackOverflowError e) {
+                /* If message is too long */
+                String postSubstring = postText.substring(0, 511);
+                if (classifier.classify(postText, title)) {
+                    ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
+                    contentDataList.add(contentData);
+                    contentModel.setContentFound(true);
                 }
             }
-        } catch (java.lang.StackOverflowError e) {
-            /* If message is too long */
-            //TODO read only the first 20 lines
-            System.out.println("\n\n\n\n");
-            e.printStackTrace();
         }
         contentModel.setContentDataList(contentDataList);
-
         collector.emit(tuple, new Values(post));
     }
 }

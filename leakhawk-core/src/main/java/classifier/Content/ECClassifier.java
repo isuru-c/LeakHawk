@@ -16,6 +16,8 @@
 
 package classifier.Content;
 
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -60,7 +62,7 @@ public class ECClassifier extends ContentClassifier {
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("EC.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("EC.model file loading error.", e);
         }
         unigrams = new ArrayList<String>();
         unigrams.add("reply|forward");
@@ -132,9 +134,9 @@ public class ECClassifier extends ContentClassifier {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Post text error occured.", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("EC.model classification error.", e);
         }
         return false;
     }

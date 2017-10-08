@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package bolt;
+package bolt.pastebin;
 
 import bolt.core.LeakHawkPreFilter;
 import model.Post;
