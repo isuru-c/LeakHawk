@@ -261,8 +261,7 @@ public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
         //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
-            sclassifier.setModelFile(new File("./src/main/resources/EviC.model"));
-
+            sclassifier.setModelFile(new File(this.getClass().getClassLoader().getResource("EviC.model").getFile()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -382,7 +381,6 @@ public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
         try {
             // convert String into InputStream
             String result = createARFF(text, title);
-            //System.out.println(result);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // wrap it with buffered reader

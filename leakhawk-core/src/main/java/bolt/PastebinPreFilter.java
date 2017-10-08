@@ -445,16 +445,10 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
             isPrefilterPassed = true;
         }
 
-        System.out.println(post);
-        if(isPostEmpty) System.out.println("post empty");
-        else if(isPostTest) System.out.println("test post");
-        //else if(!isPostEnglish) System.out.println("post is not in English");
-
         if(!isPostEmpty && !isPostTest){
             isPrefilterPassed = isNotFilteredOut(post,title);
         }
 
-        System.out.println(isPrefilterPassed);
         return isPrefilterPassed;
     }
 
@@ -481,7 +475,6 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         try{
             // convert String into InputStream
             String result = createARFF(text,title);
-            //System.out.println(result);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // wrap it with buffered reader
@@ -506,7 +499,6 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
             double pred = sclassifier.classifyInstance(unlabeled.instance(0));
             labeled.instance(0).setClassValue(pred);
 
-            System.out.println("pred:"+pred);
             //get the predicted class value
             String classLabel = unlabeled.classAttribute().value((int) pred);
 

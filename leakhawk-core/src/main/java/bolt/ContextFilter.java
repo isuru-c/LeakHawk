@@ -168,7 +168,9 @@ public class ContextFilter extends LeakHawkContextFilter {
 
             // initialize JWNL (this must be done before JWNL can be used)
             // See the JWordnet documentation for details on the properties file
-            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
+
+            JWNL.initialize(this.getClass().getClassLoader().getResourceAsStream("properties.xml"));
+//            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
 
         } catch (IOException e) {
             e.printStackTrace();
