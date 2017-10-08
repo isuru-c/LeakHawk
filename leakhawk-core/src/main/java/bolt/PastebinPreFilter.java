@@ -18,6 +18,7 @@ package bolt;
 
 import bolt.core.LeakHawkPreFilter;
 import model.Post;
+import org.apache.storm.shade.org.apache.commons.io.FileUtils;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
@@ -357,7 +358,9 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
     public PastebinPreFilter(){
         try {
             sclassifier = new SerializedClassifier();
-            sclassifier.setModelFile(new File("./src/main/resources/PF.model"));
+            File file = new File(this.getClass().getClassLoader().getResource("Twitter_EV.model").getFile());
+            sclassifier.setModelFile(file);
+//            sclassifier.setModelFile(new File("./src/main/resources/PF.model"));
             //classifier = (RandomForest) sclassifier;
         } catch (Exception e) {
             e.printStackTrace();

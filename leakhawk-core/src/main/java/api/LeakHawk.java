@@ -46,8 +46,8 @@ public class LeakHawk {
     public static void startLeakhawk(){
         /* Pastebin sensor */
 
-//        PastebinSensor pastebinSensor = new PastebinSensor();
-//        pastebinSensor.start();
+        PastebinSensor pastebinSensor = new PastebinSensor();
+        pastebinSensor.start();
 
         /* Twitter sensor */
 

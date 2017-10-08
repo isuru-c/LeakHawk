@@ -135,7 +135,8 @@ public class ContextFilter extends LeakHawkContextFilter {
     private void createRegularExpressionList() {
 
         try {
-            InputStream input = new FileInputStream(new File("./src/main/resources/context.properties"));
+            InputStream input = this.getClass().getClassLoader().getResourceAsStream("context.properties");
+//            InputStream input = new FileInputStream(new File("./src/main/resources/context.properties"));
             Properties properties = new Properties();
             properties.load(input);
             regularExpressionList = new ArrayList<>();
@@ -154,7 +155,8 @@ public class ContextFilter extends LeakHawkContextFilter {
         ArrayList<String> wordSet = new ArrayList<>();
 
         try {
-            FileInputStream fileInputStream = new FileInputStream("./src/main/resources/SriLanka.txt");
+            InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("SriLanka.txt");
+//            FileInputStream fileInputStream = new FileInputStream("./src/main/resources/SriLanka.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
 
             String strLine;

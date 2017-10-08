@@ -38,7 +38,7 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
 
     @Override
     public void preparePreFilter() {
-        keywordList = LeakHawkParameters.getTwitterPreFilterKeywordList();
+        keywordList = new LeakHawkParameters().getTwitterPreFilterKeywordList();
     }
 
     @Override

@@ -97,7 +97,7 @@ public class CCClassifier extends ContentClassifier {
     public CCClassifier(String model,String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("CC.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }
