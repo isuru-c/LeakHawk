@@ -15,3 +15,12 @@ CREATE TABLE Incident(
 	evidence BOOLEAN NOT NULL,
 	predictClass VARCHAR(255) NOT NULL
 )ENGINE=INNODB;
+
+
+INSERT INTO chart_detail (field_name, value) VALUES ('totalPostCount',0);
+INSERT INTO chart_detail (field_name, value) VALUES ('preFilterPassedCount',0);
+INSERT INTO chart_detail (field_name, value) VALUES ('contextFilterPassedCount',0);
+INSERT INTO chart_detail (field_name, value) VALUES ('contentPassedCount',0);
+INSERT INTO chart_detail (field_name, value) VALUES ('evidencePassedCount',0);
+
+

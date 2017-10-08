@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+package api;
 import bolt.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -37,11 +38,16 @@ import spout.TwitterSpout;
 public class LeakHawk {
 
     public static void main(String[] args) {
+        startLeakhawk();
 
+    }
+
+
+    public static void startLeakhawk(){
         /* Pastebin sensor */
 
-        //PastebinSensor pastebinSensor = new PastebinSensor();
-        //pastebinSensor.start();
+        PastebinSensor pastebinSensor = new PastebinSensor();
+        pastebinSensor.start();
 
         /* Twitter sensor */
 
@@ -51,11 +57,11 @@ public class LeakHawk {
 
          /* Testing sensor */
 
-        DumpSensor dumpSensor = new DumpSensor();
-        dumpSensor.start();
+//        DumpSensor dumpSensor = new DumpSensor();
+//        dumpSensor.start();
 
         // Create topology
-        final String TOPOLOGY_NAME = "LeakHawk-topology";
+        final String TOPOLOGY_NAME = "api.LeakHawk-topology";
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
         TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -126,7 +132,6 @@ public class LeakHawk {
                 cluster.shutdown();
             }
         });
-
     }
 
 }
