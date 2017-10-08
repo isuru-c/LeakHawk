@@ -1,4 +1,4 @@
-# api.LeakHawk
+# LeakHawk
 
 Leakhawk is  a product designed to identify potential data breaches or hacking attacks in near real-time related to a domain(s) defined by the user. 
 It performs multilevel filtering and classification to identify as well as classify data leakages and evidence of hacking attacks. 
@@ -10,7 +10,7 @@ These instructions will guide you to install and start the leakhawk system in yo
 
 ### Prerequisites
 
-We need to start apache kafka server before getting started with api.LeakHawk. 
+We need to start apache kafka server before getting started with LeakHawk. 
 ```
 * Download Apache Kafka (With zookeeper)
 

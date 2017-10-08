@@ -46,8 +46,8 @@ public class LeakHawk {
     public static void startLeakhawk(){
         /* Pastebin sensor */
 
-        PastebinSensor pastebinSensor = new PastebinSensor();
-        pastebinSensor.start();
+//        PastebinSensor pastebinSensor = new PastebinSensor();
+//        pastebinSensor.start();
 
         /* Twitter sensor */
 
@@ -57,11 +57,11 @@ public class LeakHawk {
 
          /* Testing sensor */
 
-//        DumpSensor dumpSensor = new DumpSensor();
-//        dumpSensor.start();
+        DumpSensor dumpSensor = new DumpSensor();
+        dumpSensor.start();
 
         // Create topology
-        final String TOPOLOGY_NAME = "api.LeakHawk-topology";
+        final String TOPOLOGY_NAME = "LeakHawk-topology";
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
         TopologyBuilder topologyBuilder = new TopologyBuilder();
