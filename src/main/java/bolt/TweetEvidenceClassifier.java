@@ -248,9 +248,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
     }
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
-
+    public void prepareEvidenceClassifier() {
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
@@ -261,11 +259,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
     }
 
     @Override
-    public void execute(Tuple tuple) {
-        Post post = (Post) tuple.getValue(0);
-
-        EvidenceModel evidenceModel = new EvidenceModel();
-        post.setEvidenceModel(evidenceModel);
+    public void executeEvidenceClassifier(Post post, EvidenceModel evidenceModel, Tuple tuple, OutputCollector collector) {
 
         boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
 
@@ -279,8 +273,6 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
             // No evidence found, send the post through the normal flow
             collector.emit(tweetsNormalFlow, tuple, new Values(post));
         }
-
-        collector.ack(tuple);
     }
 
     /**

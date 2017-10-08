@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SWIS
+ *    Copyright 2017 SWIS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package bolt.core;
 
-import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -28,23 +27,23 @@ import org.apache.storm.tuple.Tuple;
 import java.util.Map;
 
 /**
- * Content Classifier classifies each textual input into a set of classes. Each class is
- * defined by a template comprised of multiple checkpoints that evaluate the content.
- * The set of classes is pre-defined, and the list is not exhaustive as the categorization of
- * sensitive content is not comprehensive.
+ * This class is the super class of all other bolts in the LeakHawk topology except
+ * the bolts in the main flow. [pre filter, context filter, evidence classifier and
+ * content classifier]
  *
- * Extend this class to classify text from different sources.
+ * This class can be extended to use a new bolt in the topology for a specific task
+ * except the main flow.
  *
  * @author Isuru Chandima
  */
-public abstract class LeakHawkContentClassifier extends BaseRichBolt{
+public abstract class LeakHawkUtility extends BaseRichBolt {
 
     private OutputCollector collector;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
-        prepareContentClassifier();
+        prepareUtility();
     }
 
     /**
@@ -53,32 +52,28 @@ public abstract class LeakHawkContentClassifier extends BaseRichBolt{
      *
      * This method is called only once when the bolt is created in apache storm topology
      */
-    public abstract void prepareContentClassifier();
+    public abstract void prepareUtility();
 
     @Override
-    public void execute(Tuple tuple){
-        Post post = (Post) tuple.getValue(0);
+    public void execute(Tuple tuple) {
 
-        ContentModel contentModel = new ContentModel();
-        post.setContentModel(contentModel);
-
-        executeContentClassifier(post, contentModel, tuple, collector);
+        executeUtility(tuple, collector);
 
         collector.ack(tuple);
     }
 
     /**
      * This method is called for each tuple in the bolt, all the functionality needs to
-     * defined within the override method of executeContentClassifier in the sub class
+     * defined within the override method of executeUtility in the sub class
      *
-     * @param post Post object containing every detail of a single post
-     * @param contentModel ContentModel object needs to store all outputs from content classifications
+     * @param tuple Tuple object received to this bolt
      * @param collector OutputCollector to emit output tuple after the execution
      */
-    public abstract void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector);
+    public abstract void executeUtility(Tuple tuple, OutputCollector collector);
+
 
     /**
-     * In the default application of Content classifier, only one output stream is declared
+     * In the default application of utility, only one output stream is declared
      * with one field "post" and no specific output stream.
      *
      * If different type of output streams are required according to the application,

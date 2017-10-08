@@ -15,6 +15,7 @@
  */
 package bolt;
 
+import bolt.core.LeakHawkUtility;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -26,6 +27,7 @@ import org.apache.storm.tuple.Values;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import parameters.LeakHawkParameters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,22 +37,26 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * Created by Isuru Chandima on 7/3/17.
+ * When requesting for new posts from pastebin scrape_url, it only gives the set of keys
+ * of latest post. Later it needs to fetch each post using its unique key by requesting
+ * again using the scrape_url and unique key.
+ *
+ * Fetching each post and encapsulate contents of each post in a Post object is the
+ * task of this bolt. Only pastebin flow needs to go through this bolt.
+ *
+ * @author Isuru Chandima
  */
-public class PastebinPostDownload extends BaseRichBolt {
+public class PastebinPostDownload extends LeakHawkUtility {
 
-    private OutputCollector collector;
     private JSONParser parser = null;
 
-    private String postType = "pastebin-posts";
-
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+    @Override
+    public void prepareUtility() {
         parser = new JSONParser();
     }
 
-    public void execute(Tuple tuple) {
-
+    @Override
+    public void executeUtility(Tuple tuple, OutputCollector collector) {
         try {
 
             Object obj = parser.parse(tuple.getString(0));
@@ -60,7 +66,7 @@ public class PastebinPostDownload extends BaseRichBolt {
 
             String postUrl = (String) postDetails.get("scrape_url");
 
-            post.setPostType(postType);
+            post.setPostType(LeakHawkParameters.postTypePastebin);
             post.setKey((String) postDetails.get("key"));
             post.setDate((String) postDetails.get("date"));
             post.setTitle((String) postDetails.get("title"));
@@ -87,9 +93,6 @@ public class PastebinPostDownload extends BaseRichBolt {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        collector.ack(tuple);
-
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {

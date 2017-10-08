@@ -26,7 +26,6 @@ import net.didion.jwnl.dictionary.Dictionary;
 import java.io.FileInputStream;
 
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -57,19 +56,13 @@ public class ContextFilter extends LeakHawkContextFilter {
     private ArrayList<String> synonyms;
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
-
+    public void prepareContextFilter() {
         createRegularExpressionList();
         createSynonyms();
-
     }
 
     @Override
-    public void execute(Tuple tuple) {
-
-        Post post = (Post) tuple.getValue(0);
-
+    public void executeContextFilter(Post post, Tuple tuple, OutputCollector collector) {
         String postText = post.getPostText();
 
         if (isContextFilterPassed(postText)) {
@@ -82,8 +75,6 @@ public class ContextFilter extends LeakHawkContextFilter {
                 collector.emit(pastebinOut, tuple, new Values(post));
             }
         }
-
-        collector.ack(tuple);
     }
 
     /**

@@ -48,8 +48,7 @@ public class Synthesizer extends LeakHawkSynthesizer {
     private Connection connection;
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
+    public void prepareSynthesizer() {
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
@@ -60,17 +59,12 @@ public class Synthesizer extends LeakHawkSynthesizer {
     }
 
     @Override
-    public void execute(Tuple tuple) {
-
-        Post post = (Post) tuple.getValue(0);
-
+    public void executeSynthesizer(Post post, Tuple tuple, OutputCollector collector) {
         if (post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
             synthesizePastebinPosts(post);
         } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
             synthesizeTweets(post);
         }
-
-        collector.ack(tuple);
     }
 
     private void synthesizePastebinPosts(Post post){

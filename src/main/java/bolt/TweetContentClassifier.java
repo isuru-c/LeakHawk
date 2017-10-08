@@ -17,13 +17,11 @@
 package bolt;
 
 import bolt.core.LeakHawkContentClassifier;
+import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-
-import java.util.Map;
 
 /**
  *
@@ -34,15 +32,12 @@ import java.util.Map;
 public class TweetContentClassifier extends LeakHawkContentClassifier {
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
+    public void prepareContentClassifier() {
+
     }
 
     @Override
-    public void execute(Tuple tuple) {
-        Post post = (Post) tuple.getValue(0);
-
+    public void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector) {
         collector.emit(tuple, new Values(post));
-        collector.ack(tuple);
     }
 }

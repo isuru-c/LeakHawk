@@ -19,13 +19,11 @@ package bolt;
 import bolt.core.LeakHawkPreFilter;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import parameters.LeakHawkParameters;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * This Bolt is used to filter out posts that does not contain any sensitive data like
@@ -39,16 +37,12 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
     private ArrayList<String> keywordList;
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
+    public void preparePreFilter() {
         keywordList = LeakHawkParameters.getTwitterPreFilterKeywordList();
     }
 
     @Override
-    public void execute(Tuple tuple) {
-
-        Post post = (Post) tuple.getValue(0);
-
+    public void executePreFilter(Post post, Tuple tuple, OutputCollector collector) {
         // Convert the tweet to the lower case
         String postText = post.getPostText().toLowerCase();
         post.setPostText(postText);
@@ -56,16 +50,14 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
         if (postText.substring(0, 4).equals("rt @")) {
             // Drop this retweet, no further operations
+            return;
         } else if (!post.getLanguage().equals("en")) {
             // Language is not English, drop the tweet
+            return;
         } else if (!isContainKeyword(post.getPostText())) {
             // Filter in for the context filter
             collector.emit(tuple, new Values(post));
-        } else{
-            // Tweets contain the given keywords, drop them
         }
-
-        collector.ack(tuple);
     }
 
     /**

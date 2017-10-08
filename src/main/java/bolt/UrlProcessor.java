@@ -16,6 +16,7 @@
 
 package bolt;
 
+import bolt.core.LeakHawkUtility;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -43,21 +44,18 @@ import java.util.regex.Pattern;
  *
  * @author Isuru Chandima
  */
-public class UrlProcessor extends BaseRichBolt {
-
-    private OutputCollector collector;
+public class UrlProcessor extends LeakHawkUtility {
 
     private String pastebinOut = "url-processor-pastebin-out";
     private String tweetsOut = "url-processor-tweets-out";
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+    public void prepareUtility() {
+
     }
 
     @Override
-    public void execute(Tuple tuple) {
-
+    public void executeUtility(Tuple tuple, OutputCollector collector) {
         Post post = (Post) tuple.getValue(0);
 
         Pattern urlPattern = Pattern.compile(
@@ -89,8 +87,6 @@ public class UrlProcessor extends BaseRichBolt {
         } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
             collector.emit(tweetsOut, tuple, new Values(post));
         }
-
-        collector.ack(tuple);
     }
 
     @Override

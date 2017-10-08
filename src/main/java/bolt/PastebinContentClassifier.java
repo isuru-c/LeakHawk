@@ -22,7 +22,6 @@ import model.ContentData;
 import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.reflections.Reflections;
@@ -31,7 +30,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,9 +45,8 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
      */
     private ArrayList<ContentClassifier> classifierList;
 
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
-
+    @Override
+    public void prepareContentClassifier() {
         classifierList = new ArrayList<>();
 
         // Load the all the ContentPatterns
@@ -71,23 +68,19 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
                 e.printStackTrace();
             }
         }
-
     }
 
-    public void execute(Tuple tuple) {
-
-        Post post = (Post) tuple.getValue(0);
+    @Override
+    public void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector) {
         String title = post.getTitle();
         String postText = post.getPostText();
-        ContentModel contentModel = new ContentModel();
         List<ContentData> contentDataList = new ArrayList();
-
 
         try {
             /* Check post with each classifier and if it is match add the classifier type and
             sensitivity to the contentDataList */
             for (ContentClassifier classifier : classifierList) {
-                if(classifier.classify(postText, title)) {
+                if (classifier.classify(postText, title)) {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
                     contentModel.setContentFound(true);
@@ -102,9 +95,6 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
         }
         contentModel.setContentDataList(contentDataList);
 
-        post.setContentModel(contentModel);
         collector.emit(tuple, new Values(post));
-        collector.ack(tuple);
-
     }
 }

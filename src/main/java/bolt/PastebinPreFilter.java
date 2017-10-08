@@ -19,7 +19,6 @@ package bolt;
 import bolt.core.LeakHawkPreFilter;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import weka.classifiers.misc.SerializedClassifier;
@@ -28,7 +27,6 @@ import weka.core.Instances;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -402,9 +400,8 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
 
     }
 
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        super.prepare(map, topologyContext, outputCollector);
-
+    @Override
+    public void preparePreFilter() {
         keyWordList = new ArrayList<String>();
         keyWordList.add("game");
         keyWordList.add("sports");
@@ -413,10 +410,8 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         keyWordList.add("xxx");
     }
 
-    public void execute(Tuple tuple) {
-
-        Post post = (Post)tuple.getValue(0);
-
+    @Override
+    public void executePreFilter(Post post, Tuple tuple, OutputCollector collector) {
         // Convert the pastebin post to the lower case
         post.setPostText(post.getPostText().toLowerCase());
 
@@ -424,8 +419,6 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         if(isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
         }
-        collector.ack(tuple);
-
     }
 
     private boolean isPassedPrefilter(String title, String post) {
