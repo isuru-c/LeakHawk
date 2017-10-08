@@ -73,7 +73,7 @@ public class PKClassifier extends ContentClassifier {
     public PKClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("PK.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }

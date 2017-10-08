@@ -56,13 +56,14 @@ public class LeakHawkParameters {
      *
      * @return Array List of strings containing keyword list for the twitter pre filter
      */
-    public static ArrayList<String> getTwitterPreFilterKeywordList() {
+    public ArrayList<String> getTwitterPreFilterKeywordList() {
 
         if (twitterPreFilterKeywordListSet) {
             return twitterPreFilterKeywordList;
         } else {
             try {
-                FileInputStream fileInputStream = new FileInputStream("./src/main/resources/TwitterPreFilterList.txt");
+                InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
+//                FileInputStream fileInputStream = new FileInputStream("./src/main/resources/TwitterPreFilterList.txt");
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
 
                 String strLine;

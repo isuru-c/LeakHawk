@@ -72,7 +72,7 @@ public class DAClassifier extends ContentClassifier {
         super(model, name);
 
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("DA.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }

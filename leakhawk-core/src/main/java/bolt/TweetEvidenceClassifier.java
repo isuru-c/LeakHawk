@@ -147,7 +147,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
 
     public TweetEvidenceClassifier() {
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read("./src/main/resources/Twitter_EV.model");
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("Twitter_EV.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }

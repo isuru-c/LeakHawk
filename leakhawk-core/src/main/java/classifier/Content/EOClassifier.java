@@ -50,7 +50,7 @@ public class EOClassifier extends ContentClassifier {
     public EOClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(model);
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("EO.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }
