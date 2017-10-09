@@ -1,0 +1,73 @@
+
+<div class="container">
+    <section class="content" style="padding: 15px 0px">
+
+        <!--<div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Command Interface</h3>
+                    </div>
+                    <div class="box-body">
+                        <a ng-if="vm.leakHawkButton != true" ng-click = "vm.startLeakHawk()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Start LeakHawk
+                        </a>
+                        <a ng-if="vm.leakHawkButton == true" ng-click = "vm.stopLeakHawk()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Stop LeakHawk
+                        </a>
+                        <a ng-if="vm.twitterButton != true" ng-click = "vm.addTwitter()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Add Twitter Data Feed
+                        </a>
+                        <a ng-if="vm.twitterButton == true" ng-click = "vm.removeTwitter()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Remove Twitter Data Feed
+                        </a>
+                        <a class="btn btn-app">
+                            <i class="fa fa-play"></i> Add Pastebin Data Feed
+                        </a>
+                    </div>
+                    &lt;!&ndash; /.box-body &ndash;&gt;
+                </div>
+                &lt;!&ndash; /.info-box &ndash;&gt;
+            </div>
+        </div>
+-->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <!--<label>LeakHawk Output</label>-->
+                    <!--<textarea id = "mytext" class="form-control" rows="10" placeholder="" disabled="" ng-model="vm.responseData"></textarea>-->
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <table class="table no-margin table-hover dataTable">
+                                <tbody data-link="row" class="rowlink hand-cursor">
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Link</th>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Level</th>
+                                    <th></th>
+                                </tr>
+
+                                <tr ng-repeat="order in vm.postList" data-href='google.com'>
+                                    <td>{{order.postType}}</td>
+                                    <td><a href="https://pastebin.com/{{order.key}}">{{order.key}}</a></td>
+                                    <td>{{order.date *1000| date:'yyyy-MM-dd hh:mm a'}}</td>
+                                    <td>{{order.user}}</td>
+                                    <td>{{order.predictClass}}</td>
+                                    <td ng-if="order.level==1" style="color: #6400ff"><strong>Low</strong></td>
+                                    <td ng-if="order.level==2" style="color: rgba(255,99,0,0.99)"><strong>High</strong></td>
+                                    <td ng-if="order.level==3" style="color: #ff1e00"><strong>Critical</strong></td>
+                                    <td><strong><button data-ng-click="vm.routeToOrder(order.key)" class="btn btn-block btn-success btn-sm">More Detail</button></strong></a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -30,6 +30,7 @@ import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensor.DumpSensor;
+import sensor.PastebinSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
@@ -51,8 +52,8 @@ public class LeakHawk {
     public static void startLeakhawk(){
         /* Pastebin sensor */
 
-//        PastebinSensor pastebinSensor = new PastebinSensor();
-//        pastebinSensor.start();
+        PastebinSensor pastebinSensor = new PastebinSensor();
+        pastebinSensor.start();
 
         /* Twitter sensor */
 
