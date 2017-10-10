@@ -14,6 +14,9 @@ public class ContentData {
         this.contentType = contentType;
         this.level = level;
     }
+    public ContentData(String contentType){
+        this.contentType = contentType;
+    }
 
     public String getContentType() {
         return contentType;

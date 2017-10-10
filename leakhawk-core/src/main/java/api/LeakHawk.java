@@ -31,6 +31,7 @@ import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensor.DumpSensor;
+import sensor.TwitterSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
@@ -57,14 +58,14 @@ public class LeakHawk {
 
         /* Twitter sensor */
 
-        //TwitterSensor twitterSensor = new TwitterSensor();
-        //twitterSensor.start();
+        TwitterSensor twitterSensor = new TwitterSensor();
+        twitterSensor.start();
 
 
          /* Testing sensor */
 
-        DumpSensor dumpSensor = new DumpSensor();
-        dumpSensor.start();
+        //DumpSensor dumpSensor = new DumpSensor();
+        //dumpSensor.start();
 
         // Create topology
         final String TOPOLOGY_NAME = "LeakHawk-topology";
@@ -91,7 +92,7 @@ public class LeakHawk {
         // Separate pre filter for pastebin posts [ also the dump posts]
         BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter(), 3);
         pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
-        pastebinPreFilter.shuffleGrouping("dump-spout");
+        //pastebinPreFilter.shuffleGrouping("dump-spout");
 
         // Separate pre filter for tweets
         BoltDeclarer twitterPreFilter = topologyBuilder.setBolt("twitter-pre-filter", new TwitterPreFilter(), 3);

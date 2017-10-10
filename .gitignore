@@ -1,6 +1,7 @@
 .idea/
 logs/
 leakhawk-core/target/
+target/
 dict/
 posts/
 leakhawk-app.iml

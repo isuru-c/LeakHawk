@@ -63,7 +63,7 @@ public class Synthesizer extends LeakHawkClassifier {
 
         if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
             synthesizePastebinPosts(post);
-        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
+        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
             synthesizeTweets(post);
         }
     }
@@ -117,6 +117,41 @@ public class Synthesizer extends LeakHawkClassifier {
     }
 
     private void synthesizeTweets(Post post){
+        evidenceModel = post.getEvidenceModel();
+        contentModel = post.getContentModel();
+        String classString = "";
+
+        if (contentModel.isContentFound()) {
+            List contentDataList = contentModel.getContentDataList();
+            int i=1;
+
+            for (Object contentDataObj : contentDataList) {
+                ContentData contentData = (ContentData) contentDataObj;
+                classString+=contentData.getContentType();
+                if(contentDataList.size()>i){
+                    classString += ",";
+                }
+                i++;
+            }
+
+            if (evidenceModel.isEvidenceFound()) {
+                String title = post.getTitle().replace("'", "/'");
+                String user = post.getUser().replace("'", "/'");
+                try {
+                    DBHandle.setData(connection, "INSERT INTO Incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
+                            + post.getPostType() + "','" + post.getDate() + "'," + 0 + "," + contentModel.isContentFound()
+                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
+
+                    System.out.println("\nPost  : " + post.getKey());
+                    System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
+                    System.out.println("\nContent Found  : " + contentModel.isContentFound());
+                    System.out.println("Sensitivity class is  :" + classString + "\n");
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
 

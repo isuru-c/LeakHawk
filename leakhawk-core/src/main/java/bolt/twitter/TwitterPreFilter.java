@@ -64,16 +64,22 @@ public class TwitterPreFilter extends LeakHawkFilter {
         post.setPostText(postText);
 
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
-        if (postText.substring(0, 4).equals("rt @")) {
-            // Drop this retweet, no further operations
+        try {
+            if (postText.substring(0, 4).equals("rt @")) {
+                // Drop this retweet, no further operations
+                return false;
+            } else if (!post.getLanguage().equals("en")) {
+                // Language is not English, drop the tweet
+                return false;
+            } else if (!isContainKeyword(post.getPostText())) {
+                // Filter in for the context filter
+                post.setNextOutputStream(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+                return true;
+            }
+        } catch (NullPointerException e) {
+            // This is a temporary solution to handle twitter control tweets
+            // needs to solve correctly
             return false;
-        } else if (!post.getLanguage().equals("en")) {
-            // Language is not English, drop the tweet
-            return false;
-        } else if (!isContainKeyword(post.getPostText())) {
-            // Filter in for the context filter
-            post.setNextOutputStream(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
-            return true;
         }
         return false;
     }
