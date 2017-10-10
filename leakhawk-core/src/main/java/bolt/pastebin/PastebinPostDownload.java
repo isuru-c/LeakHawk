@@ -87,8 +87,4 @@ public class PastebinPostDownload extends LeakHawkUtility {
             throw new LeakHawkDataStreamException("Pastebin Post Download failed, Paste reading failed.",e);
         }
     }
-
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
-    }
 }

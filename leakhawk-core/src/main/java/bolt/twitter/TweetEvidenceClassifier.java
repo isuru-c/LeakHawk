@@ -423,7 +423,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
+        super.declareOutputFields(outputFieldsDeclarer);
         outputFieldsDeclarer.declareStream(tweetsNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsUrlFlow, new Fields("post"));
     }

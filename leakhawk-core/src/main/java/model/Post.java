@@ -20,9 +20,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Created by Isuru Chandima on 8/13/17.
+ *
+ * @author Isuru Chandima
  */
-
 public class Post implements Serializable{
 
     private String postType;

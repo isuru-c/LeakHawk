@@ -1,7 +1,8 @@
-.idea/*
-logs/*
-leakhawk-core/target/*
+.idea/
+logs/
+leakhawk-core/target/
+dict/
+posts/
+leakhawk-app.iml
 leakhawk-core/leakhawk-core.iml
 leakhawk-monitor/leakhawk-monitor.iml
-dict/*
-posts/*

@@ -208,6 +208,7 @@ public class ContextFilter extends LeakHawkContextFilter {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+        super.declareOutputFields(outputFieldsDeclarer);
         outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
     }

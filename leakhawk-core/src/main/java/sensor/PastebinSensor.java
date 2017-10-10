@@ -17,7 +17,6 @@
 package sensor;
 
 import exception.LeakHawkDataStreamException;
-import exception.LeakHawkFilePathException;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -68,7 +67,7 @@ public class PastebinSensor extends Thread {
     public void run() {
         ProducerRecord<String, String> message = null;
         try {
-            URL my_url = new URL(LeakHawkParameters.PASTEBIN_SCAPING_URL + LeakHawkParameters.PASTEBIN_POST_LIMIT);
+            URL my_url = new URL(LeakHawkParameters.PASTEBIN_SCRAPING_URL + LeakHawkParameters.PASTEBIN_POST_LIMIT);
             String lastKey = "";
             boolean pastebinSensorRunning = true;
             while (pastebinSensorRunning) {

@@ -419,7 +419,7 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         post.setPostText(post.getPostText().toLowerCase());
 
         //if pre filter is passed forward the model to next bolt(context filter)
-        if(isPassedPrefilter(post.getTitle(), post.getPostText())) {
+        if(!isPassedPrefilter(post.getTitle(), post.getPostText())) {
             collector.emit(tuple, new Values(post));
         }
     }

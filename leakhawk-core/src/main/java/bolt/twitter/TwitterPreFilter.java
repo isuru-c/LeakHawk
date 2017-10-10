@@ -21,8 +21,8 @@ import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import util.LeakHawkParameters;
 
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -38,7 +38,25 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
 
     @Override
     public void preparePreFilter() {
-        keywordList = new LeakHawkParameters().getTwitterPreFilterKeywordList();
+
+        try {
+            InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+
+            String strLine;
+            keywordList = new ArrayList<String>();
+
+            while ((strLine = bufferedReader.readLine()) != null) {
+                keywordList.add(strLine);
+            }
+
+            bufferedReader.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

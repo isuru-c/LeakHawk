@@ -486,10 +486,10 @@ public class PastebinEvidenceClassifier extends LeakHawkEvidenceClassifier {
      *                  to check for urls. For that post is forwarded to UrlProcessor.
      *
      * These exact identifiers are needs to be used when creating the storm topology.
-     *
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+        super.declareOutputFields(outputFieldsDeclarer);
         outputFieldsDeclarer.declareStream(pastebinNormalFlow, new Fields("post"));
         outputFieldsDeclarer.declareStream(pastebinUrlFlow, new Fields("post"));
     }

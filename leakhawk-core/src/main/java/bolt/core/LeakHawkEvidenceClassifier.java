@@ -8,6 +8,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import util.LeakHawkParameters;
 
 import java.util.Map;
 
@@ -66,9 +67,13 @@ public abstract class LeakHawkEvidenceClassifier extends BaseRichBolt{
      *
      * If different type of output streams are required according to the application,
      * override this method and declare output streams.
+     *
+     * It is necessary to call for super.declareOutputFields() method if statics
+     * are collecting in the new bolt
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
+        outputFieldsDeclarer.declareStream(LeakHawkParameters.STATICS_FLOW, new Fields("statics"));
         outputFieldsDeclarer.declare(new Fields("post"));
     }
 }

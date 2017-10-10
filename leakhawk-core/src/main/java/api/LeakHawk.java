@@ -15,6 +15,7 @@
  */
 
 package api;
+
 import bolt.*;
 import bolt.pastebin.PastebinContentClassifier;
 import bolt.pastebin.PastebinEvidenceClassifier;
@@ -34,9 +35,9 @@ import sensor.PastebinSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
+import util.LeakHawkParameters;
 
 /**
- *
  * This is the main class of the system. running main method in here will start to run the storm topology.
  *
  * @author Isuru Chandima
@@ -49,11 +50,11 @@ public class LeakHawk {
     }
 
 
-    public static void startLeakhawk(){
+    public static void startLeakhawk() {
         /* Pastebin sensor */
 
-        PastebinSensor pastebinSensor = new PastebinSensor();
-        pastebinSensor.start();
+        //PastebinSensor pastebinSensor = new PastebinSensor();
+        //pastebinSensor.start();
 
         /* Twitter sensor */
 
@@ -82,11 +83,11 @@ public class LeakHawk {
         SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(), 2);
 
         // PastebinPostDownload is used to get the content of a pastebin post
-        BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload() , 4);
+        BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload(), 4);
         pastebinPostDownload.shuffleGrouping("pastebin-spout");
 
         // Separate pre filter for pastebin posts [ also the dump posts]
-        BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter() , 3);
+        BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter(), 3);
         pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
         pastebinPreFilter.shuffleGrouping("dump-spout");
 
@@ -96,16 +97,16 @@ public class LeakHawk {
         //twitterPreFilter.shuffleGrouping("dump-spout");
 
         // Both pastebin and twitter feeds are going through same context filter
-        BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter() , 2);
+        BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter(), 2);
         contextFilter.shuffleGrouping("pastebin-pre-filter-bolt");
         contextFilter.shuffleGrouping("twitter-pre-filter");
 
         // Separate evidence classifier for pastebin posts
-        BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier() , 1);
+        BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier(), 1);
         pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-pastebin-out");
 
         // Separate evidence classifier for tweets
-        BoltDeclarer tweetEvidenceClassifier = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier() , 1);
+        BoltDeclarer tweetEvidenceClassifier = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier(), 1);
         tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-tweets-out");
 
         // Url Processor for both pastebin posts and tweets
@@ -114,26 +115,35 @@ public class LeakHawk {
         urlProcessor.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-url-flow");
 
         // Separate content classifier for pastebin posts
-        BoltDeclarer pastebinContentClassifier = topologyBuilder.setBolt("pastebin-content-classifier-bolt", new PastebinContentClassifier() , 1);
+        BoltDeclarer pastebinContentClassifier = topologyBuilder.setBolt("pastebin-content-classifier-bolt", new PastebinContentClassifier(), 1);
         pastebinContentClassifier.shuffleGrouping("pastebin-evidence-classifier-bolt", "pastebin-normal-flow");
         pastebinContentClassifier.shuffleGrouping("url-processor", "url-processor-pastebin-out");
 
         // Separate content classifier for tweets
-        BoltDeclarer tweetContentClassifier = topologyBuilder.setBolt("tweets-content-classifier-bolt", new TweetContentClassifier() , 1);
+        BoltDeclarer tweetContentClassifier = topologyBuilder.setBolt("tweets-content-classifier-bolt", new TweetContentClassifier(), 1);
         tweetContentClassifier.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-normal-flow");
-        tweetContentClassifier.shuffleGrouping("url-processor","url-processor-tweets-out");
+        tweetContentClassifier.shuffleGrouping("url-processor", "url-processor-tweets-out");
 
         // Both pastebin and twitter feeds are going through same synthesizer
         BoltDeclarer synthesizer = topologyBuilder.setBolt("synthesizer-bolt", new Synthesizer(), 1);
         synthesizer.shuffleGrouping("pastebin-content-classifier-bolt");
         synthesizer.shuffleGrouping("tweets-content-classifier-bolt");
 
+        BoltDeclarer staticsCounter = topologyBuilder.setBolt("statics-counter-bolt", new StaticsCounter(), 1);
+        staticsCounter.shuffleGrouping("pastebin-pre-filter-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("twitter-pre-filter", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("context-filter-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("pastebin-evidence-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("tweets-evidence-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("pastebin-content-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("tweets-content-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
+
         final LocalCluster cluster = new LocalCluster();
 
         try {
             cluster.submitTopology(TOPOLOGY_NAME, config, topologyBuilder.createTopology());
-        }catch (Exception exception){
-            throw new LeakHawkTopologyException("Topology build failed",exception);
+        } catch (Exception exception) {
+            throw new LeakHawkTopologyException("Topology build failed", exception);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
