@@ -16,17 +16,14 @@
 
 package bolt;
 
-import bolt.core.LeakHawkSynthesizer;
+import bolt.core.LeakHawkClassifier;
 import exception.LeakHawkDatabaseException;
-import exception.LeakHawkFilePathException;
 import model.ContentData;
 import model.EvidenceModel;
 import model.ContentModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.tuple.Tuple;
 import util.LeakHawkParameters;
 
 import java.sql.Connection;
@@ -41,14 +38,14 @@ import java.util.List;
  * @author Isuru Chandima
  * @author Sugeesh Chandraweera
  */
-public class Synthesizer extends LeakHawkSynthesizer {
+public class Synthesizer extends LeakHawkClassifier {
 
     private EvidenceModel evidenceModel;
     private ContentModel contentModel;
     private Connection connection;
 
     @Override
-    public void prepareSynthesizer() {
+    public void prepareClassifier() {
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
@@ -59,7 +56,11 @@ public class Synthesizer extends LeakHawkSynthesizer {
     }
 
     @Override
-    public void executeSynthesizer(Post post, Tuple tuple, OutputCollector collector) {
+    public void classifyPost(Post post) {
+
+        // Set next output stream to be null, so there will be no more forwarding
+        post.setNextOutputStream(null);
+
         if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
             synthesizePastebinPosts(post);
         } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
@@ -117,6 +118,13 @@ public class Synthesizer extends LeakHawkSynthesizer {
 
     private void synthesizeTweets(Post post){
 
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        return outputStream;
     }
 }
 

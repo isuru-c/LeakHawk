@@ -52,7 +52,9 @@ public abstract class LeakHawkClassifier extends BaseRichBolt {
         Post post = (Post) tuple.getValue(0);
 
         classifyPost(post);
-        collector.emit(post.getNextOutputStream(), tuple, new Values(post));
+
+        if (post.getNextOutputStream() != null)
+            collector.emit(post.getNextOutputStream(), tuple, new Values(post));
 
         collector.ack(tuple);
     }
