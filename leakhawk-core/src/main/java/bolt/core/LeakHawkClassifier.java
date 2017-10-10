@@ -16,7 +16,6 @@
 
 package bolt.core;
 
-import model.ContentModel;
 import model.Post;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -24,73 +23,76 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import util.LeakHawkParameters;
 
+import java.util.ArrayList;
 import java.util.Map;
 
-/**
- * Content Classifier classifies each textual input into a set of classes. Each class is
- * defined by a template comprised of multiple checkpoints that evaluate the content.
- * The set of classes is pre-defined, and the list is not exhaustive as the categorization of
- * sensitive content is not comprehensive.
- *
- * Extend this class to classify text from different sources.
- *
- * @author Isuru Chandima
- */
-public abstract class LeakHawkContentClassifier extends BaseRichBolt{
+public abstract class LeakHawkClassifier extends BaseRichBolt {
 
     private OutputCollector collector;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
-        prepareContentClassifier();
+        prepareClassifier();
     }
 
     /**
      * This method is used to prepare the bolt as the LeakHawk application wants.
      * For creating necessary data structures and IO operations, override ths method.
-     *
+     * <p>
      * This method is called only once when the bolt is created in apache storm topology
      */
-    public abstract void prepareContentClassifier();
+    public abstract void prepareClassifier();
 
     @Override
-    public void execute(Tuple tuple){
+    public void execute(Tuple tuple) {
         Post post = (Post) tuple.getValue(0);
 
-        ContentModel contentModel = new ContentModel();
-        post.setContentModel(contentModel);
-
-        executeContentClassifier(post, contentModel, tuple, collector);
+        classifyPost(post);
+        collector.emit(post.getNextOutputStream(), tuple, new Values(post));
 
         collector.ack(tuple);
     }
 
     /**
-     * This method is called for each tuple in the bolt, all the functionality needs to
-     * defined within the override method of executeContentClassifier in the sub class
+     * This method is called once for each post. Do necessary processing and add the
+     * results of classifications to the post object using classify models.
+     * <p>
+     * It is necessary to indicate next output stream in the post object if it is
+     * going to forward further in LeakHawk core system.
      *
      * @param post Post object containing every detail of a single post
-     * @param contentModel ContentModel object needs to store all outputs from content classifications
-     * @param collector OutputCollector to emit output tuple after the execution
      */
-    public abstract void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector);
+    public abstract void classifyPost(Post post);
 
     /**
-     * In the default application of Content classifier, only one output stream is declared
-     * with one field "post" and no specific output stream.
-     *
+     * In the default application of LeakHawkFilter, only one specific output stream
+     * LeakHawkParameters.STATICS_FLOW is dedicated for aggregating statics for statics counter
+     * <p>
      * If different type of output streams are required according to the application,
-     * override this method and declare output streams.
-     *
-     * It is necessary to call for super.declareOutputFields() method if statics
-     * are collecting in the new bolt
+     * override declareOutputStreams method and declare output streams.
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declareStream(LeakHawkParameters.STATICS_FLOW, new Fields("statics"));
-        outputFieldsDeclarer.declare(new Fields("post"));
+
+        ArrayList<String> outputStreams = declareOutputStreams();
+
+        for (String outputStream : outputStreams) {
+            outputFieldsDeclarer.declareStream(outputStream, new Fields("post"));
+        }
     }
+
+    /**
+     * If different type of output streams are required according to the application,
+     * override declareOutputStreams method and declare output streams.
+     * <p>
+     * Needs to return an array of String containing the names of output streams
+     *
+     * @return ArrayList of Strings containing names of required output streams
+     */
+    public abstract ArrayList<String> declareOutputStreams();
 }

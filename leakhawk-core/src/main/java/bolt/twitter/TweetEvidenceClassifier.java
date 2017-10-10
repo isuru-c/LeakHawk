@@ -16,17 +16,12 @@
 
 package bolt.twitter;
 
-import bolt.core.LeakHawkEvidenceClassifier;
+import bolt.core.LeakHawkClassifier;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 import model.EvidenceModel;
 import db.DBConnection;
 import db.DBHandle;
+import util.LeakHawkParameters;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -37,7 +32,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Map;
 
 /**
  * This class is used to classify tweets according to evidences of hacking attacks or data breaches
@@ -46,7 +40,7 @@ import java.util.Map;
  * @author Udeshika Sewwandi
  * @author Warunika Amali
  */
-public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
+public class TweetEvidenceClassifier extends LeakHawkClassifier {
 
     /**
      * These identifiers are defined to identify output streams from TweetEvidenceClassifier
@@ -248,7 +242,7 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
     }
 
     @Override
-    public void prepareEvidenceClassifier() {
+    public void prepareClassifier() {
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
@@ -259,7 +253,10 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
     }
 
     @Override
-    public void executeEvidenceClassifier(Post post, EvidenceModel evidenceModel, Tuple tuple, OutputCollector collector) {
+    public void classifyPost(Post post) {
+
+        EvidenceModel evidenceModel = new EvidenceModel();
+        post.setEvidenceModel(evidenceModel);
 
         boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
 
@@ -268,10 +265,10 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
         if (evidenceFound) {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
-            collector.emit(tweetsUrlFlow, tuple, new Values(post));
-        }else {
+            post.setNextOutputStream(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+        } else {
             // No evidence found, send the post through the normal flow
-            collector.emit(tweetsNormalFlow, tuple, new Values(post));
+            post.setNextOutputStream(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
         }
     }
 
@@ -408,23 +405,13 @@ public class TweetEvidenceClassifier extends LeakHawkEvidenceClassifier {
         return count;
     }
 
-    /**
-     * In the current topology, output of the TweetEvidenceClassifier is connected to two
-     * different bolts [TweetContentClassifier and UrlProcessor] depend on the content
-     * of the post. {existence of evidence or not] Hence two output streams are defined in here.
-     *
-     * tweetsNormalFlow - when there is no evidence in the post, it is forwarded to
-     *                      TweetContentClassier in the LeakHawk core topology
-     * tweetsUrlFlow - if it turns to be true in evidence classification, content is needed
-     *                  to check for urls. For that post is forwarded to UrlProcessor.
-     *
-     * These exact identifiers are needs to be used when creating the storm topology.
-     *
-     */
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        super.declareOutputFields(outputFieldsDeclarer);
-        outputFieldsDeclarer.declareStream(tweetsNormalFlow, new Fields("post"));
-        outputFieldsDeclarer.declareStream(tweetsUrlFlow, new Fields("post"));
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+
+        return outputStream;
     }
 }

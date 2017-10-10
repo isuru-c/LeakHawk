@@ -81,15 +81,15 @@ public class UrlProcessor extends LeakHawkUtility {
 
         if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN) ||
                 post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
-            collector.emit(pastebinOut, tuple, new Values(post));
+            collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, tuple, new Values(post));
         } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
-            collector.emit(tweetsOut, tuple, new Values(post));
+            collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, tuple, new Values(post));
         }
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
-        outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, new Fields("post"));
     }
 }

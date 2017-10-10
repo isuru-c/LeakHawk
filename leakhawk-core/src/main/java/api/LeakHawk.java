@@ -31,7 +31,6 @@ import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import sensor.DumpSensor;
-import sensor.PastebinSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
@@ -71,6 +70,9 @@ public class LeakHawk {
         final String TOPOLOGY_NAME = "LeakHawk-topology";
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
+
+        LeakHawkParameters lp = new LeakHawkParameters();
+
         TopologyBuilder topologyBuilder = new TopologyBuilder();
 
         // Create pastebin Spout and connect to the topology
@@ -98,45 +100,45 @@ public class LeakHawk {
 
         // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter(), 2);
-        contextFilter.shuffleGrouping("pastebin-pre-filter-bolt", LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
-        contextFilter.shuffleGrouping("twitter-pre-filter", LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+        contextFilter.shuffleGrouping("pastebin-pre-filter-bolt", lp.P_PRE_FILTER_TO_CONTEXT_FILTER);
+        contextFilter.shuffleGrouping("twitter-pre-filter", lp.T_PRE_FILTER_TO_CONTEXT_FILTER);
 
         // Separate evidence classifier for pastebin posts
         BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier(), 1);
-        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
+        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", lp.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
 
         // Separate evidence classifier for tweets
         BoltDeclarer tweetEvidenceClassifier = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier(), 1);
-        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", lp.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
 
         // Url Processor for both pastebin posts and tweets
         BoltDeclarer urlProcessor = topologyBuilder.setBolt("url-processor", new UrlProcessor(), 3);
-        urlProcessor.shuffleGrouping("pastebin-evidence-classifier-bolt", "pastebin-url-flow");
-        urlProcessor.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-url-flow");
+        urlProcessor.shuffleGrouping("pastebin-evidence-classifier-bolt", lp.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+        urlProcessor.shuffleGrouping("tweets-evidence-classifier-bolt", lp.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
 
         // Separate content classifier for pastebin posts
         BoltDeclarer pastebinContentClassifier = topologyBuilder.setBolt("pastebin-content-classifier-bolt", new PastebinContentClassifier(), 1);
-        pastebinContentClassifier.shuffleGrouping("pastebin-evidence-classifier-bolt", "pastebin-normal-flow");
-        pastebinContentClassifier.shuffleGrouping("url-processor", "url-processor-pastebin-out");
+        pastebinContentClassifier.shuffleGrouping("pastebin-evidence-classifier-bolt", lp.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);
+        pastebinContentClassifier.shuffleGrouping("url-processor", lp.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER);
 
         // Separate content classifier for tweets
         BoltDeclarer tweetContentClassifier = topologyBuilder.setBolt("tweets-content-classifier-bolt", new TweetContentClassifier(), 1);
-        tweetContentClassifier.shuffleGrouping("tweets-evidence-classifier-bolt", "tweets-normal-flow");
-        tweetContentClassifier.shuffleGrouping("url-processor", "url-processor-tweets-out");
+        tweetContentClassifier.shuffleGrouping("tweets-evidence-classifier-bolt", lp.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
+        tweetContentClassifier.shuffleGrouping("url-processor", lp.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER);
 
         // Both pastebin and twitter feeds are going through same synthesizer
         BoltDeclarer synthesizer = topologyBuilder.setBolt("synthesizer-bolt", new Synthesizer(), 1);
-        synthesizer.shuffleGrouping("pastebin-content-classifier-bolt");
-        synthesizer.shuffleGrouping("tweets-content-classifier-bolt");
+        synthesizer.shuffleGrouping("pastebin-content-classifier-bolt", lp.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+        synthesizer.shuffleGrouping("tweets-content-classifier-bolt", lp.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 
         BoltDeclarer staticsCounter = topologyBuilder.setBolt("statics-counter-bolt", new StaticsCounter(), 1);
-        staticsCounter.shuffleGrouping("pastebin-pre-filter-bolt", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("twitter-pre-filter", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("context-filter-bolt", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("pastebin-evidence-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("tweets-evidence-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("pastebin-content-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
-        staticsCounter.shuffleGrouping("tweets-content-classifier-bolt", LeakHawkParameters.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("pastebin-pre-filter-bolt", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("twitter-pre-filter", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("context-filter-bolt", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("pastebin-evidence-classifier-bolt", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("tweets-evidence-classifier-bolt", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("pastebin-content-classifier-bolt", lp.STATICS_FLOW);
+        staticsCounter.shuffleGrouping("tweets-content-classifier-bolt", lp.STATICS_FLOW);
 
         final LocalCluster cluster = new LocalCluster();
 

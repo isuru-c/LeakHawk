@@ -16,16 +16,14 @@
 
 package bolt.pastebin;
 
-import bolt.core.LeakHawkContentClassifier;
+import bolt.core.LeakHawkClassifier;
 import classifier.Content.*;
 import exception.LeakHawkClassifierLoadingException;
 import model.ContentData;
 import model.ContentModel;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 import org.reflections.Reflections;
+import util.LeakHawkParameters;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -38,8 +36,9 @@ import java.util.Set;
  *
  * @author Isuru Chandima
  * @author Sugeesh Chandraweera
+ * @author Warunika Amali
  */
-public class PastebinContentClassifier extends LeakHawkContentClassifier {
+public class PastebinContentClassifier extends LeakHawkClassifier {
 
     /**
      * This classifierList will contain the custom classifier list load on the run time
@@ -47,7 +46,7 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
     private ArrayList<ContentClassifier> classifierList;
 
     @Override
-    public void prepareContentClassifier() {
+    public void prepareClassifier() {
         classifierList = new ArrayList<>();
 
         // Load the all the ContentPatterns
@@ -72,7 +71,11 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
     }
 
     @Override
-    public void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector) {
+    public void classifyPost(Post post) {
+
+        ContentModel contentModel = new ContentModel();
+        post.setContentModel(contentModel);
+
         String title = post.getTitle();
         String postText = post.getPostText();
         List<ContentData> contentDataList = new ArrayList();
@@ -98,6 +101,17 @@ public class PastebinContentClassifier extends LeakHawkContentClassifier {
             }
         }
         contentModel.setContentDataList(contentDataList);
-        collector.emit(tuple, new Values(post));
+
+        post.setNextOutputStream(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+
+        return outputStream;
     }
 }

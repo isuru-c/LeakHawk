@@ -134,7 +134,7 @@ public class ContextFilter extends LeakHawkFilter {
                 return true;
             } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
                 // Dump posts are emit as pastebin posts
-                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
                 return true;
             }
         }

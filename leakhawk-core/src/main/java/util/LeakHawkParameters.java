@@ -53,6 +53,17 @@ public class LeakHawkParameters {
     public static String CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER = "cf-pec";
     public static String CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER = "cf-tec";
 
+    public static String P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER = "pec-pcc";
+    public static String P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR = "pec-url";
+    public static String URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER = "url-pcc";
+
+    public static String T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER = "tec-tcc";
+    public static String T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR = "tec-url";
+    public static String URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER = "url-tcc";
+
+    public static String P_CONTENT_CLASSIFIER_TO_SYNTHESIZER = "pcc-s";
+    public static String T_CONTENT_CLASSIFIER_TO_SYNTHESIZER = "tcc-s";
+
     // Path for the dump post folder
     public  static String DUMP_FOLDER_PATH = "./posts";
 

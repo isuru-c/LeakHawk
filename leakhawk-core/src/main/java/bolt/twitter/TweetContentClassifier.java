@@ -16,28 +16,41 @@
 
 package bolt.twitter;
 
-import bolt.core.LeakHawkContentClassifier;
+import bolt.core.LeakHawkClassifier;
 import model.ContentModel;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import util.LeakHawkParameters;
+
+import java.util.ArrayList;
 
 /**
- *
  * This class is used to classify tweets into different sensitive classes
  *
  * @author Isuru Chandima
  */
-public class TweetContentClassifier extends LeakHawkContentClassifier {
+public class TweetContentClassifier extends LeakHawkClassifier {
 
     @Override
-    public void prepareContentClassifier() {
+    public void prepareClassifier() {
 
     }
 
     @Override
-    public void executeContentClassifier(Post post, ContentModel contentModel, Tuple tuple, OutputCollector collector) {
-        collector.emit(tuple, new Values(post));
+    public void classifyPost(Post post) {
+
+        ContentModel contentModel = new ContentModel();
+        post.setContentModel(contentModel);
+
+        post.setNextOutputStream(LeakHawkParameters.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
     }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+
+        return outputStream;
+    }
+
 }
