@@ -17,20 +17,20 @@
 package bolt;
 
 import bolt.core.LeakHawkContextFilter;
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkFilePathException;
 import model.Post;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.Dictionary;
 
-import java.io.FileInputStream;
-
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.io.*;
 import java.util.*;
@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
  *
  * @author Isuru Chandima
  * @author Warunika Amali
+ * @author Sugeesh Chandraweera
  */
 public class ContextFilter extends LeakHawkContextFilter {
 
@@ -57,146 +58,56 @@ public class ContextFilter extends LeakHawkContextFilter {
 
     @Override
     public void prepareContextFilter() {
-        createRegularExpressionList();
-        createSynonyms();
-    }
-
-    @Override
-    public void executeContextFilter(Post post, Tuple tuple, OutputCollector collector) {
-        String postText = post.getPostText();
-
-        if (isContextFilterPassed(postText)) {
-            if (post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
-                collector.emit(pastebinOut, tuple, new Values(post));
-            } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
-                collector.emit(tweetsOut, tuple, new Values(post));
-            } else if (post.getPostType().equals(LeakHawkParameters.postTypeDump)) {
-                // Dump posts are emit as pastebin posts
-                collector.emit(pastebinOut, tuple, new Values(post));
-            }
-        }
-    }
-
-    /**
-     * Checking whether context filter is passed
-     *
-     * @param postText
-     * @return
-     */
-    private boolean isContextFilterPassed(String postText) {
-
-        return isRegularExpressionMatched(postText) || isSynonymsMatched(postText);
-    }
-
-    /**
-     * matching the posts with regular expressions
-     *
-     * @param postText
-     * @return
-     */
-    private boolean isRegularExpressionMatched(String postText) {
-
-        boolean found = false;
-        try {
-            for (String stringPattern : regularExpressionList) {
-
-                Pattern pattern = Pattern.compile(String.valueOf(stringPattern));
-                Matcher matcher = pattern.matcher(postText);
-
-                if (matcher.find()) {
-                    found = true;
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return found;
-    }
-
-    /**
-     * Checking whether the post has matching words
-     *
-     * @param postText
-     * @return
-     */
-    private boolean isSynonymsMatched(String postText) {
-
-        // Check if the postText contains synonyms generated before
-        for (String synonym : synonyms) {
-            if (postText.contains(synonym)) {
-                return true;
-            }
-        }
-
-        return false;
+        this.createRegularExpressionList();
+        this.createSynonyms();
     }
 
     private void createRegularExpressionList() {
-
         try {
             InputStream input = this.getClass().getClassLoader().getResourceAsStream("context.properties");
-//            InputStream input = new FileInputStream(new File("./src/main/resources/context.properties"));
             Properties properties = new Properties();
             properties.load(input);
             regularExpressionList = new ArrayList<>();
-
             for (int i = 0; i < properties.size(); i++) {
                 regularExpressionList.add(properties.getProperty("regexp" + (i + 1)));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkFilePathException("Can't load context.properties file.", e);
         }
     }
 
     private void createSynonyms() {
-
         synonyms = new ArrayList<>();
         ArrayList<String> wordSet = new ArrayList<>();
-
         try {
             InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("SriLanka.txt");
-//            FileInputStream fileInputStream = new FileInputStream("./src/main/resources/SriLanka.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
-
             String strLine;
-
             while ((strLine = br.readLine()) != null) {
                 wordSet.add(strLine);
             }
             br.close();
 
             // initialize JWNL (this must be done before JWNL can be used)
-            // See the JWordnet documentation for details on the properties file
-
             JWNL.initialize(this.getClass().getClassLoader().getResourceAsStream("properties.xml"));
-//            JWNL.initialize(new FileInputStream("./src/main/resources/properties.xml"));
-
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new LeakHawkFilePathException("Can't load SriLanka.txt file.", e);
+        } catch (JWNLException e) {
+            throw new LeakHawkFilePathException("Can't load properties.xml file.", e);
         }
-
         Dictionary dictionary = Dictionary.getInstance();
 
         // Create the list of synonyms using given list of words
         for (String word : wordSet) {
-
-            IndexWord connectedNouns = null;
-            IndexWord connectedVerbs = null;
-
-            synonyms.add(word.toLowerCase());
-
             try {
-                connectedNouns = dictionary.lookupIndexWord(POS.NOUN, word);
-                connectedVerbs = dictionary.lookupIndexWord(POS.VERB, word);
+                synonyms.add(word.toLowerCase());
+                IndexWord connectedNouns = dictionary.lookupIndexWord(POS.NOUN, word);
+                IndexWord connectedVerbs = dictionary.lookupIndexWord(POS.VERB, word);
+                matchSynonyms(connectedNouns);
+                matchSynonyms(connectedVerbs);
             } catch (JWNLException e) {
-                e.printStackTrace();
+                throw new LeakHawkFilePathException("Properties.xml file Config Error.", e);
             }
-
-            matchSynonyms(connectedNouns);
-            matchSynonyms(connectedVerbs);
         }
     }
 
@@ -217,25 +128,86 @@ public class ContextFilter extends LeakHawkContextFilter {
                     }
                 }
             } catch (JWNLException e) {
-                e.printStackTrace();
+                throw new LeakHawkFilePathException("Wordnet Syset generation error", e);
+            }
+        }
+    }
+
+
+
+    @Override
+    public void executeContextFilter(Post post, Tuple tuple, OutputCollector collector) {
+        String postText = post.getPostText();
+        if (isContextFilterPassed(postText)) {
+            if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
+                collector.emit(pastebinOut, tuple, new Values(post));
+            } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
+                collector.emit(tweetsOut, tuple, new Values(post));
+            } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
+                // Dump posts are emit as pastebin posts
+                collector.emit(pastebinOut, tuple, new Values(post));
             }
         }
     }
 
     /**
+     * Checking whether context filter is passed
+     *
+     * @param postText
+     * @return
+     */
+    private boolean isContextFilterPassed(String postText) {
+        return isRegularExpressionMatched(postText) || isSynonymsMatched(postText);
+    }
+
+    /**
+     * matching the posts with regular expressions
+     *
+     * @param postText
+     * @return
+     */
+    private boolean isRegularExpressionMatched(String postText) {
+        boolean found = false;
+        for (String stringPattern : regularExpressionList) {
+            Pattern pattern = Pattern.compile(String.valueOf(stringPattern));
+            Matcher matcher = pattern.matcher(postText);
+            if (matcher.find()) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Checking whether the post has matching words
+     *
+     * @param postText
+     * @return
+     */
+    private boolean isSynonymsMatched(String postText) {
+        // Check if the postText contains synonyms generated before
+        for (String synonym : synonyms) {
+            if (postText.contains(synonym)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * In the current topology, output of the context filter is connected to two different
      * bolts [evidence classifiers] depend on the type of the post. Hence two output streams
      * are defined in here.
-     *
+     * <p>
      * pastebinOut - output stream for the PastebinEvidenceClassifier
      * tweetsOut - output stream for the tweetsEvidenceClassifier
-     *
+     * <p>
      * These exact identifiers are needs to be used when creating the storm topology.
-     *
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
         outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
         outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
     }

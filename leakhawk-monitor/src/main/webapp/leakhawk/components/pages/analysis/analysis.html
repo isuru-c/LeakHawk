@@ -1,0 +1,121 @@
+<div class="row content-header">
+    <div class="col-md-6"></div>
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+<div class="row content-header">
+    <div class="col-md-1"></div>
+    <div class="col-md-11">
+        <h3 class="box-header with-border">FILTERS</h3>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <canvas id="prefilter" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.preFilterDataList" chart-labels="vm.preFilterTitleList">
+        </canvas>
+    </div>
+    <div class="col-md-4">
+        <canvas id="contextfilter" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.contextFilterDataList" chart-labels="vm.contextFilterTitleList">
+        </canvas>
+    </div>
+
+    <div class="col-md-4">
+        <canvas id="filter" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.filterDataList" chart-labels="vm.filterTitleList">
+        </canvas>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 120px;">PRE FILTERED POSTS</p>
+        <!--<div ng-repeat="deal in vm.bestDeals">
+            <p style="color: {{deal.color}}">{{deal.name}}</p>
+        </div>-->
+    </div>
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 110px;">CONTEXT FILTERED POSTS</p>
+    </div>
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 150px;">FILTERED POSTS</p>
+    </div>
+</div>
+
+<!--=======================================================================================-->
+
+<div class="row content-header">
+    <div class="col-md-1"></div>
+    <div class="col-md-11">
+        <h3 class="box-header with-border">CLASSIFIERS</h3>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <canvas id="contentClassifier" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.contentClassifierDataList" chart-labels="vm.contentClassifierTitleList">
+        </canvas>
+    </div>
+    <div class="col-md-6">
+        <canvas id="evidenceClassifier" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.evidenceClassifierDataList" chart-labels="vm.evidenceClassifierTitleList">
+        </canvas>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <p class="lead" style="padding-left: 200px;">CONTENT CLASSIFIED POSTS</p>
+        <!--<div ng-repeat="deal in vm.bestDeals">
+            <p style="color: {{deal.color}}">{{deal.name}}</p>
+        </div>-->
+    </div>
+    <div class="col-md-6">
+        <p class="lead" style="padding-left: 200px;">EVIDENCE CLASSIFIED POSTS</p>
+    </div>
+</div>
+
+<!--=======================================================================================-->
+
+
+<div class="row">
+    <div class="col-md-4">
+        <canvas id="sensitivityLevel" class="chart chart-pie" chart-colors="vm.colors1"
+                chart-data="vm.sensitivityLevelDataList" chart-labels="vm.sensitivityLevelTitleList">
+        </canvas>
+    </div>
+    <div class="col-md-4">
+        <canvas id="classificationType" class="chart chart-pie" chart-colors="vm.colors1"
+                chart-data="vm.classificationTypeDataList" chart-labels="vm.classificationTypeTitleList">
+        </canvas>
+    </div>
+
+    <div class="col-md-4">
+        <canvas id="filter" class="chart chart-pie" chart-colors="vm.colors"
+                chart-data="vm.filterDataList" chart-labels="vm.filterTitleList">
+        </canvas>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 120px;">PRE FILTERED POSTS</p>
+        <!--<div ng-repeat="deal in vm.bestDeals">
+            <p style="color: {{deal.color}}">{{deal.name}}</p>
+        </div>-->
+    </div>
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 110px;">CONTEXT FILTERED POSTS</p>
+    </div>
+    <div class="col-md-4">
+        <p class="lead" style="padding-left: 150px;">FILTERED POSTS</p>
+    </div>
+</div>

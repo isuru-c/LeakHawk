@@ -16,6 +16,9 @@
 
 package classifier.Content;
 
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
+import exception.LeakHawkFilePathException;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -99,7 +102,7 @@ public class CCClassifier extends ContentClassifier {
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("CC.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("CC.model file loading error.", e);
         }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("card");
@@ -280,9 +283,9 @@ public class CCClassifier extends ContentClassifier {
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Post text error occured.", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("CC.model classification error.", e);
         }
         return false;
     }
@@ -300,14 +303,11 @@ public class CCClassifier extends ContentClassifier {
         return 0;
     }
 
-
     public int extractCCNumberCount(String post) {
         ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
         Matcher matcherCC = ccCardPattern.matcher(post);
         int CC_Count = getMatchingCount(matcherCC);
         return CC_Count;
     }
-
-
 }
 

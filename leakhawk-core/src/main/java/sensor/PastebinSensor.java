@@ -16,6 +16,8 @@
 
 package sensor;
 
+import exception.LeakHawkDataStreamException;
+import exception.LeakHawkFilePathException;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -23,7 +25,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,22 +61,16 @@ public class PastebinSensor extends Thread {
      * Set kafka producer for pastebin sensor
      */
     public PastebinSensor() {
-
         LeakHawkKafkaProducer leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         pastebinProducer = leakHawkKafkaProducer.getProducer();
     }
 
     public void run() {
-
         ProducerRecord<String, String> message = null;
-
         try {
-            URL my_url = new URL(LeakHawkParameters.pastebinScapingURL + LeakHawkParameters.pastebinPostLimit);
-
+            URL my_url = new URL(LeakHawkParameters.PASTEBIN_SCAPING_URL + LeakHawkParameters.PASTEBIN_POST_LIMIT);
             String lastKey = "";
-
             boolean pastebinSensorRunning = true;
-
             while (pastebinSensorRunning) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url.openStream()));
                 StringBuilder webPageContent = new StringBuilder();
@@ -100,22 +96,21 @@ public class PastebinSensor extends Thread {
                     } else {
                         continue;
                     }
-                    message = new ProducerRecord<String, String>(LeakHawkParameters.postTypePastebin, post);
+                    message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_PASTEBIN, post);
                     pastebinProducer.send(message);
                 }
-                sleep(LeakHawkParameters.pastebinSensorSleepTime);
+                sleep(LeakHawkParameters.PASTEBIN_SENSOR_SLEEP_TIME);
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);
         }
         pastebinProducer.close();
-
     }
 
 }

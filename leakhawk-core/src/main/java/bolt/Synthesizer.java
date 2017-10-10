@@ -17,6 +17,8 @@
 package bolt;
 
 import bolt.core.LeakHawkSynthesizer;
+import exception.LeakHawkDatabaseException;
+import exception.LeakHawkFilePathException;
 import model.ContentData;
 import model.EvidenceModel;
 import model.ContentModel;
@@ -24,15 +26,13 @@ import model.Post;
 import db.DBConnection;
 import db.DBHandle;
 import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is used to predict the sensitive level and risk of a post by using
@@ -52,17 +52,17 @@ public class Synthesizer extends LeakHawkSynthesizer {
         try {
             connection = DBConnection.getDBConnection().getConnection();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new LeakHawkDatabaseException("DBConnection class not found", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new LeakHawkDatabaseException("Database Connection Error. Please check username and password", e);
         }
     }
 
     @Override
     public void executeSynthesizer(Post post, Tuple tuple, OutputCollector collector) {
-        if (post.getPostType().equals(LeakHawkParameters.postTypePastebin)) {
+        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
             synthesizePastebinPosts(post);
-        } else if (post.getPostType().equals(LeakHawkParameters.postTypeTweets)) {
+        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
             synthesizeTweets(post);
         }
     }
@@ -74,14 +74,12 @@ public class Synthesizer extends LeakHawkSynthesizer {
         if (contentModel.isContentFound()) {
             List contentDataList = contentModel.getContentDataList();
             int highestLevel = 0;
-
             for (Object contentDataObj : contentDataList) {
                 ContentData contentData = (ContentData) contentDataObj;
                 if (contentData.getLevel() > highestLevel) {
                    highestLevel = contentData.getLevel();
                 }
             }
-
             ArrayList<ContentData> highestContent = new ArrayList<>();
             for (Object contentDataObj : contentDataList) {
                 ContentData contentData = (ContentData) contentDataObj;
@@ -89,7 +87,6 @@ public class Synthesizer extends LeakHawkSynthesizer {
                     highestContent.add(contentData);
                 }
             }
-
             String classString = "";
             for (int i = 0; i < highestContent.size(); i++) {
                 classString += highestContent.get(i).getContentType();
@@ -97,7 +94,6 @@ public class Synthesizer extends LeakHawkSynthesizer {
                     classString += ",";
                 }
             }
-
             if (evidenceModel.isEvidenceFound() && highestLevel > 0) {
                 String title = post.getTitle().replace("'", "/'");
                 String user = post.getUser().replace("'", "/'");
@@ -115,10 +111,8 @@ public class Synthesizer extends LeakHawkSynthesizer {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
             }
         }
-
     }
 
     private void synthesizeTweets(Post post){

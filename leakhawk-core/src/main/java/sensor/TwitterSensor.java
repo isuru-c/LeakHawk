@@ -27,7 +27,7 @@ import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import parameters.LeakHawkParameters;
+import util.LeakHawkParameters;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
@@ -60,10 +60,10 @@ public class TwitterSensor extends Thread {
     public TwitterSensor() {
 
         // Set the parameters for the twitter stream API
-        consumerKey = LeakHawkParameters.consumerKey;
-        consumerSecret = LeakHawkParameters.consumerSecret;
-        token = LeakHawkParameters.token;
-        tokenSecret = LeakHawkParameters.tokenSecret;
+        consumerKey = LeakHawkParameters.CONSUMER_KEY;
+        consumerSecret = LeakHawkParameters.CONSUMER_SECRET;
+        token = LeakHawkParameters.TOKEN;
+        tokenSecret = LeakHawkParameters.TOKEN_SECRET;
 
         LeakHawkKafkaProducer leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         twitterProducer = leakHawkKafkaProducer.getProducer();
@@ -93,7 +93,7 @@ public class TwitterSensor extends Thread {
         while (true) {
             ProducerRecord<String, String> message = null;
             try {
-                message = new ProducerRecord<String, String>(LeakHawkParameters.postTypeTweets, queue.take());
+                message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_TWEETS, queue.take());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

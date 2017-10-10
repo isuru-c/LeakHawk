@@ -1,0 +1,168 @@
+<script>
+    $(document).ready(function () {
+        $('#carousel-example-generic').carousel({
+            interval: 3500
+        });
+
+        var clickEvent = false;
+        $('#carousel-example-generic').on('click', '.nav a', function () {
+            clickEvent = true;
+            $('.nav li').removeClass('active');
+            $(this).parent().addClass('active');
+        }).on('slid.bs.carousel', function (e) {
+            if (!clickEvent) {
+                var count = $('.nav').children().length - 1;
+                var current = $('.nav li.active');
+                current.removeClass('active').next().addClass('active');
+                var id = parseInt(current.data('slide-to'));
+                if (count == id) {
+                    $('.nav li').first().addClass('active');
+                }
+            }
+            clickEvent = false;
+        });
+    });
+
+</script>
+
+<div class="container">
+    <section class="content" style="padding: 15px 0px">
+
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-aqua"><i class="fa fa-sellsy"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Num of Data Feeds</span>
+                        <span class="info-box-number">1</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-red"><i class="fa fa-inbox"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Sensitive Posts</span>
+                        <span class="info-box-number">{{vm.numOfSensitivePosts}}</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <!-- fix for small devices only -->
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-green"><i class="fa fa-tasks"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Critical Incidents</span>
+                        <span class="info-box-number">{{vm.totalCriticalPosts}}</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col --><!--
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-yellow"><i class="fa fa-warning"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Critical Incidents</span>
+                        <span class="info-box-number">0</span>
+                    </div>
+                    &lt;!&ndash; /.info-box-content &ndash;&gt;
+                </div>
+                &lt;!&ndash; /.info-box &ndash;&gt;
+            </div>-->
+            <!-- /.col -->
+        </div>
+
+        <!--<div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Command Interface</h3>
+                    </div>
+                    <div class="box-body">
+                        <a ng-if="vm.leakHawkButton != true" ng-click = "vm.startLeakHawk()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Start LeakHawk
+                        </a>
+                        <a ng-if="vm.leakHawkButton == true" ng-click = "vm.stopLeakHawk()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Stop LeakHawk
+                        </a>
+                        <a ng-if="vm.twitterButton != true" ng-click = "vm.addTwitter()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Add Twitter Data Feed
+                        </a>
+                        <a ng-if="vm.twitterButton == true" ng-click = "vm.removeTwitter()" class="btn btn-app">
+                            <i class="fa fa-edit"></i> Remove Twitter Data Feed
+                        </a>
+                        <a class="btn btn-app">
+                            <i class="fa fa-play"></i> Add Pastebin Data Feed
+                        </a>
+                    </div>
+                    &lt;!&ndash; /.box-body &ndash;&gt;
+                </div>
+                &lt;!&ndash; /.info-box &ndash;&gt;
+            </div>
+        </div>
+-->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>LeakHawk Output</label>
+                    <!--<textarea id = "mytext" class="form-control" rows="10" placeholder="" disabled="" ng-model="vm.responseData"></textarea>-->
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <table class="table no-margin table-hover dataTable">
+                                <tbody data-link="row" class="rowlink hand-cursor">
+                                <tr>
+                                    <th>PostType</th>
+                                    <th>Post Key</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Title</th>
+                                    <th>User</th>
+                                    <th>content</th>
+                                    <th>evidence</th>
+                                    <th>class</th>
+                                    <th>Level</th>
+                                </tr>
+
+                                <tr ng-repeat="order in vm.postList" data-href='google.com'>
+                                    <td>{{order.postType}}</td>
+                                    <td><a href="https://pastebin.com/{{order.key}}">{{order.key}}</a></td>
+                                    <td>{{order.date *1000| date:'yyyy-MM-dd'}}</td>
+                                    <td>{{order.date *1000| date:'shortTime'}}</td>
+                                    <td>{{order.title}}</td>
+                                    <td>{{order.user}}</td>
+                                    <td>{{order.content}}</td>
+                                    <td>{{order.evidence}}</td>
+                                    <td>{{order.predictClass}}</td>
+                                    <td ng-if="order.level==1">Low</td>
+                                    <td ng-if="order.level==2">High</td>
+                                    <td ng-if="order.level==3">Critical</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- /.box-body -->
+    </section>
+</div>

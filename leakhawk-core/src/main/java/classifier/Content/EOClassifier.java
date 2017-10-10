@@ -16,6 +16,8 @@
 
 package classifier.Content;
 
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -52,7 +54,7 @@ public class EOClassifier extends ContentClassifier {
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("EO.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("EO.model file loading error.", e);
         }
         relatedPattern1 = Pattern.compile("email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
         relatedPattern2 = Pattern.compile("leaked by|emails leaked|domains hacked|leaked email list|email list leaked|leaked emails|leak of|email_hacked|emails_hacked|email|emails_leak|email_dump|emails_dump|email_dumps|email-list|leaked_email|email_hack", Pattern.CASE_INSENSITIVE);
@@ -119,10 +121,10 @@ public class EOClassifier extends ContentClassifier {
                 return true;
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch (IOException e) {
+            throw new LeakHawkDataStreamException("Post text error occured.", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("EO.model classification error.", e);
         }
         return false;
     }

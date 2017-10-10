@@ -1,0 +1,116 @@
+<!--<div class="wrapper">-->
+<header class="main-header">
+    <nav class="navbar navbar-static-top">
+        <div class="container">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <h4>Leak Hawk</h4>
+                </div>
+            </nav>
+
+
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-aqua"><i class="fa fa-sellsy"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Num of Data Feeds</span>
+                            <!--<span class="info-box-number" style="font-size: 14px">Twitter</span>-->
+                            <span class="info-box-number" style="font-size: 14px">Pastebin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-green"><i class="fa fa-inbox"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Total Posts</span>
+                            <span class="info-box-number">{{vm.numOfTotalPosts}}</span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- fix for small devices only -->
+                <div class="clearfix visible-sm-block"></div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-yellow"><i class="fa fa-tasks"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Sensitive Posts</span>
+                            <span class="info-box-number">{{vm.totalSensitivePosts}}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-red"><i class="fa fa-warning"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Critical Incidents</span>
+                            <span class="info-box-number">{{vm.totalCriticalPosts}}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+            </div>
+
+
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <a class="navbar-brand" ui-sref="home">Home</a>
+                    </div>
+
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li><a ui-sref="control_panel">Control Panel</a></li>
+                            <li><a ui-sref="configuration">Configuration</a></li>
+                            <li><a ui-sref="analysis">Analysis</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                   aria-expanded="false">Sensitivity<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Critical</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#">High</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#">Low</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+            </nav>
+    </nav>
+</header>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <div ui-view="view"></div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<footer class="main-footer">
+    <div class="pull-right hidden-xs down">
+        <b>Version 2.0</b>
+    </div>
+    <strong>Copyright &copy; 2017 LeakHawk</strong> All rights
+    reserved.
+</footer>

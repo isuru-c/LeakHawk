@@ -16,6 +16,8 @@
 
 package classifier.Content;
 
+import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -75,7 +77,7 @@ public class PKClassifier extends ContentClassifier {
         try {
             tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("PK.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("PK.model file loading error.", e);
         }
         ArrayList<String> unigramList = new ArrayList<String>();
         unigramList.add("private");
@@ -194,9 +196,9 @@ public class PKClassifier extends ContentClassifier {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LeakHawkDataStreamException("Post text error occured.", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("PK.model classification error.", e);
         }
         return false;
     }

@@ -1,0 +1,27 @@
+{
+  "name": "webapp",
+  "authors": [
+    "sugeesh <sugeesh.13@cse.mrt.ac.lk>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "Apache2",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-loader": "~1.5.0",
+    "angular-mocks": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "angular-ui-router": "1.0.0-beta.3",
+    "q": "1.0.0",
+    "angular": "1.6.4",
+    "chart.js": "^2.7.0",
+    "angular-chart.js": "^1.1.1"
+  }
+}
