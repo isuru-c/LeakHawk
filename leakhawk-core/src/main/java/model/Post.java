@@ -20,10 +20,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- *
  * @author Isuru Chandima
  */
-public class Post implements Serializable{
+public class Post implements Serializable {
 
     private String postType;
     private String key;
@@ -36,6 +35,9 @@ public class Post implements Serializable{
 
     private ContentModel contentModel = null;
     private EvidenceModel evidenceModel = null;
+
+    // Next output stream the post needs to be emitted
+    private String nextOutputStream;
 
     // List of urls inside the post
     private ArrayList<String> urlList = new ArrayList<>();
@@ -68,7 +70,7 @@ public class Post implements Serializable{
         this.postText = postText;
     }
 
-    public void setLanguage(String language){
+    public void setLanguage(String language) {
         this.language = language;
     }
 
@@ -80,7 +82,11 @@ public class Post implements Serializable{
         this.evidenceModel = evidenceModel;
     }
 
-    public void addUrl(String url){
+    public void setNextOutputStream(String nextOutputStream) {
+        this.nextOutputStream = nextOutputStream;
+    }
+
+    public void addUrl(String url) {
         this.urlList.add(url);
     }
 
@@ -113,11 +119,11 @@ public class Post implements Serializable{
         return postText;
     }
 
-    public String getLanguage(){
+    public String getLanguage() {
         return language;
     }
 
-    public ArrayList<String> getUrlList(){
+    public ArrayList<String> getUrlList() {
         return urlList;
     }
 
@@ -129,4 +135,7 @@ public class Post implements Serializable{
         return evidenceModel;
     }
 
+    public String getNextOutputStream() {
+        return nextOutputStream;
+    }
 }

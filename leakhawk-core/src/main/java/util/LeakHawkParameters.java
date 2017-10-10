@@ -30,18 +30,28 @@ public class LeakHawkParameters {
 
     // Identifiers for different classifiers and filters
     public static String PASTEBIN_PRE_FILTER = "pastebin-pre-filter";
-    public static String CONTEXT_FILTER = "context-filter";
     public static String PASTEBIN_EVIDENCE_CLASSIFIER = "pastebin-evidence-classifier";
     public static String PASTEBIN_CONTENT_CLASSIFIER = "pastebin-content-classifier";
+
+    public static String CONTEXT_FILTER = "context-filter";
+
     public static String TWEETS_PRE_FILTER = "tweets-pre-filter";
     public static String TWEETS_EVIDENCE_CLASSIFIER = "tweets-evidence-classifier";
     public static String TWEETS_CONTENT_CLASSIFIER = "tweets-content-classifier";
+
     public static String SYNTHESIZER = "synthesizer";
 
     // Time interval for statics updates
     public static int STATICS_UPDATE_INTERVAL = 60;
 
     public static String STATICS_FLOW = "statics-flow";
+
+    // Identifiers for streams between bolts
+    public static String P_PRE_FILTER_TO_CONTEXT_FILTER = "ppf-cf";
+    public static String T_PRE_FILTER_TO_CONTEXT_FILTER = "tpf-cf";
+
+    public static String CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER = "cf-pec";
+    public static String CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER = "cf-tec";
 
     // Path for the dump post folder
     public  static String DUMP_FOLDER_PATH = "./posts";

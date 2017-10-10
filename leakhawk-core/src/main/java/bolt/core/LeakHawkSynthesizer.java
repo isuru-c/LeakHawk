@@ -62,7 +62,7 @@ public abstract class LeakHawkSynthesizer extends BaseRichBolt{
 
     /**
      * This method is called for each tuple in the bolt, all the functionality needs to
-     * defined within the override method of executeSynthersizer in the sub class
+     * defined within the override method of executeSynthesizer in the sub class
      *
      * @param post Post object containing every detail of a single post
      * @param tuple Tuple object received to this bolt

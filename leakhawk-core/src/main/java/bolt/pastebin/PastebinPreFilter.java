@@ -16,12 +16,9 @@
 
 package bolt.pastebin;
 
-import bolt.core.LeakHawkPreFilter;
+import bolt.core.LeakHawkFilter;
 import model.Post;
-import org.apache.storm.shade.org.apache.commons.io.FileUtils;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import util.LeakHawkParameters;
 import weka.classifiers.misc.SerializedClassifier;
 import weka.core.Instances;
 
@@ -34,7 +31,7 @@ import java.util.regex.Pattern;
 /**
  * @author sewwandi
  */
-public class PastebinPreFilter extends LeakHawkPreFilter {
+public class PastebinPreFilter extends LeakHawkFilter {
 
     private ArrayList keyWordList;
 
@@ -354,8 +351,9 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
             "@data\n";
+    @Override
+    public void prepareFilter() {
 
-    public PastebinPreFilter(){
         try {
             sclassifier = new SerializedClassifier();
             File file = new File(this.getClass().getClassLoader().getResource("Twitter_EV.model").getFile());
@@ -401,10 +399,6 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
             greetingsWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
         }
 
-    }
-
-    @Override
-    public void preparePreFilter() {
         keyWordList = new ArrayList<String>();
         keyWordList.add("game");
         keyWordList.add("sports");
@@ -414,17 +408,20 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
     }
 
     @Override
-    public void executePreFilter(Post post, Tuple tuple, OutputCollector collector) {
+    public boolean isFilterPassed(Post post) {
         // Convert the pastebin post to the lower case
         post.setPostText(post.getPostText().toLowerCase());
 
-        //if pre filter is passed forward the model to next bolt(context filter)
-        if(!isPassedPrefilter(post.getTitle(), post.getPostText())) {
-            collector.emit(tuple, new Values(post));
+        // Return true if post needs to forwarded to the next bolt
+        // Return false if post needs not to forwarded to the next bolt
+        if(!isPassedPreFilter(post.getTitle(), post.getPostText())){
+            post.setNextOutputStream(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
+            return true;
         }
+        return false;
     }
 
-    private boolean isPassedPrefilter(String title, String post) {
+    private boolean isPassedPreFilter(String title, String post) {
 
         title = title.toLowerCase();
         post = post.toLowerCase();
@@ -565,5 +562,14 @@ public class PastebinPreFilter extends LeakHawkPreFilter {
         while (matcher.find())
             count++;
         return count;
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
+
+        return outputStream;
     }
 }

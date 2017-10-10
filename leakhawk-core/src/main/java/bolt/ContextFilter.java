@@ -16,8 +16,7 @@
 
 package bolt;
 
-import bolt.core.LeakHawkContextFilter;
-import exception.LeakHawkClassifierLoadingException;
+import bolt.core.LeakHawkFilter;
 import exception.LeakHawkFilePathException;
 import model.Post;
 import net.didion.jwnl.JWNL;
@@ -25,11 +24,6 @@ import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.Dictionary;
 
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 import util.LeakHawkParameters;
 
 import java.io.*;
@@ -44,20 +38,13 @@ import java.util.regex.Pattern;
  * @author Warunika Amali
  * @author Sugeesh Chandraweera
  */
-public class ContextFilter extends LeakHawkContextFilter {
-
-    /**
-     * These identifiers are defined to identify output streams from context filter
-     * to the evidence classifiers
-     */
-    private String pastebinOut = "context-filter-pastebin-out";
-    private String tweetsOut = "context-filter-tweets-out";
+public class ContextFilter extends LeakHawkFilter {
 
     private List<String> regularExpressionList;
     private ArrayList<String> synonyms;
 
     @Override
-    public void prepareContextFilter() {
+    public void prepareFilter() {
         this.createRegularExpressionList();
         this.createSynonyms();
     }
@@ -134,20 +121,25 @@ public class ContextFilter extends LeakHawkContextFilter {
     }
 
 
-
     @Override
-    public void executeContextFilter(Post post, Tuple tuple, OutputCollector collector) {
+    public boolean isFilterPassed(Post post) {
         String postText = post.getPostText();
+
         if (isContextFilterPassed(postText)) {
             if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
-                collector.emit(pastebinOut, tuple, new Values(post));
+                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
+                return true;
             } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
-                collector.emit(tweetsOut, tuple, new Values(post));
+                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+                return true;
             } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
                 // Dump posts are emit as pastebin posts
-                collector.emit(pastebinOut, tuple, new Values(post));
+                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
@@ -195,21 +187,13 @@ public class ContextFilter extends LeakHawkContextFilter {
         return false;
     }
 
-
-    /**
-     * In the current topology, output of the context filter is connected to two different
-     * bolts [evidence classifiers] depend on the type of the post. Hence two output streams
-     * are defined in here.
-     * <p>
-     * pastebinOut - output stream for the PastebinEvidenceClassifier
-     * tweetsOut - output stream for the tweetsEvidenceClassifier
-     * <p>
-     * These exact identifiers are needs to be used when creating the storm topology.
-     */
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        super.declareOutputFields(outputFieldsDeclarer);
-        outputFieldsDeclarer.declareStream(pastebinOut, new Fields("post"));
-        outputFieldsDeclarer.declareStream(tweetsOut, new Fields("post"));
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
+        outputStream.add(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+
+        return outputStream;
     }
 }

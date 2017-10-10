@@ -98,16 +98,16 @@ public class LeakHawk {
 
         // Both pastebin and twitter feeds are going through same context filter
         BoltDeclarer contextFilter = topologyBuilder.setBolt("context-filter-bolt", new ContextFilter(), 2);
-        contextFilter.shuffleGrouping("pastebin-pre-filter-bolt");
-        contextFilter.shuffleGrouping("twitter-pre-filter");
+        contextFilter.shuffleGrouping("pastebin-pre-filter-bolt", LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
+        contextFilter.shuffleGrouping("twitter-pre-filter", LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
 
         // Separate evidence classifier for pastebin posts
         BoltDeclarer pastebinEvidenceClassifier = topologyBuilder.setBolt("pastebin-evidence-classifier-bolt", new PastebinEvidenceClassifier(), 1);
-        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-pastebin-out");
+        pastebinEvidenceClassifier.shuffleGrouping("context-filter-bolt", LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
 
         // Separate evidence classifier for tweets
         BoltDeclarer tweetEvidenceClassifier = topologyBuilder.setBolt("tweets-evidence-classifier-bolt", new TweetEvidenceClassifier(), 1);
-        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", "context-filter-tweets-out");
+        tweetEvidenceClassifier.shuffleGrouping("context-filter-bolt", LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
 
         // Url Processor for both pastebin posts and tweets
         BoltDeclarer urlProcessor = topologyBuilder.setBolt("url-processor", new UrlProcessor(), 3);

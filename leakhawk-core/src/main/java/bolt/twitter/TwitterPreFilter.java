@@ -16,11 +16,9 @@
 
 package bolt.twitter;
 
-import bolt.core.LeakHawkPreFilter;
+import bolt.core.LeakHawkFilter;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import util.LeakHawkParameters;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -32,19 +30,19 @@ import java.util.ArrayList;
  *
  * @author Isuru Chandima
  */
-public class TwitterPreFilter extends LeakHawkPreFilter {
+public class TwitterPreFilter extends LeakHawkFilter {
 
     private ArrayList<String> keywordList;
 
     @Override
-    public void preparePreFilter() {
+    public void prepareFilter() {
 
         try {
             InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
 
             String strLine;
-            keywordList = new ArrayList<String>();
+            keywordList = new ArrayList<>();
 
             while ((strLine = bufferedReader.readLine()) != null) {
                 keywordList.add(strLine);
@@ -60,7 +58,7 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
     }
 
     @Override
-    public void executePreFilter(Post post, Tuple tuple, OutputCollector collector) {
+    public boolean isFilterPassed(Post post) {
         // Convert the tweet to the lower case
         String postText = post.getPostText().toLowerCase();
         post.setPostText(postText);
@@ -68,14 +66,16 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
         if (postText.substring(0, 4).equals("rt @")) {
             // Drop this retweet, no further operations
-            return;
+            return false;
         } else if (!post.getLanguage().equals("en")) {
             // Language is not English, drop the tweet
-            return;
+            return false;
         } else if (!isContainKeyword(post.getPostText())) {
             // Filter in for the context filter
-            collector.emit(tuple, new Values(post));
+            post.setNextOutputStream(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -94,5 +94,14 @@ public class TwitterPreFilter extends LeakHawkPreFilter {
         }
 
         return false;
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+
+        return outputStream;
     }
 }
