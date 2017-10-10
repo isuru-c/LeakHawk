@@ -24,18 +24,30 @@ public class Hash_id {
     String[] hs = {"4607", "3d08", "0e5b","b33fd057"};
     //String[] algorithms = {"CRC16","CRC16CCITT","FCS16","CRC32"};
 
+    /*
+    Check if the word is all letters
+     */
     private boolean isLetter(String hash){
         return hash.chars().allMatch(Character::isLetter);
     }
 
+    /*
+    Check if the word id all digits
+     */
     private boolean isAllDigit(String word){
         return word.matches(".*[^0-9].*") || word.matches(".*\\D.*");
     }
 
+    /*
+    Check if the word is alphanumeric
+     */
     private boolean isAlphaNum(String word){
         return StringUtils.isAlphanumeric(word);
     }
 
+    /*
+    Check if the word is a hash
+     */
     public boolean isHash(String word) {
         //CRC16
         if(word.length()==hs[0].length() && !isLetter(word) && isAlphaNum(word)){

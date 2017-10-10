@@ -92,6 +92,9 @@ public class UCClassifier extends ContentClassifier{
 
     }
 
+    /*
+    Creating the arff file of new post
+     */
     public String createARFF(String text, String title) {
 
         String feature_list = "";
@@ -180,6 +183,9 @@ public class UCClassifier extends ContentClassifier{
         return 0;
     }
 
+    /*
+    Getting the hash count in the post
+     */
     public void extractHashCount(String post) {
 
         Hash_id hash_id = new Hash_id();
