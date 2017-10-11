@@ -17,9 +17,11 @@
 package bolt.pastebin;
 
 import bolt.core.LeakHawkFilter;
+import exception.LeakHawkClassifierLoadingException;
 import model.Post;
 import util.LeakHawkParameters;
 import weka.classifiers.misc.SerializedClassifier;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import java.io.*;
@@ -30,10 +32,9 @@ import java.util.regex.Pattern;
 
 /**
  * @author sewwandi
+ * @author Warunika Amali
  */
 public class PastebinPreFilter extends LeakHawkFilter {
-
-    private ArrayList keyWordList;
 
     private ArrayList<String> codeWordsList;
     private ArrayList<String> gameWordsList;
@@ -45,18 +46,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
     private ArrayList<Pattern> sportsWordsPatternList;
     private ArrayList<Pattern> pornWordsPatternList;
     private ArrayList<Pattern> greetingsWordsPatternList;
-    private Pattern relatedPattern1;
-    //private Connection connection;
-   /* private TextDirectoryLoader loader;
-    private Instances dataRaw;
-    private StringToWordVector filter;
-    private Instances dataFiltered;
-    private List<String> stopWordList;
-    private String regex;
-    private String regex1;*/
-    //private RandomForest classifier;
-    private static SerializedClassifier sclassifier;
-
+    private RandomForest tclassifier;
     private String headingPreFilter ="@relation PF\n" +
             "\n" +
             "@attribute $PF1 numeric\n" +
@@ -107,261 +97,16 @@ public class PastebinPreFilter extends LeakHawkFilter {
             "@attribute $PF46 numeric\n" +
             "@attribute $PF47 numeric\n" +
             "@attribute $PF48 numeric\n" +
-            "@attribute $PF49 numeric\n" +
-            "@attribute $PF50 numeric\n" +
-            "@attribute $PF51 numeric\n" +
-            "@attribute $PF52 numeric\n" +
-            "@attribute $PF53 numeric\n" +
-            "@attribute $PF54 numeric\n" +
-            "@attribute $PF55 numeric\n" +
-            "@attribute $PF56 numeric\n" +
-            "@attribute $PF57 numeric\n" +
-            "@attribute $PF58 numeric\n" +
-            "@attribute $PF59 numeric\n" +
-            "@attribute $PF60 numeric\n" +
-            "@attribute $PF61 numeric\n" +
-            "@attribute $PF62 numeric\n" +
-            "@attribute $PF63 numeric\n" +
-            "@attribute $PF64 numeric\n" +
-            "@attribute $PF65 numeric\n" +
-            "@attribute $PF66 numeric\n" +
-            "@attribute $PF67 numeric\n" +
-            "@attribute $PF68 numeric\n" +
-            "@attribute $PF69 numeric\n" +
-            "@attribute $PF70 numeric\n" +
-            "@attribute $PF71 numeric\n" +
-            "@attribute $PF72 numeric\n" +
-            "@attribute $PF73 numeric\n" +
-            "@attribute $PF74 numeric\n" +
-            "@attribute $PF75 numeric\n" +
-            "@attribute $PF76 numeric\n" +
-            "@attribute $PF77 numeric\n" +
-            "@attribute $PF78 numeric\n" +
-            "@attribute $PF79 numeric\n" +
-            "@attribute $PF80 numeric\n" +
-            "@attribute $PF81 numeric\n" +
-            "@attribute $PF82 numeric\n" +
-            "@attribute $PF83 numeric\n" +
-            "@attribute $PF84 numeric\n" +
-            "@attribute $PF85 numeric\n" +
-            "@attribute $PF86 numeric\n" +
-            "@attribute $PF87 numeric\n" +
-            "@attribute $PF88 numeric\n" +
-            "@attribute $PF89 numeric\n" +
-            "@attribute $PF90 numeric\n" +
-            "@attribute $PF91 numeric\n" +
-            "@attribute $PF92 numeric\n" +
-            "@attribute $PF93 numeric\n" +
-            "@attribute $PF94 numeric\n" +
-            "@attribute $PF95 numeric\n" +
-            "@attribute $PF96 numeric\n" +
-            /*"@attribute $PF97 numeric\n" +
-            "@attribute $PF98 numeric\n" +
-            "@attribute $PF99 numeric\n" +
-            "@attribute $PF100 numeric\n" +
-            "@attribute $PF101 numeric\n" +
-            "@attribute $PF102 numeric\n" +
-            "@attribute $PF103 numeric\n" +
-            "@attribute $PF104 numeric\n" +
-            "@attribute $PF105 numeric\n" +
-            "@attribute $PF106 numeric\n" +
-            "@attribute $PF107 numeric\n" +
-            "@attribute $PF108 numeric\n" +
-            "@attribute $PF109 numeric\n" +
-            "@attribute $PF110 numeric\n" +
-            "@attribute $PF111 numeric\n" +
-            "@attribute $PF112 numeric\n" +
-            "@attribute $PF113 numeric\n" +
-            "@attribute $PF114 numeric\n" +
-            "@attribute $PF115 numeric\n" +
-            "@attribute $PF116 numeric\n" +
-            "@attribute $PF117 numeric\n" +
-            "@attribute $PF118 numeric\n" +
-            "@attribute $PF119 numeric\n" +
-            "@attribute $PF120 numeric\n" +
-            "@attribute $PF121 numeric\n" +
-            "@attribute $PF122 numeric\n" +
-            "@attribute $PF123 numeric\n" +
-            "@attribute $PF124 numeric\n" +
-            "@attribute $PF125 numeric\n" +
-            "@attribute $PF126 numeric\n" +
-            "@attribute $PF127 numeric\n" +
-            "@attribute $PF128 numeric\n" +
-            "@attribute $PF129 numeric\n" +
-            "@attribute $PF130 numeric\n" +
-            "@attribute $PF131 numeric\n" +
-            "@attribute $PF132 numeric\n" +
-            "@attribute $PF133 numeric\n" +
-            "@attribute $PF134 numeric\n" +
-            "@attribute $PF135 numeric\n" +
-            "@attribute $PF136 numeric\n" +
-            "@attribute $PF137 numeric\n" +
-            "@attribute $PF138 numeric\n" +
-            "@attribute $PF139 numeric\n" +
-            "@attribute $PF140 numeric\n" +
-            "@attribute $PF141 numeric\n" +
-            "@attribute $PF142 numeric\n" +
-            "@attribute $PF143 numeric\n" +
-            "@attribute $PF144 numeric\n" +
-            "@attribute $PF145 numeric\n" +
-            "@attribute $PF146 numeric\n" +
-            "@attribute $PF147 numeric\n" +
-            "@attribute $PF148 numeric\n" +
-            "@attribute $PF149 numeric\n" +
-            "@attribute $PF150 numeric\n" +
-            "@attribute $PF151 numeric\n" +
-            "@attribute $PF152 numeric\n" +
-            "@attribute $PF153 numeric\n" +
-            "@attribute $PF154 numeric\n" +
-            "@attribute $PF155 numeric\n" +
-            "@attribute $PF156 numeric\n" +
-            "@attribute $PF157 numeric\n" +
-            "@attribute $PF158 numeric\n" +
-            "@attribute $PF159 numeric\n" +
-            "@attribute $PF160 numeric\n" +
-            "@attribute $PF161 numeric\n" +
-            "@attribute $PF162 numeric\n" +
-            "@attribute $PF163 numeric\n" +
-            "@attribute $PF164 numeric\n" +
-            "@attribute $PF165 numeric\n" +
-            "@attribute $PF166 numeric\n" +
-            "@attribute $PF167 numeric\n" +
-            "@attribute $PF168 numeric\n" +
-            "@attribute $PF169 numeric\n" +
-            "@attribute $PF170 numeric\n" +
-            "@attribute $PF171 numeric\n" +
-            "@attribute $PF172 numeric\n" +
-            "@attribute $PF173 numeric\n" +
-            "@attribute $PF174 numeric\n" +
-            "@attribute $PF175 numeric\n" +
-            "@attribute $PF176 numeric\n" +
-            "@attribute $PF177 numeric\n" +
-            "@attribute $PF178 numeric\n" +
-            "@attribute $PF179 numeric\n" +
-            "@attribute $PF180 numeric\n" +
-            "@attribute $PF181 numeric\n" +
-            "@attribute $PF182 numeric\n" +
-            "@attribute $PF183 numeric\n" +
-            "@attribute $PF184 numeric\n" +
-            "@attribute $PF185 numeric\n" +
-            "@attribute $PF186 numeric\n" +
-            "@attribute $PF187 numeric\n" +
-            "@attribute $PF188 numeric\n" +
-            "@attribute $PF189 numeric\n" +
-            "@attribute $PF190 numeric\n" +
-            "@attribute $PF191 numeric\n" +
-            "@attribute $PF192 numeric\n" +
-            "@attribute $PF193 numeric\n" +
-            "@attribute $PF194 numeric\n" +
-            "@attribute $PF195 numeric\n" +
-            "@attribute $PF196 numeric\n" +
-            "@attribute $PF197 numeric\n" +
-            "@attribute $PF198 numeric\n" +
-            "@attribute $PF199 numeric\n" +
-            "@attribute $PF200 numeric\n" +
-            "@attribute $PF201 numeric\n" +
-            "@attribute $PF202 numeric\n" +
-            "@attribute $PF203 numeric\n" +
-            "@attribute $PF204 numeric\n" +
-            "@attribute $PF205 numeric\n" +
-            "@attribute $PF206 numeric\n" +
-            "@attribute $PF207 numeric\n" +
-            "@attribute $PF208 numeric\n" +
-            "@attribute $PF209 numeric\n" +
-            "@attribute $PF210 numeric\n" +
-            "@attribute $PF211 numeric\n" +
-            "@attribute $PF212 numeric\n" +
-            "@attribute $PF213 numeric\n" +
-            "@attribute $PF214 numeric\n" +
-            "@attribute $PF215 numeric\n" +
-            "@attribute $PF216 numeric\n" +
-            "@attribute $PF217 numeric\n" +
-            "@attribute $PF218 numeric\n" +
-            "@attribute $PF219 numeric\n" +
-            "@attribute $PF220 numeric\n" +
-            "@attribute $PF221 numeric\n" +
-            "@attribute $PF222 numeric\n" +
-            "@attribute $PF223 numeric\n" +
-            "@attribute $PF224 numeric\n" +
-            "@attribute $PF225 numeric\n" +
-            "@attribute $PF226 numeric\n" +
-            "@attribute $PF227 numeric\n" +
-            "@attribute $PF228 numeric\n" +
-            "@attribute $PF229 numeric\n" +
-            "@attribute $PF230 numeric\n" +
-            "@attribute $PF231 numeric\n" +
-            "@attribute $PF232 numeric\n" +
-            "@attribute $PF233 numeric\n" +
-            "@attribute $PF234 numeric\n" +
-            "@attribute $PF235 numeric\n" +
-            "@attribute $PF236 numeric\n" +
-            "@attribute $PF237 numeric\n" +
-            "@attribute $PF238 numeric\n" +
-            "@attribute $PF239 numeric\n" +
-            "@attribute $PF240 numeric\n" +
-            "@attribute $PF241 numeric\n" +
-            "@attribute $PF242 numeric\n" +
-            "@attribute $PF243 numeric\n" +
-            "@attribute $PF244 numeric\n" +
-            "@attribute $PF245 numeric\n" +
-            "@attribute $PF246 numeric\n" +
-            "@attribute $PF247 numeric\n" +
-            "@attribute $PF248 numeric\n" +
-            "@attribute $PF249 numeric\n" +
-            "@attribute $PF250 numeric\n" +
-            "@attribute $PF251 numeric\n" +
-            "@attribute $PF252 numeric\n" +
-            "@attribute $PF253 numeric\n" +
-            "@attribute $PF254 numeric\n" +
-            "@attribute $PF255 numeric\n" +
-            "@attribute $PF256 numeric\n" +
-            "@attribute $PF257 numeric\n" +
-            "@attribute $PF258 numeric\n" +
-            "@attribute $PF259 numeric\n" +
-            "@attribute $PF260 numeric\n" +
-            "@attribute $PF261 numeric\n" +
-            "@attribute $PF262 numeric\n" +
-            "@attribute $PF263 numeric\n" +
-            "@attribute $PF264 numeric\n" +
-            "@attribute $PF265 numeric\n" +
-            "@attribute $PF266 numeric\n" +
-            "@attribute $PF267 numeric\n" +
-            "@attribute $PF268 numeric\n" +
-            "@attribute $PF269 numeric\n" +
-            "@attribute $PF270 numeric\n" +
-            "@attribute $PF271 numeric\n" +
-            "@attribute $PF272 numeric\n" +
-            "@attribute $PF273 numeric\n" +
-            "@attribute $PF274 numeric\n" +
-            "@attribute $PF275 numeric\n" +
-            "@attribute $PF276 numeric\n" +
-            "@attribute $PF277 numeric\n" +
-            "@attribute $PF278 numeric\n" +
-            "@attribute $PF279 numeric\n" +
-            "@attribute $PF280 numeric\n" +
-            "@attribute $PF281 numeric\n" +
-            "@attribute $PF282 numeric\n" +
-            "@attribute $PF283 numeric\n" +
-            "@attribute $PF284 numeric\n" +
-            "@attribute $PF285 numeric\n" +
-            "@attribute $PF286 numeric\n" +
-            "@attribute $PF287 numeric\n" +
-            "@attribute $PF288 numeric\n" +*/
-            "\n" +
             "@attribute @@class@@ {pos,neg}\n" +
-            "\n" +
             "@data\n";
+
     @Override
     public void prepareFilter() {
 
         try {
-            sclassifier = new SerializedClassifier();
-            File file = new File(this.getClass().getClassLoader().getResource("Twitter_EV.model").getFile());
-            sclassifier.setModelFile(file);
-//            sclassifier.setModelFile(new File("./src/main/resources/PF.model"));
-            //classifier = (RandomForest) sclassifier;
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("PreFilter.model"));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new LeakHawkClassifierLoadingException("PreFilter.model file loading error.", e);
         }
 
         codeWordsPatternList = new ArrayList<>();
@@ -370,14 +115,11 @@ public class PastebinPreFilter extends LeakHawkFilter {
         pornWordsPatternList = new ArrayList<>();
         greetingsWordsPatternList = new ArrayList<>();
 
-        codeWordsList = new ArrayList(Arrays.asList("java|php|python "," abstract "," boolean | bool | byte | char | float | int | void | object | struct"," interface |package| class | function"," static | volatile | var ",
-                "#define |#include "," exit "," namespace "," operator | xor | compl ","sizeof|del|insteadof|isset|echo|def|declare|lambda","foreach|switch|synchronized |null"," implements |import |override |using ",
-                "<html>|</html>|html","<head>|</head>|head","<title>|</title>|title","<body>|</body>|body","<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>","<img>|</img>","<link>|link","<br>","<a>|</a>","<p>|</p>","<style>|</style>","<script>|</script>","<div>|</div>",
-                "elseif|elif","include_once|require_once"));
-        gameWordsList = new ArrayList(Arrays.asList("game|games","wolfenstein|the new colossus|assassin's creed|middle-earth|shadow of war|destiny|call of duty|dishonored|death of the outsider|dusk|lawbreakers|vanquish|playerUnknown's battlegrounds|friday the 13th|the signal from tolva|ghost recon|wildlands|prey|resident evil|biohazard|bulletstorm|sniper elite |strafe|desync|rising storm|sea of thieves|metal gear survive|world at war|black ops|ghosts","warfare","xbox one"));
-        sportsWordsList = new ArrayList(Arrays.asList("arena|play ground","athlete|Athletics","ball|bat|racket","badminton|baseball|basketball|boxing|cricket|paintball|rugby|table tennis|tennis|taekwondo|volley ball|surfing|rafting|relay|marathon","bronze medal|gold medal|silver medal","competitor","field|fielder|fielding","Gym|gymnast|gymnastics|gymnasium","goal|goalie","race|racer|racing","Ride|riding","run|runner|running","swim|swimmer|swimming","team|teammate|umpire","Weightlifter|weightlifting|weights","winner|winning","Olympics|IPL|World Cup|World Series","Wrestler|wrestling","Sports"));
-        pornWordsList = new ArrayList(Arrays.asList("loved|lover|love|loves|cuddle","kiss|kisses|Hug|hugs","homo|homo sexual|gay|lesbian|virgin","sex|seduce|intercouse|fingering|lust|makeout|foreplay","rape,rapist","erection|erectile|erect|erotic","pubic|dick|penis|cocks|cock|pussy|vagina|womb|ass|anus|anal|butt|butts","prostitute|prostate|slut","genital|pregnant|abortion","condom|condoms","breast|breasts|nipple|boob|boobs|tit|tits","aroused|horny|orgasm","porn|pornography","naked|nude"));
-        greetingsWordsList = new ArrayList(Arrays.asList("blessings","greetings","gratitude","celebrate|celebration","joy|pleasure|laughter","health","peace","prosperity","season","success|fortune","wishes|best wishes","new year|coming year","chritmas","eid|eid mubarak"));
+        codeWordsList = new ArrayList(Arrays.asList("java|php|python ", " boolean | bool | byte | char | float | int | void | object | struct |namespace", " interface |package| class | function| static | var |implements|override", "#define |#include ", "sizeof|insteadof|isset|echo|def|declare|lambda", "foreach|switch|synchronized |null", "<html>|</html>|html|<head>|</head>|head|<title>|</title>|title|<body>|</body>|body|<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>|<img>|</img>|<link>|<link>|<br>|<a>|</a>|<p>|</p>|<style>|</style>","<script>|</script>","<div>|</div>" ));
+        gameWordsList = new ArrayList(Arrays.asList("game|games", "wolfenstein|the new colossus|assassin's creed|middle-earth|shadow of war|destiny|call of duty|dishonored|death of the outsider|dusk|lawbreakers|vanquish|playerUnknown's battlegrounds|friday the 13th|the signal from tolva|ghost recon|wildlands|prey|resident evil|biohazard|bulletstorm|sniper elite |strafe|desync|rising storm|sea of thieves|metal gear survive|world at war|black ops|ghosts|warfare|xbox one"));
+        sportsWordsList = new ArrayList(Arrays.asList("arena|play ground|athlete|athletics", "ball|bat|racket|badminton|baseball|basketball|boxing|cricket|paintball|rugby|table tennis|tennis|taekwondo|volley ball|surfing|rafting|relay|marathon|field|fielder|fielding", "bronze medal|gold medal|silver medal|competitor|winner|winning|Gym|gymnast|gymnastics|gymnasium", "goal|goalie|race|racer|racing|Ride|riding|run|runner|running|swim|swimmer|swimming|Weightlifter|weightlifting|weights", "team|teammate|umpire|Olympics|IPL|World Cup|World Series", "Wrestler|wrestling", "Sports"));
+        pornWordsList = new ArrayList(Arrays.asList("loved|lover|love|loves|cuddle", "kiss|kisses|Hug|hugs", "homo|homo sexual|gay|lesbian|virgin", "sex|seduce|intercouse|fingering|lust|makeout|foreplay|rape,rapist", "erection|erectile|erect|erotic", "pubic|dick|penis|cocks|cock|pussy|vagina|womb|ass|anus|anal|butt|butts", "prostitute|prostate|slut", "genital|pregnant|abortion", "condom|condoms", "breast|breasts|nipple|boob|boobs|tit|tits|aroused|horny|orgasm", "porn|pornography|naked|nude"));
+        greetingsWordsList = new ArrayList(Arrays.asList("blessings|greetings|gratitude|best wishes", "celebrate|celebration", " joy|pleasure |laughte r", "health |prosperity |success|fortune ", "season|new year|coming year", "chritmas|eid|eid mubarak"));
 
         for(String word:codeWordsList){
             codeWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
@@ -399,12 +141,6 @@ public class PastebinPreFilter extends LeakHawkFilter {
             greetingsWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
         }
 
-        keyWordList = new ArrayList<String>();
-        keyWordList.add("game");
-        keyWordList.add("sports");
-        keyWordList.add("porn");
-        keyWordList.add("sex");
-        keyWordList.add("xxx");
     }
 
     @Override
@@ -417,9 +153,9 @@ public class PastebinPreFilter extends LeakHawkFilter {
         // Convert the pastebin post to the lower case
         post.setPostText(post.getPostText().toLowerCase());
 
-        // Return true if post needs to forwarded to the next bolt
-        // Return false if post needs not to forwarded to the next bolt
-        if(!isPassedPreFilter(post.getTitle(), post.getPostText())){
+        // Return true if post needs to be forwarded to the next bolt
+        // Return false if post needs not to be forwarded to the next bolt
+        if(isPassedPreFilter(post.getTitle(), post.getPostText())){
             post.setNextOutputStream(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
             increaseOutCount();
             return true;
@@ -427,35 +163,43 @@ public class PastebinPreFilter extends LeakHawkFilter {
         return false;
     }
 
+    /**
+     * This method will check whether the PreFilter is passed
+     * @param title
+     * @param post
+     * @return
+     */
     private boolean isPassedPreFilter(String title, String post) {
 
         title = title.toLowerCase();
         post = post.toLowerCase();
 
         boolean isPrefilterPassed = false;
-        boolean isPostEmpty;
-        boolean isPostTest = false;
-        boolean isPostEnglish = false;
 
         //check whether the post is empty
-        if(isPostEmpty = post.isEmpty()){
+        if(post.isEmpty()){
+            isPrefilterPassed = false;
+        }//check whether the post is a test post
+        else if( post.contains("test") || title.contains("test")){
             isPrefilterPassed = false;
         }
-        else if(isPostTest = ( post.contains("test") || title.contains("test"))){
-            isPrefilterPassed = false;
-        }
-        else if(isPostEnglish = isPostEnglish(title,post)){
-            isPrefilterPassed = true;
-        }
-
-        if(!isPostEmpty && !isPostTest){
+        //TODO : Language Detector
+        //check whether the post is in English
+        //else if(isPostEnglish(title,post)){
+        else{
             isPrefilterPassed = isNotFilteredOut(post,title);
         }
 
         return isPrefilterPassed;
     }
 
-    private boolean isPostEnglish(String title, String text){
+    /**
+     * This method will classify whether the post is English
+     * @param title
+     * @param text
+     * @return
+     */
+   /* private boolean isPostEnglish(String title, String text){
         String[] textWords= text.split(" ");
         String[] titleWords = title.split("");
         boolean isPostEnglish = false;
@@ -472,8 +216,14 @@ public class PastebinPreFilter extends LeakHawkFilter {
         }
 
         return isPostEnglish;
-    }
+    }*/
 
+    /**
+     * This method will classify whether the post is filtered out or in
+     * @param text
+     * @param title
+     * @return
+     */
     private boolean isNotFilteredOut(String text, String title){
         try{
             // convert String into InputStream
@@ -496,10 +246,10 @@ public class PastebinPreFilter extends LeakHawkFilter {
             String[] options = new String[2];
             options[0] = "-P";
             options[1] = "0";
-            sclassifier.setOptions(options);
+            tclassifier.setOptions(options);
 
             //predict class for the unseen text
-            double pred = sclassifier.classifyInstance(unlabeled.instance(0));
+            double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             labeled.instance(0).setClassValue(pred);
 
             //get the predicted class value
