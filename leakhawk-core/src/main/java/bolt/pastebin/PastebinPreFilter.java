@@ -268,7 +268,12 @@ public class PastebinPreFilter extends LeakHawkFilter {
         return false;
     }
 
-    //create arff file for the predicting text and the title
+    /**
+     * Create arff file for the predicting text and the title
+     * @param text
+     * @param title
+     * @return
+     */
     private String createARFF(String text, String title) {
         String feature_list = "";
 

@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
  * This class is used to classify tweets into different sensitive classes
  *
  * @author Isuru Chandima
+ * @author Warunika Amali
  */
 public class TweetContentClassifier extends LeakHawkClassifier {
 
