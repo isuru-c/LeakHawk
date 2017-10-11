@@ -10,7 +10,7 @@
     function IncidentController(webservice, $stateParams,$state) {
         var vm = this;
 
-        webservice.call('/getIncident/'+$stateParams.id, 'GET').then(function (response) {
+        webservice.call('/incident/get_incident/'+$stateParams.id, 'GET').then(function (response) {
 
             vm.postDetails = response.data.details;
         });

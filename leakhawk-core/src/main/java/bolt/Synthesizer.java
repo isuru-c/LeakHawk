@@ -109,7 +109,7 @@ public class Synthesizer extends LeakHawkSynthesizer {
                     System.out.println("Sensitivity class is  :" + classString + "\n");
 
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new LeakHawkDatabaseException("Database Insertion Failed on Synthesizer.",e);
                 }
             }
         }

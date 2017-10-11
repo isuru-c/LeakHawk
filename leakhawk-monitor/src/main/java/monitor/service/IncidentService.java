@@ -38,6 +38,12 @@ public class IncidentService {
         return incidentResourceList;
     }
 
+    public IncidentResource getIncident(long id) {
+        Incident incident = incidentRepository.findOne(id);
+        IncidentResource resource = IncidentResource.getResource(incident);
+        return resource;
+    }
+
     public HeaderDataResource getHeaderData() {
         HeaderDataResource headerDataResource = new HeaderDataResource();
 

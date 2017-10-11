@@ -17,10 +17,16 @@
         loadData();
 
         function loadData() {
+            $("#totalPosts").LoadingOverlay("show");
+            $("#sensitivePosts").LoadingOverlay("show");
+            $("#criticalPosts").LoadingOverlay("show");
             webservice.call('/incident/get_header_data', 'GET').then(function (response) {
                 vm.numOfTotalPosts = response.data.totalPosts;
                 vm.totalSensitivePosts = response.data.sensitivePosts;
                 vm.totalCriticalPosts = response.data.criticalPosts;
+                $("#totalPosts").LoadingOverlay("hide");
+                $("#sensitivePosts").LoadingOverlay("hide");
+                $("#criticalPosts").LoadingOverlay("hide");
             });
         }
 

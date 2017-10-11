@@ -6,5 +6,8 @@ notifications:
   email:
     recipients:
     - sugeesh.13@cse.mrt.ac.lk
+    - warunikaamali.13@cse.mrt.ac.lk
+    - isuru.13@cse.mrt.ac.lk
+    - sewwandikaus.13@cse.mrt.ac.lk
     on_success: change
     on_failure: always

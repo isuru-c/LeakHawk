@@ -29,14 +29,12 @@
 
 
         function loadTable() {
+            $("#dataTable").LoadingOverlay("show");
             webservice.call('/incident/get_all_incidents', 'GET').then(function (response) {
                 vm.postList = response.data;
+                $("#dataTable").LoadingOverlay("hide");
             });
         }
-
-
-
-
 
         function startLeakHawk(){
             $.LoadingOverlay("show");

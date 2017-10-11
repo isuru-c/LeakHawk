@@ -96,6 +96,9 @@ public class IncidentResource {
         incidentResource.setKey(incident.getPost_key());
         incidentResource.setContent(incident.isContent());
         incidentResource.setEvidence(incident.isEvidence());
+        if(!incident.getUser().isEmpty()) {
+            incidentResource.setUser(incident.getUser());
+        }
         incidentResource.setDate(incident.getDate());
         incidentResource.setLevel(Integer.parseInt(incident.getSensitivityLevel()));
         incidentResource.setTitle(incident.getTitle());
