@@ -24,13 +24,58 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
+import backtype.storm.tuple.Tuple;
 
 /**
  *
  * @author Sugeesh Chandraweera
+ * @author sewwandi
  */
 public class DBHandle {
-     public static int setData(Connection connection,String sql) throws SQLException{
+    /**
+     * Database connection
+     */
+    private Connection connection;
+
+    public DBHandle(){
+        try {
+            connection = DBConnection.getDBConnection().getConnection();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int insertData(Tuple tuple,String sensitivityLevel,int content,int evidence,String predictClass){
+        PreparedStatement statement=null;
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date date = new Date();
+        int result;
+
+        try{
+            statement = connection.prepareStatement("insert into Incident (post_key,user,title,type,date,sensivityLevel,content,evidence,predictClass) values (?,?,?,?,?,?,?,?,?)");
+            statement.setString(0, tuple.getString(0));
+            statement.setString(1, tuple.getString(1));
+            statement.setString(2, tuple.getString(2));
+            statement.setString(3, tuple.getString(3));
+            statement.setString(4, dateFormat.format(date));
+            statement.setString(5, sensitivityLevel);
+            statement.setString(6, content);
+            statement.setString(7, evidence);
+            statement.setString(8, predictClass);
+
+            result=statement.executeUpdate();
+        }catch(Exception exception)
+        {
+            exception.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static int setData(Connection connection,String sql) throws SQLException{
         Statement statement=connection.createStatement();
         int result=statement.executeUpdate(sql);
         return result;
@@ -41,5 +86,10 @@ public class DBHandle {
         ResultSet result=statement.executeQuery(sql);
         return result;
     }
+
+    /*public static void close()
+    {
+        connection.closeDBConnection();
+    }*/
 
 }

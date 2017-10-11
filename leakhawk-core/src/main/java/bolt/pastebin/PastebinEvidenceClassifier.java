@@ -43,11 +43,9 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
      */
     private ArrayList<String> keyWordList1;
     private ArrayList<String> keyWordList2;
-    //private ArrayList<String> keyWordList3;
     private ArrayList<String> keyWordList4;
     private ArrayList<Pattern> hackingAttackPatternList;
     private ArrayList<Pattern> securityToolPatternList;
-    //private ArrayList<Pattern> securityVulnerabilityPatternList;
     private ArrayList<Pattern> hackerPatternList;
     private Pattern relatedPattern1;
     /**

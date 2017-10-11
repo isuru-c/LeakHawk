@@ -27,6 +27,7 @@ import java.sql.SQLException;
 /**
  *
  * @author Sugeesh Chandraweera
+ * @author sewwandi
  */
 public class DBConnection {
     static private DBConnection dbConnection;
@@ -46,6 +47,20 @@ public class DBConnection {
             dbConnection=new DBConnection();
      //   }
         return dbConnection;
+    }
+
+    /**
+     * Closes database connection
+     */
+    public static void closeDBConnection(){
+        try{
+            if(connection!=null)
+                connection.close();
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     
