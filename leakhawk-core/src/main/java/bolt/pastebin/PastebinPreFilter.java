@@ -19,14 +19,16 @@ package bolt.pastebin;
 import bolt.core.LeakHawkFilter;
 import exception.LeakHawkClassifierLoadingException;
 import model.Post;
+import org.apache.tika.langdetect.OptimaizeLangDetector;
+import org.apache.tika.language.detect.LanguageDetector;
+import org.apache.tika.language.detect.LanguageResult;
+import org.omg.CORBA.SystemException;
 import util.LeakHawkParameters;
-import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +49,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
     private ArrayList<Pattern> pornWordsPatternList;
     private ArrayList<Pattern> greetingsWordsPatternList;
     private RandomForest tclassifier;
-    private String headingPreFilter ="@relation PF\n" +
+    private String headingPreFilter = "@relation PF\n" +
             "\n" +
             "@attribute $PF1 numeric\n" +
             "@attribute $PF2 numeric\n" +
@@ -115,30 +117,30 @@ public class PastebinPreFilter extends LeakHawkFilter {
         pornWordsPatternList = new ArrayList<>();
         greetingsWordsPatternList = new ArrayList<>();
 
-        codeWordsList = new ArrayList(Arrays.asList("java|php|python ", " boolean | bool | byte | char | float | int | void | object | struct |namespace", " interface |package| class | function| static | var |implements|override", "#define |#include ", "sizeof|insteadof|isset|echo|def|declare|lambda", "foreach|switch|synchronized |null", "<html>|</html>|html|<head>|</head>|head|<title>|</title>|title|<body>|</body>|body|<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>|<img>|</img>|<link>|<link>|<br>|<a>|</a>|<p>|</p>|<style>|</style>","<script>|</script>","<div>|</div>" ));
+        codeWordsList = new ArrayList(Arrays.asList("java|php|python ", " boolean | bool | byte | char | float | int | void | object | struct |namespace", " interface |package| class | function| static | var |implements|override", "#define |#include ", "sizeof|insteadof|isset|echo|def|declare|lambda", "foreach|switch|synchronized |null", "<html>|</html>|html|<head>|</head>|head|<title>|</title>|title|<body>|</body>|body|<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>|<img>|</img>|<link>|<link>|<br>|<a>|</a>|<p>|</p>|<style>|</style>", "<script>|</script>", "<div>|</div>"));
         gameWordsList = new ArrayList(Arrays.asList("game|games", "wolfenstein|the new colossus|assassin's creed|middle-earth|shadow of war|destiny|call of duty|dishonored|death of the outsider|dusk|lawbreakers|vanquish|playerUnknown's battlegrounds|friday the 13th|the signal from tolva|ghost recon|wildlands|prey|resident evil|biohazard|bulletstorm|sniper elite |strafe|desync|rising storm|sea of thieves|metal gear survive|world at war|black ops|ghosts|warfare|xbox one"));
         sportsWordsList = new ArrayList(Arrays.asList("arena|play ground|athlete|athletics", "ball|bat|racket|badminton|baseball|basketball|boxing|cricket|paintball|rugby|table tennis|tennis|taekwondo|volley ball|surfing|rafting|relay|marathon|field|fielder|fielding", "bronze medal|gold medal|silver medal|competitor|winner|winning|Gym|gymnast|gymnastics|gymnasium", "goal|goalie|race|racer|racing|Ride|riding|run|runner|running|swim|swimmer|swimming|Weightlifter|weightlifting|weights", "team|teammate|umpire|Olympics|IPL|World Cup|World Series", "Wrestler|wrestling", "Sports"));
         pornWordsList = new ArrayList(Arrays.asList("loved|lover|love|loves|cuddle", "kiss|kisses|Hug|hugs", "homo|homo sexual|gay|lesbian|virgin", "sex|seduce|intercouse|fingering|lust|makeout|foreplay|rape,rapist", "erection|erectile|erect|erotic", "pubic|dick|penis|cocks|cock|pussy|vagina|womb|ass|anus|anal|butt|butts", "prostitute|prostate|slut", "genital|pregnant|abortion", "condom|condoms", "breast|breasts|nipple|boob|boobs|tit|tits|aroused|horny|orgasm", "porn|pornography|naked|nude"));
         greetingsWordsList = new ArrayList(Arrays.asList("blessings|greetings|gratitude|best wishes", "celebrate|celebration", " joy|pleasure |laughte r", "health |prosperity |success|fortune ", "season|new year|coming year", "chritmas|eid|eid mubarak"));
 
-        for(String word:codeWordsList){
-            codeWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : codeWordsList) {
+            codeWordsPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:gameWordsList){
-            gameWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : gameWordsList) {
+            gameWordsPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:sportsWordsList){
-            sportsWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : sportsWordsList) {
+            sportsWordsPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:pornWordsList){
-            pornWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : pornWordsList) {
+            pornWordsPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        for(String word:greetingsWordsList){
-            greetingsWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+        for (String word : greetingsWordsList) {
+            greetingsWordsPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
     }
@@ -155,7 +157,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
         // Return true if post needs to be forwarded to the next bolt
         // Return false if post needs not to be forwarded to the next bolt
-        if(isPassedPreFilter(post.getTitle(), post.getPostText())){
+        if (isPassedPreFilter(post.getTitle(), post.getPostText())) {
             post.setNextOutputStream(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
             increaseOutCount();
             return true;
@@ -165,6 +167,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
     /**
      * This method will check whether the PreFilter is passed
+     *
      * @param title
      * @param post
      * @return
@@ -177,17 +180,15 @@ public class PastebinPreFilter extends LeakHawkFilter {
         boolean isPrefilterPassed = false;
 
         //check whether the post is empty
-        if(post.isEmpty()){
+        if (post.isEmpty()) {
             isPrefilterPassed = false;
         }//check whether the post is a test post
-        else if( post.contains("test") || title.contains("test")){
+        else if (post.contains("test") || title.contains("test")) {
             isPrefilterPassed = false;
         }
-        //TODO : Language Detector
         //check whether the post is in English
-        //else if(isPostEnglish(title,post)){
-        else{
-            isPrefilterPassed = isNotFilteredOut(post,title);
+        else if(isPostEnglish(post)){
+            isPrefilterPassed = isNotFilteredOut(post, title);
         }
 
         return isPrefilterPassed;
@@ -195,39 +196,38 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
     /**
      * This method will classify whether the post is English
-     * @param title
+     *
      * @param text
      * @return
      */
-   /* private boolean isPostEnglish(String title, String text){
-        String[] textWords= text.split(" ");
-        String[] titleWords = title.split("");
-        boolean isPostEnglish = false;
 
-        char[] textCharArr = textWords[0].toCharArray();
-        char[] titleCharArr = titleWords[0].toCharArray();
+    private boolean isPostEnglish(String text) throws SystemException {
 
-        for(char c:textCharArr){
-            if(c>=0x0020 && c<=0x0060) isPostEnglish=true;
+        LanguageDetector detector = null;
+        try {
+            detector = new OptimaizeLangDetector().loadModels();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        LanguageResult result = detector.detect(text);
+        if("en".equals(result.getLanguage()) | "so".equals(result.getLanguage())){
+            return true;
         }
 
-        for(char c:titleCharArr){
-            if(c>=0x0020 && c<=0x0060) isPostEnglish=true;
-        }
-
-        return isPostEnglish;
-    }*/
+        return false;
+    }
 
     /**
      * This method will classify whether the post is filtered out or in
+     *
      * @param text
      * @param title
      * @return
      */
-    private boolean isNotFilteredOut(String text, String title){
-        try{
+    private boolean isNotFilteredOut(String text, String title) {
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // wrap it with buffered reader
@@ -256,7 +256,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
             //if class is pos there's an evidence found
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
@@ -309,7 +309,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
         }
 
         //add unknown class for the feature vector
-        feature_list +=  "?";
+        feature_list += "?";
         return headingPreFilter + feature_list;
     }
 
