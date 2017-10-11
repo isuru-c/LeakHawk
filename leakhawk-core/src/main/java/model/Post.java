@@ -41,6 +41,8 @@ public class Post implements Serializable {
 
     // List of urls inside the post
     private ArrayList<String> urlList = new ArrayList<>();
+    private String urlContent = new String();
+    private boolean urlContentFound = false;
 
     public void setPostType(String postType) {
         this.postType = postType;
@@ -90,6 +92,14 @@ public class Post implements Serializable {
         this.urlList.add(url);
     }
 
+    public void setUrlContent(String urlContent) {
+        this.urlContent = urlContent;
+    }
+
+    public void setUrlContentFound(boolean urlContentFound) {
+        this.urlContentFound = urlContentFound;
+    }
+
     public String getPostType() {
 
         return postType;
@@ -125,6 +135,14 @@ public class Post implements Serializable {
 
     public ArrayList<String> getUrlList() {
         return urlList;
+    }
+
+    public String getUrlContent() {
+        return urlContent;
+    }
+
+    public boolean isUrlContentFound() {
+        return urlContentFound;
     }
 
     public ContentModel getContentModel() {

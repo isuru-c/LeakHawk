@@ -22,6 +22,11 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import util.LeakHawkParameters;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,6 +77,33 @@ public class UrlProcessor extends LeakHawkBolt {
         if (urlFound) {
             // Url is found within the post.
             increaseOutCount();
+
+            ArrayList<String> urlList = post.getUrlList();
+
+            StringBuffer urlContent = new StringBuffer();
+
+            for (String url : urlList) {
+
+                try {
+                    URL url1 = new URL(url);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(url1.openStream()));
+
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null)
+                        urlContent.append(inputLine);
+
+                    in.close();
+                } catch (MalformedURLException e) {
+
+                } catch (IOException e) {
+
+                }
+            }
+
+            if(!urlContent.toString().isEmpty()){
+                post.setUrlContent(urlContent.toString());
+                post.setUrlContentFound(true);
+            }
 
         }
 
