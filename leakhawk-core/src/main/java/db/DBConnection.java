@@ -25,44 +25,39 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- *
  * @author Sugeesh Chandraweera
- * @author sewwandi
  */
 public class DBConnection {
     static private DBConnection dbConnection;
     static private Connection connection;
 
-    private DBConnection() throws ClassNotFoundException, SQLException{
+    private DBConnection() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
-        connection=DriverManager.getConnection("jdbc:mysql://localhost/LeakHawk","root","");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost/LeakHawk", "root", "");
     }
 
-    public Connection getConnection(){
+    public Connection getConnection() {
         return connection;
     }
 
-    public static DBConnection getDBConnection() throws ClassNotFoundException, SQLException{
-   //     if(dbConnection==null){
-            dbConnection=new DBConnection();
-     //   }
+    public static DBConnection getDBConnection() throws ClassNotFoundException, SQLException {
+        //     if(dbConnection==null){
+        dbConnection = new DBConnection();
+        //   }
         return dbConnection;
     }
 
     /**
      * Closes database connection
      */
-    public static void closeDBConnection(){
-        try{
-            if(connection!=null)
+    public static void closeDBConnection() {
+        try {
+            if (connection != null)
                 connection.close();
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    
-    
+
 }
