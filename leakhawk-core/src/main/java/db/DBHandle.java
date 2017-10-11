@@ -67,9 +67,9 @@ public class DBHandle {
             statement.setString(8, predictClass);
 
             result=statement.executeUpdate();
-        }catch(Exception ex)
+        }catch(Exception exception)
         {
-            ex.printStackTrace();
+            exception.printStackTrace();
         }
 
         return result;
@@ -87,9 +87,9 @@ public class DBHandle {
         return result;
     }
 
-    public static void close()
+    /*public static void close()
     {
         connection.closeDBConnection();
-    }
+    }*/
 
 }
