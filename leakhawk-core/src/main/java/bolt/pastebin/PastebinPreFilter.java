@@ -155,7 +155,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
             "@attribute $PF94 numeric\n" +
             "@attribute $PF95 numeric\n" +
             "@attribute $PF96 numeric\n" +
-            "@attribute $PF97 numeric\n" +
+            /*"@attribute $PF97 numeric\n" +
             "@attribute $PF98 numeric\n" +
             "@attribute $PF99 numeric\n" +
             "@attribute $PF100 numeric\n" +
@@ -346,7 +346,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
             "@attribute $PF285 numeric\n" +
             "@attribute $PF286 numeric\n" +
             "@attribute $PF287 numeric\n" +
-            "@attribute $PF288 numeric\n" +
+            "@attribute $PF288 numeric\n" +*/
             "\n" +
             "@attribute @@class@@ {pos,neg}\n" +
             "\n" +
@@ -370,14 +370,14 @@ public class PastebinPreFilter extends LeakHawkFilter {
         pornWordsPatternList = new ArrayList<>();
         greetingsWordsPatternList = new ArrayList<>();
 
-        codeWordsList = new ArrayList(Arrays.asList("java","abstract","boolean","byte","char","else","extends","float","if","implements","import","int","interface","new","package","private","protected","public","return","static","super","switch","synchronized","this","throw|throws","void","volatile","while",
-                "C++","bool","compl","#define","delete","exit","false","namespace","operator","sizeof","struct","xor","C#","foreach","null","object","override","using",
+        codeWordsList = new ArrayList(Arrays.asList("java|php|python "," abstract "," boolean | bool | byte | char | float | int | void | object | struct"," interface |package| class | function"," static | volatile | var ",
+                "#define |#include "," exit "," namespace "," operator | xor | compl ","sizeof|del|insteadof|isset|echo|def|declare|lambda","foreach|switch|synchronized |null"," implements |import |override |using ",
                 "<html>|</html>|html","<head>|</head>|head","<title>|</title>|title","<body>|</body>|body","<h1>|</h1>|<h2>|</h2>|<h3>|</h3>|<h4>|</h4>|<h5>|</h5>|<h6>|</h6>","<img>|</img>","<link>|link","<br>","<a>|</a>","<p>|</p>","<style>|</style>","<script>|</script>","<div>|</div>",
-                "php","declare","echo","elseif","function","global","include_once","insteadof","isset","require_once","use","var","python","lambda","none","def","del","elif","var"));
-        gameWordsList = new ArrayList(Arrays.asList("Wolfenstein","game|games","The New Colossus","Assassin's Creed","Middle-earth","Shadow of War","Destiny","Call of Duty","Dishonored","Death of the Outsider","Dusk","Lawbreakers","Vanquish","PlayerUnknown's Battlegrounds","Friday the 13th","Game","The Signal From Tolva","Ghost Recon","Wildlands","Prey","Resident Evil","Biohazard","Bulletstorm","Sniper Elite ","Strafe","Desync","Rising Storm","Sea of Thieves","Metal Gear Survive","World at war","Black ops","Ghosts","Warfare","Xbox one"));
-        sportsWordsList = new ArrayList(Arrays.asList("arena","athlete|Athletics" ,"badminton","ball","base","baseball","basketball","bat","boxing","bronze medal|gold medal|silver medal","competitor","crew","Cricket","field|fielder|fielding\n","Gym|gymnast|gymnastics|gymnasium","goal","goalie","Olympics","Paintball","race|racer|racing","Racket","relay","Ride|riding","rugby","Run|runner|running","Swim|swimmer|swimming","table tennis|tennis","taekwondo","Team|teammate","tetherball","Throw,throwing","Umpire","volley ball","Weightlifter|weightlifting|weights","Rafting","winner|winning","World Cup|World Series","Wrestler|wrestling","Surfing","Sports\n"));
-        pornWordsList = new ArrayList(Arrays.asList("Intercouse","Loved|lover|love|loves","Kiss","Hug|hugs","Womb","Virgin","Homo|homo sexual","Vagina","Gay","Lesbian","Sex","Seduce","Rape,rapist","Erection|erectile|erect|erotic","Pubic","Dick","Prostitute|prostate","Cuddle","Genital","Pregnant","Condom|condoms","Butt|butts","Penis","Breast|breasts","Nipple","Aroused","porn","Naked|nude","Lust","Makeout","Abortion","Fingering","Horny","Orgasm","Ass|anus|anal","Boob","Fuck|fucked|fucking|fucker","Tit|tits","Cocks|cock","Pussy","Slut","Pornography","Foreplay"));
-        greetingsWordsList = new ArrayList(Arrays.asList("Blessings","Greetings","Gratitude","Celebrate,celebration","Happiness|joy|pleasure|laughter","Health","Peace","Prosperity","Season","Rejoice","Success|fortune","Wishes|best wishes","New year|coming year","Chritmas","Good luck","fantastic"));
+                "elseif|elif","include_once|require_once"));
+        gameWordsList = new ArrayList(Arrays.asList("game|games","wolfenstein|the new colossus|assassin's creed|middle-earth|shadow of war|destiny|call of duty|dishonored|death of the outsider|dusk|lawbreakers|vanquish|playerUnknown's battlegrounds|friday the 13th|the signal from tolva|ghost recon|wildlands|prey|resident evil|biohazard|bulletstorm|sniper elite |strafe|desync|rising storm|sea of thieves|metal gear survive|world at war|black ops|ghosts","warfare","xbox one"));
+        sportsWordsList = new ArrayList(Arrays.asList("arena|play ground","athlete|Athletics","ball|bat|racket","badminton|baseball|basketball|boxing|cricket|paintball|rugby|table tennis|tennis|taekwondo|volley ball|surfing|rafting|relay|marathon","bronze medal|gold medal|silver medal","competitor","field|fielder|fielding","Gym|gymnast|gymnastics|gymnasium","goal|goalie","race|racer|racing","Ride|riding","run|runner|running","swim|swimmer|swimming","team|teammate|umpire","Weightlifter|weightlifting|weights","winner|winning","Olympics|IPL|World Cup|World Series","Wrestler|wrestling","Sports"));
+        pornWordsList = new ArrayList(Arrays.asList("loved|lover|love|loves|cuddle","kiss|kisses|Hug|hugs","homo|homo sexual|gay|lesbian|virgin","sex|seduce|intercouse|fingering|lust|makeout|foreplay","rape,rapist","erection|erectile|erect|erotic","pubic|dick|penis|cocks|cock|pussy|vagina|womb|ass|anus|anal|butt|butts","prostitute|prostate|slut","genital|pregnant|abortion","condom|condoms","breast|breasts|nipple|boob|boobs|tit|tits","aroused|horny|orgasm","porn|pornography","naked|nude"));
+        greetingsWordsList = new ArrayList(Arrays.asList("blessings","greetings","gratitude","celebrate|celebration","joy|pleasure|laughter","health","peace","prosperity","season","success|fortune","wishes|best wishes","new year|coming year","chritmas","eid|eid mubarak"));
 
         for(String word:codeWordsList){
             codeWordsPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
