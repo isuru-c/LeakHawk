@@ -16,15 +16,13 @@
 
 package bolt;
 
-import bolt.core.LeakHawkUtility;
+import bolt.core.LeakHawkBolt;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import util.LeakHawkParameters;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,25 +39,22 @@ import java.util.regex.Pattern;
  *
  * @author Isuru Chandima
  */
-public class UrlProcessor extends LeakHawkUtility {
+public class UrlProcessor extends LeakHawkBolt {
 
-    private String pastebinOut = "url-processor-pastebin-out";
-    private String tweetsOut = "url-processor-tweets-out";
-
-    @Override
-    public void prepareUtility() {
-
-    }
+    private Pattern urlPattern;
 
     @Override
-    public void executeUtility(Tuple tuple, OutputCollector collector) {
-        Post post = (Post) tuple.getValue(0);
-
-        Pattern urlPattern = Pattern.compile(
+    public void prepareBolt() {
+        urlPattern = Pattern.compile(
                 "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)"
                         + "(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*"
                         + "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+    }
+
+    @Override
+    public void execute(Tuple tuple) {
+        Post post = (Post) tuple.getValue(0);
 
         Matcher matcher = urlPattern.matcher(post.getPostText());
 
@@ -76,11 +71,11 @@ public class UrlProcessor extends LeakHawkUtility {
 
         if (urlFound) {
             // Url is found within the post.
+            increaseOutCount();
 
         }
 
-        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN) ||
-                post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
+        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
             collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, tuple, new Values(post));
         } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
             collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, tuple, new Values(post));
@@ -88,8 +83,17 @@ public class UrlProcessor extends LeakHawkUtility {
     }
 
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, new Fields("post"));
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, new Fields("post"));
+    protected String getBoltName() {
+        return LeakHawkParameters.URL_PROCESSOR;
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER);
+
+        return outputStream;
     }
 }

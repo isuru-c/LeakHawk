@@ -86,7 +86,7 @@ public class LeakHawk {
         // Create twitter Spout and connect to the topology
         // Use parameter LeakHawkParameters.POST_TYPE_PASTEBIN_POSTS to use dump posts as pastebin-posts
         // Use parameter LeakHawkParameters.POST_TYPE_TWEETS to use dump posts as tweets
-        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(LeakHawkParameters.POST_TYPE_TWEETS), 2);
+        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(LeakHawkParameters.POST_TYPE_PASTEBIN), 2);
 
         // PastebinPostDownload is used to get the content of a pastebin post
         BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload(), 4);
@@ -94,7 +94,7 @@ public class LeakHawk {
 
         // Separate pre filter for pastebin posts [ also the dump posts]
         BoltDeclarer pastebinPreFilter = topologyBuilder.setBolt("pastebin-pre-filter-bolt", new PastebinPreFilter(), 3);
-        pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt");
+        pastebinPreFilter.shuffleGrouping("pastebin-post-download-bolt", lp.P_POST_DOWNLOADER_TO_P_PRE_FILTER);
         pastebinPreFilter.shuffleGrouping("dump-spout", lp.DUMP_SPOUT_TO_P_PRE_FILTER);
 
         // Separate pre filter for tweets
