@@ -49,6 +49,11 @@ public class ContextFilter extends LeakHawkFilter {
         this.createSynonyms();
     }
 
+    @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.CONTEXT_FILTER;
+    }
+
     private void createRegularExpressionList() {
         try {
             InputStream input = this.getClass().getClassLoader().getResourceAsStream("context.properties");
@@ -126,6 +131,9 @@ public class ContextFilter extends LeakHawkFilter {
         String postText = post.getPostText();
 
         if (isContextFilterPassed(postText)) {
+
+            increaseOutCount();
+
             if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
                 post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
                 return true;

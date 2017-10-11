@@ -298,6 +298,11 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.PASTEBIN_EVIDENCE_CLASSIFIER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         EvidenceModel evidenceModel = new EvidenceModel();
@@ -311,6 +316,7 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
             post.setNextOutputStream(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+            increaseOutCount();
         }else {
             // No evidence found, send the post through the normal flow
             post.setNextOutputStream(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);

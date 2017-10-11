@@ -17,36 +17,22 @@
 package bolt.core;
 
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import util.LeakHawkParameters;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * This bolt can be extended to use for any type of filtering of post text data
- * <p>
- * OutputCollector is defined in this class and, no output stream has been
- * declared except statics aggregation flow. Override declareOutputStreams method
- * and use it to define application specific output streams.
  * <p>
  * isFilterPassed method needs to be override and use it for the filtering process
  *
  * @author Isuru Chandima
  */
-public abstract class LeakHawkFilter extends BaseRichBolt {
-
-    private OutputCollector collector;
+public abstract class LeakHawkFilter extends LeakHawkBolt {
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        collector = outputCollector;
+    public void prepareBolt() {
         prepareFilter();
     }
 
@@ -59,6 +45,9 @@ public abstract class LeakHawkFilter extends BaseRichBolt {
     public abstract void prepareFilter();
 
     @Override
+    protected abstract String getBoltName();
+
+    @Override
     public void execute(Tuple tuple) {
         Post post = (Post) tuple.getValue(0);
 
@@ -67,6 +56,8 @@ public abstract class LeakHawkFilter extends BaseRichBolt {
         }
 
         collector.ack(tuple);
+        increaseInCount();
+        runCounter();
     }
 
     /**
@@ -81,32 +72,6 @@ public abstract class LeakHawkFilter extends BaseRichBolt {
      */
     public abstract boolean isFilterPassed(Post post);
 
-    /**
-     * In the default application of LeakHawkFilter, only one specific output stream
-     * LeakHawkParameters.STATICS_FLOW is dedicated for aggregating statics for statics counter
-     * <p>
-     * If different type of output streams are required according to the application,
-     * override declareOutputStreams method and declare output streams.
-     */
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.STATICS_FLOW, new Fields("statics"));
-
-        ArrayList<String> outputStreams = declareOutputStreams();
-
-        for (String outputStream : outputStreams) {
-            outputFieldsDeclarer.declareStream(outputStream, new Fields("post"));
-        }
-
-    }
-
-    /**
-     * If different type of output streams are required according to the application,
-     * override declareOutputStreams method and declare output streams.
-     * <p>
-     * Needs to return an array of String containing the names of output streams
-     *
-     * @return ArrayList of Strings containing names of required output streams
-     */
     public abstract ArrayList<String> declareOutputStreams();
 }
