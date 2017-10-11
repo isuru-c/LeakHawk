@@ -43,11 +43,9 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
      */
     private ArrayList<String> keyWordList1;
     private ArrayList<String> keyWordList2;
-    //private ArrayList<String> keyWordList3;
     private ArrayList<String> keyWordList4;
     private ArrayList<Pattern> hackingAttackPatternList;
     private ArrayList<Pattern> securityToolPatternList;
-    //private ArrayList<Pattern> securityVulnerabilityPatternList;
     private ArrayList<Pattern> hackerPatternList;
     private Pattern relatedPattern1;
     /**
@@ -351,7 +349,7 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
         //#E7	BODY:	Are there any signs of security vulnerability in the body text?
         //#E8	BODY:	Are there any signs of security vulnerability in the body text?
         try {
-            ResultSet data = DBHandle.getData(connection, "SELECT user FROM Incident");
+            ResultSet data = DBHandle.getData(connection, "SELECT user FROM incident");
             while (data.next()) {
                 String userFromDB = data.getString("user");
                 if (title.contains(userFromDB.toLowerCase())) {

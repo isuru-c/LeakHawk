@@ -1,5 +1,4 @@
-
-<div class="container">
+<div class="container" id="dataTable">
     <section class="content" style="padding: 15px 0px">
 
         <!--<div class="row">
@@ -32,14 +31,14 @@
         </div>
 -->
 
-        <div class="row">
+        <div class="row" >
             <div class="col-md-12">
                 <div class="form-group">
                     <!--<label>LeakHawk Output</label>-->
                     <!--<textarea id = "mytext" class="form-control" rows="10" placeholder="" disabled="" ng-model="vm.responseData"></textarea>-->
                     <div class="box-body no-padding">
-                        <div class="table-responsive">
-                            <table class="table no-margin table-hover dataTable">
+                        <div class="table-responsive" >
+                            <table class="table no-margin table-hover dataTable" >
                                 <tbody data-link="row" class="rowlink hand-cursor">
                                 <tr>
                                     <th>Source</th>
@@ -55,7 +54,8 @@
                                     <td>{{order.postType}}</td>
                                     <td><a href="https://pastebin.com/{{order.key}}">{{order.key}}</a></td>
                                     <td>{{order.date *1000| date:'yyyy-MM-dd hh:mm a'}}</td>
-                                    <td>{{order.user}}</td>
+                                    <td ng-if="order.user!=null">{{order.user}}</td>
+                                    <td ng-if="order.user==null">Unknown</td>
                                     <td>{{order.predictClass}}</td>
                                     <td ng-if="order.level==1" style="color: #6400ff"><strong>Low</strong></td>
                                     <td ng-if="order.level==2" style="color: rgba(255,99,0,0.99)"><strong>High</strong></td>

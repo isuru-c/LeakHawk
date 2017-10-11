@@ -38,6 +38,12 @@ public class IncidentService {
         return incidentResourceList;
     }
 
+    public IncidentResource getIncident(long id) {
+        Incident incident = incidentRepository.findOne(id);
+        IncidentResource resource = IncidentResource.getResource(incident);
+        return resource;
+    }
+
     public HeaderDataResource getHeaderData() {
         HeaderDataResource headerDataResource = new HeaderDataResource();
 
@@ -56,7 +62,7 @@ public class IncidentService {
         int criticalIncidents = 0;
         for(Incident incident: allIncident){
             totalSensitiveIncidents++;
-            if(incident.getSensitivityLevel().equals("3")){
+            if(incident.getSensitivityLevel()==3){
                 criticalIncidents++;
             }
         }

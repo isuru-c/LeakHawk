@@ -35,11 +35,11 @@ public class ChartService {
         Iterable<Incident> allIncident = incidentRepository.findAll();
 
         for(Incident incident : allIncident){
-            if(incident.getSensitivityLevel().equals("3")){
+            if(incident.getSensitivityLevel()==3){
                 class3++;
-            }else if(incident.getSensitivityLevel().equals("2")){
+            }else if(incident.getSensitivityLevel()==2){
                 class2++;
-            }else if(incident.getSensitivityLevel().equals("1")) {
+            }else if(incident.getSensitivityLevel()==1) {
                 class1++;
             }
         }
@@ -206,11 +206,11 @@ public class ChartService {
         Iterable<Incident> allIncident = incidentRepository.findAll();
 
         for(Incident incident : allIncident){
-            if(incident.getSensitivityLevel().equals("3")){
+            if(incident.getSensitivityLevel()==3){
                 class3++;
-            }else if(incident.getSensitivityLevel().equals("2")){
+            }else if(incident.getSensitivityLevel()==2){
                 class2++;
-            }else if(incident.getSensitivityLevel().equals("1")) {
+            }else if(incident.getSensitivityLevel()==1) {
                 class1++;
             }
         }

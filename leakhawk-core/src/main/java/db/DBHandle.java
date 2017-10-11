@@ -25,12 +25,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+
 /**
  *
  * @author Sugeesh Chandraweera
+ *
  */
 public class DBHandle {
-     public static int setData(Connection connection,String sql) throws SQLException{
+    public static int setData(Connection connection,String sql) throws SQLException{
         Statement statement=connection.createStatement();
         int result=statement.executeUpdate(sql);
         return result;
@@ -41,5 +43,4 @@ public class DBHandle {
         ResultSet result=statement.executeQuery(sql);
         return result;
     }
-
 }

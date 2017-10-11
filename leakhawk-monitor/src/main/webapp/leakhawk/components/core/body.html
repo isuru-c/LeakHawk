@@ -1,5 +1,5 @@
 <!--<div class="wrapper">-->
-<header class="main-header">
+<header class="main-header" style="max-height:none">
     <nav class="navbar navbar-static-top">
         <div class="container">
             <nav class="navbar navbar-default">
@@ -7,7 +7,6 @@
                     <h4>Leak Hawk</h4>
                 </div>
             </nav>
-
 
             <div class="row">
                 <div class="col-md-3 col-sm-6 col-xs-12">
@@ -26,7 +25,7 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-green"><i class="fa fa-inbox"></i></span>
 
-                        <div class="info-box-content">
+                        <div class="info-box-content" id="totalPosts">
                             <span class="info-box-text">Total Posts</span>
                             <span class="info-box-number">{{vm.numOfTotalPosts}}</span>
                         </div>
@@ -42,7 +41,7 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-yellow"><i class="fa fa-tasks"></i></span>
 
-                        <div class="info-box-content">
+                        <div class="info-box-content" id="sensitivePosts">
                             <span class="info-box-text">Sensitive Posts</span>
                             <span class="info-box-number">{{vm.totalSensitivePosts}}</span>
                         </div>
@@ -55,7 +54,7 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-red"><i class="fa fa-warning"></i></span>
 
-                        <div class="info-box-content">
+                        <div class="info-box-content" id="criticalPosts">
                             <span class="info-box-text">Critical Incidents</span>
                             <span class="info-box-number">{{vm.totalCriticalPosts}}</span>
                         </div>
@@ -69,17 +68,12 @@
 
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
-                    <!-- Brand and toggle get grouped for better mobile display -->
-                    <div class="navbar-header">
-                        <a class="navbar-brand" ui-sref="home">Home</a>
-                    </div>
-
-
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav">
+                            <li><a ui-sref="home">Home</a></li>
                             <li><a ui-sref="control_panel">Control Panel</a></li>
-                            <li><a ui-sref="configuration">Configuration</a></li>
+                            <!--<li><a ui-sref="configuration">Configuration</a></li>-->
                             <li><a ui-sref="analysis">Analysis</a></li>
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -100,7 +94,7 @@
 </header>
 
 <!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
+<div class="content-wrapper" style="min-height: 410px;">
     <!-- Main content -->
     <div ui-view="view"></div>
     <!-- /.content -->
