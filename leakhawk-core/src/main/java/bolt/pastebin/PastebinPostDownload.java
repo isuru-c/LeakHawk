@@ -15,14 +15,10 @@
  */
 package bolt.pastebin;
 
-import bolt.core.LeakHawkUtility;
+import bolt.core.LeakHawkBolt;
 import exception.LeakHawkDataStreamException;
-import exception.LeakHawkFilePathException;
 import exception.LeakHawkTopologyException;
 import model.Post;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.json.simple.JSONObject;
@@ -35,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * When requesting for new posts from pastebin scrape_url, it only gives the set of keys
@@ -46,17 +43,22 @@ import java.net.URL;
  *
  * @author Isuru Chandima
  */
-public class PastebinPostDownload extends LeakHawkUtility {
+public class PastebinPostDownload extends LeakHawkBolt {
 
     private JSONParser parser = null;
 
     @Override
-    public void prepareUtility() {
+    public void prepareBolt() {
         parser = new JSONParser();
     }
 
     @Override
-    public void executeUtility(Tuple tuple, OutputCollector collector) {
+    protected String getBoltName() {
+        return LeakHawkParameters.POST_DOWNLOADER;
+    }
+
+    @Override
+    public void execute(Tuple tuple) {
         try {
 
             Object obj = parser.parse(tuple.getString(0));
@@ -78,7 +80,7 @@ public class PastebinPostDownload extends LeakHawkUtility {
                 postText += bufferedReader.readLine();
             }
             post.setPostText(postText);
-            collector.emit(tuple, new Values(post));
+            collector.emit(LeakHawkParameters.P_POST_DOWNLOADER_TO_P_PRE_FILTER, tuple, new Values(post));
         } catch (ParseException e) {
             throw new LeakHawkTopologyException("Posts cannot reach PatebinPostDownload Bolt.",e);
         } catch (MalformedURLException e) {
@@ -86,5 +88,14 @@ public class PastebinPostDownload extends LeakHawkUtility {
         } catch (IOException e) {
             throw new LeakHawkDataStreamException("Pastebin Post Download failed, Paste reading failed.",e);
         }
+    }
+
+    @Override
+    public ArrayList<String> declareOutputStreams() {
+        ArrayList<String> outputStream = new ArrayList<>();
+
+        outputStream.add(LeakHawkParameters.P_POST_DOWNLOADER_TO_P_PRE_FILTER);
+
+        return outputStream;
     }
 }

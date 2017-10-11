@@ -41,6 +41,10 @@ public class LeakHawkParameters {
 
     public static String SYNTHESIZER = "synthesizer";
 
+    public static String URL_PROCESSOR = "url-processor";
+    public static String STATICS_COUNTER = "statics-counter";
+    public static String POST_DOWNLOADER = "post-downloader";
+
     // Time interval for statics updates
     public static long STATICS_UPDATE_INTERVAL = 10;
 
@@ -49,6 +53,8 @@ public class LeakHawkParameters {
     // Identifiers for streams between bolts
     public static String DUMP_SPOUT_TO_P_PRE_FILTER = "ds-ppf";
     public static String DUMP_SPOUT_TO_T_PRE_FILTER = "ds-tpf";
+
+    public static String P_POST_DOWNLOADER_TO_P_PRE_FILTER = "ppd-ppf";
 
     public static String P_PRE_FILTER_TO_CONTEXT_FILTER = "ppf-cf";
     public static String T_PRE_FILTER_TO_CONTEXT_FILTER = "tpf-cf";

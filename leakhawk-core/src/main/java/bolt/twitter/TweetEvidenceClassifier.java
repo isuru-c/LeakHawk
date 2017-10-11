@@ -306,7 +306,7 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
         evidenceFound = isEvidenceFound(post);
 
         try {
-            ResultSet data = DBHandle.getData(connection, "SELECT user FROM Incident");
+            ResultSet data = DBHandle.getData(connection, "SELECT user FROM incident");
             while (data.next()) {
                 String userFromDB = data.getString("user");
                 //check user of the tweet.
