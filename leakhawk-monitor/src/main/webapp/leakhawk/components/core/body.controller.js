@@ -15,6 +15,9 @@
         var vm = this;
 
         loadData();
+        setInterval(function(){
+            loadData();
+        }, 20000);
 
         function loadData() {
             $("#totalPosts").LoadingOverlay("show");
