@@ -14,7 +14,7 @@ public class Incident {
     private String title;
     private String type;
     private String date;
-    private String sensitivityLevel;
+    private int sensitivityLevel;
     private boolean content;
     private boolean evidence;
     private String predictClass;
@@ -22,7 +22,7 @@ public class Incident {
     public Incident() {
     }
 
-    public Incident(String post_key, String user, String title, String type, String date, String sensitivityLevel, boolean content, boolean evidence, String predictClass) {
+    public Incident(String post_key, String user, String title, String type, String date, int sensitivityLevel, boolean content, boolean evidence, String predictClass) {
         this.post_key = post_key;
         this.user = user;
         this.title = title;
@@ -74,11 +74,11 @@ public class Incident {
         this.date = date;
     }
 
-    public String getSensitivityLevel() {
+    public int getSensitivityLevel() {
         return sensitivityLevel;
     }
 
-    public void setSensitivityLevel(String sensitivityLevel) {
+    public void setSensitivityLevel(int sensitivityLevel) {
         this.sensitivityLevel = sensitivityLevel;
     }
 

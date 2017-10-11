@@ -62,7 +62,7 @@ public class IncidentService {
         int criticalIncidents = 0;
         for(Incident incident: allIncident){
             totalSensitiveIncidents++;
-            if(incident.getSensitivityLevel().equals("3")){
+            if(incident.getSensitivityLevel()==3){
                 criticalIncidents++;
             }
         }

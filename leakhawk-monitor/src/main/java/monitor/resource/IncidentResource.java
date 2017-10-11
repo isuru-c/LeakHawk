@@ -100,7 +100,7 @@ public class IncidentResource {
             incidentResource.setUser(incident.getUser());
         }
         incidentResource.setDate(incident.getDate());
-        incidentResource.setLevel(Integer.parseInt(incident.getSensitivityLevel()));
+        incidentResource.setLevel(incident.getSensitivityLevel());
         incidentResource.setTitle(incident.getTitle());
         incidentResource.setPostType(incident.getType());
         incidentResource.setPredictClass(incident.getPredictClass());

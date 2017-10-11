@@ -104,9 +104,13 @@ public class Synthesizer extends LeakHawkClassifier {
                 String title = post.getTitle().replace("'", "/'");
                 String user = post.getUser().replace("'", "/'");
                 try {
-                    DBHandle.setData(connection, "INSERT INTO Incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
-                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
-                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
+//                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
+//                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
+//                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
+
+                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "'" +
+                            ","+ contentModel.isContentFound()+",'"+post.getDate()+"',"+evidenceModel.isEvidenceFound()+"" +
+                            ",'"+classString+"',"+highestLevel+",'"+post.getTitle()+"','"+post.getPostType()+"','"+post.getUser()+"')");
 
                     System.out.println("\nPost  : " + post.getKey());
                     System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
