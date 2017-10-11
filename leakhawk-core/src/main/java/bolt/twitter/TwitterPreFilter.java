@@ -58,6 +58,11 @@ public class TwitterPreFilter extends LeakHawkFilter {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.TWEETS_PRE_FILTER;
+    }
+
+    @Override
     public boolean isFilterPassed(Post post) {
         // Convert the tweet to the lower case
         String postText = post.getPostText().toLowerCase();

@@ -71,6 +71,11 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.PASTEBIN_CONTENT_CLASSIFIER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         ContentModel contentModel = new ContentModel();

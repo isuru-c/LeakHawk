@@ -45,6 +45,9 @@ public abstract class LeakHawkClassifier extends LeakHawkBolt{
     public abstract void prepareClassifier();
 
     @Override
+    protected abstract String getBoltName();
+
+    @Override
     public void execute(Tuple tuple) {
         Post post = (Post) tuple.getValue(0);
 
@@ -54,6 +57,7 @@ public abstract class LeakHawkClassifier extends LeakHawkBolt{
             collector.emit(post.getNextOutputStream(), tuple, new Values(post));
 
         collector.ack(tuple);
+        runCounter();
     }
 
     /**

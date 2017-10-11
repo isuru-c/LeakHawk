@@ -56,6 +56,11 @@ public class Synthesizer extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.SYNTHESIZER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         // Set next output stream to be null, so there will be no more forwarding

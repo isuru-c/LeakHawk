@@ -253,6 +253,11 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.TWEETS_EVIDENCE_CLASSIFIER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         EvidenceModel evidenceModel = new EvidenceModel();

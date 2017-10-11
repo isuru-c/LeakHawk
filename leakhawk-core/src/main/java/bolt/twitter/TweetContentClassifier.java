@@ -102,6 +102,11 @@ public class TweetContentClassifier extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.TWEETS_CONTENT_CLASSIFIER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         ContentModel contentModel = new ContentModel();

@@ -408,6 +408,11 @@ public class PastebinPreFilter extends LeakHawkFilter {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.PASTEBIN_PRE_FILTER;
+    }
+
+    @Override
     public boolean isFilterPassed(Post post) {
         // Convert the pastebin post to the lower case
         post.setPostText(post.getPostText().toLowerCase());

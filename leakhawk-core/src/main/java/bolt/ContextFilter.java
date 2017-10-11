@@ -49,6 +49,11 @@ public class ContextFilter extends LeakHawkFilter {
         this.createSynonyms();
     }
 
+    @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.CONTEXT_FILTER;
+    }
+
     private void createRegularExpressionList() {
         try {
             InputStream input = this.getClass().getClassLoader().getResourceAsStream("context.properties");

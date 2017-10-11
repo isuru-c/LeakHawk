@@ -298,6 +298,11 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
     }
 
     @Override
+    protected String getBoltName() {
+        return LeakHawkParameters.PASTEBIN_EVIDENCE_CLASSIFIER;
+    }
+
+    @Override
     public void classifyPost(Post post) {
 
         EvidenceModel evidenceModel = new EvidenceModel();

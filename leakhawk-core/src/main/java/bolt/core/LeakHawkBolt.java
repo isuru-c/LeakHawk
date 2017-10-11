@@ -16,12 +16,14 @@
 
 package bolt.core;
 
+import model.Statics;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import util.LeakHawkParameters;
 
 import java.util.ArrayList;
@@ -39,10 +41,17 @@ import java.util.Map;
 public abstract class LeakHawkBolt extends BaseRichBolt {
 
     protected OutputCollector collector;
+    private long startTime;
+    private int inCount;
+    private int outCount;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         collector = outputCollector;
+        startTime = System.currentTimeMillis();
+        inCount = 0;
+        outCount = 0;
+
         prepareBolt();
     }
 
@@ -53,6 +62,72 @@ public abstract class LeakHawkBolt extends BaseRichBolt {
      * This method is called only once when the bolt is created in apache storm topology
      */
     public abstract void prepareBolt();
+
+    /**
+     * This method needs to be override in every child class to get the name of the class.
+     * Name is required when sending statics to the aggregation node to identify the
+     * source of the statics.
+     *
+     * @return a string containing the name of the filter or classifier of current bolt
+     */
+    protected abstract String getBoltName();
+
+    /**
+     * Used to get the total number of tuple/posts processed by this bolt including
+     * positively and negatively classified posts.
+     *
+     * @return total number of posts processed by this bolt
+     */
+    private int getInCount() {
+        return inCount;
+    }
+
+    /**
+     * Used to get the count of tuple/posts emitted by this bolt as positive classified
+     * of filtered in to the next bolt.
+     *
+     * @return positively classified number of posts
+     */
+    private int getOutCount() {
+        return outCount;
+    }
+
+    /**
+     * Increase the inCount variable by one.
+     * Used to count the number of posts processed by single bolt
+     */
+    protected void increaseInCount(){
+        this.inCount++;
+    }
+
+    /**
+     * Increase the outCount variable by one
+     * Used to count the number of posts classified as positive by single bolt
+     */
+    protected void increaseOutCount(){
+        this.outCount++;
+    }
+
+    /**
+     * Reset both inCount and outCount variables
+     * Used when periodically statics are send to the aggregation bolt
+     */
+    private void resetCount(){
+        this.inCount=0;
+        this.outCount=0;
+    }
+
+    protected void runCounter() {
+        long currentTime = System.currentTimeMillis();
+
+        if (((currentTime - startTime) / 1000) > LeakHawkParameters.STATICS_UPDATE_INTERVAL) {
+            startTime = currentTime;
+
+            Statics statics = new Statics(getBoltName(), getInCount(), getOutCount());
+            resetCount();
+            collector.emit(LeakHawkParameters.STATICS_FLOW, new Values(statics));
+        }
+    }
 
     @Override
     public abstract void execute(Tuple tuple);
