@@ -56,6 +56,7 @@ public abstract class LeakHawkFilter extends LeakHawkBolt {
         }
 
         collector.ack(tuple);
+        increaseInCount();
         runCounter();
     }
 

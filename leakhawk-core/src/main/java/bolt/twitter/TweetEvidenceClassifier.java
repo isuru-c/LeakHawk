@@ -270,6 +270,7 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
         if (evidenceFound) {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
+            increaseOutCount();
             post.setNextOutputStream(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
         } else {
             // No evidence found, send the post through the normal flow

@@ -38,6 +38,7 @@ import java.util.Set;
  * @author Sugeesh Chandraweera
  * @author Warunika Amali
  */
+@SuppressWarnings("ALL")
 public class PastebinContentClassifier extends LeakHawkClassifier {
 
     /**
@@ -85,7 +86,6 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
         String postText = post.getPostText();
         List<ContentData> contentDataList = new ArrayList();
 
-
         /* Check post with each classifier and if it is match add the classifier type and
            sensitivity to the contentDataList */
         for (ContentClassifier classifier : classifierList) {
@@ -106,6 +106,10 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
             }
         }
         contentModel.setContentDataList(contentDataList);
+
+        if (contentModel.isContentFound()) {
+            increaseOutCount();
+        }
 
         post.setNextOutputStream(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 

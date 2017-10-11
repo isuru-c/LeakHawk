@@ -42,7 +42,7 @@ public class LeakHawkParameters {
     public static String SYNTHESIZER = "synthesizer";
 
     // Time interval for statics updates
-    public static int STATICS_UPDATE_INTERVAL = 60;
+    public static long STATICS_UPDATE_INTERVAL = 10;
 
     public static String STATICS_FLOW = "statics-flow";
 

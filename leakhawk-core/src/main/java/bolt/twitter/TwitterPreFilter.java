@@ -78,6 +78,7 @@ public class TwitterPreFilter extends LeakHawkFilter {
                 return false;
             } else if (!isContainKeyword(post.getPostText())) {
                 // Filter in for the context filter
+                increaseOutCount();
                 post.setNextOutputStream(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
                 return true;
             }

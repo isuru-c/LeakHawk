@@ -187,6 +187,10 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         contentModel.setContentDataList(contentDataList);
 
+        if(contentModel.isContentFound()){
+            increaseOutCount();
+        }
+
         post.setNextOutputStream(LeakHawkParameters.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
     }
 

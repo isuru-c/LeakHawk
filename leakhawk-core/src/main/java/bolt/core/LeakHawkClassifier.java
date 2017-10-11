@@ -57,6 +57,7 @@ public abstract class LeakHawkClassifier extends LeakHawkBolt{
             collector.emit(post.getNextOutputStream(), tuple, new Values(post));
 
         collector.ack(tuple);
+        increaseInCount();
         runCounter();
     }
 
