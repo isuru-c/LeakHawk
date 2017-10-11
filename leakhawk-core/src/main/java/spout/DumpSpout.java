@@ -28,6 +28,7 @@ import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
+import util.LeakHawkParameters;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -46,12 +47,14 @@ public class DumpSpout extends BaseRichSpout {
 
     private String postType = "dump-posts";
 
-    public DumpSpout() {
+    public DumpSpout(String postType) {
         properties = new Properties();
         properties.put("bootstrap.servers", "localhost:9092");
         properties.put("group.id", "consumer-dump");
         properties.put("key.deserializer", StringDeserializer.class.getName());
         properties.put("value.deserializer", StringDeserializer.class.getName());
+
+        this.postType = postType;
     }
 
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
@@ -71,12 +74,18 @@ public class DumpSpout extends BaseRichSpout {
             post.setTitle("");
             post.setUser("");
             post.setSyntax("");
+            post.setLanguage("en");
             post.setPostText(record.value());
-            collector.emit(new Values(post));
+            if(postType.equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
+                collector.emit(LeakHawkParameters.DUMP_SPOUT_TO_P_PRE_FILTER, new Values(post));
+            }else if(postType.equals(LeakHawkParameters.POST_TYPE_TWEETS)){
+                collector.emit(LeakHawkParameters.DUMP_SPOUT_TO_T_PRE_FILTER, new Values(post));
+            }
         }
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkParameters.DUMP_SPOUT_TO_P_PRE_FILTER, new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkParameters.DUMP_SPOUT_TO_T_PRE_FILTER, new Fields("post"));
     }
 }

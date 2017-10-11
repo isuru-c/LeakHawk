@@ -47,6 +47,9 @@ public class LeakHawkParameters {
     public static String STATICS_FLOW = "statics-flow";
 
     // Identifiers for streams between bolts
+    public static String DUMP_SPOUT_TO_P_PRE_FILTER = "ds-ppf";
+    public static String DUMP_SPOUT_TO_T_PRE_FILTER = "ds-tpf";
+
     public static String P_PRE_FILTER_TO_CONTEXT_FILTER = "ppf-cf";
     public static String T_PRE_FILTER_TO_CONTEXT_FILTER = "tpf-cf";
 

@@ -63,7 +63,7 @@ public class DumpSensor extends Thread {
                         line = br.readLine();
                     }
                     String post = sb.toString();
-                    ProducerRecord<String, String> message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_DUMP, post);
+                    ProducerRecord<String, String> message = new ProducerRecord<>(LeakHawkParameters.POST_TYPE_DUMP, post);
                     dumpProducer.send(message);
                     br.close();
                 }
