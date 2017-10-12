@@ -93,7 +93,7 @@ public class IncidentResource {
 
     public static IncidentResource getResource(Incident incident){
         IncidentResource incidentResource = new IncidentResource();
-        incidentResource.setKey(incident.getPost_key());
+        incidentResource.setKey(incident.getPostKey());
         incidentResource.setContent(incident.isContent());
         incidentResource.setEvidence(incident.isEvidence());
         if(!incident.getUser().isEmpty()) {

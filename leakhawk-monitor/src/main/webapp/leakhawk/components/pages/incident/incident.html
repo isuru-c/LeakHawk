@@ -4,44 +4,75 @@
             <div class="col-md-12">
                 <div class="box">
                     <div class="box-header">
-                        <h3 class="box-title">Detection Details</h3>
+                        <h3 class="box-title">Incident Details</h3>
                     </div>
                     <!-- /.box-header -->
+
                     <div class="box-body no-padding">
-                        <table class="table table-condensed">
+                        <table class="table table-bordered">
                             <tbody>
                             <tr>
                                 <th style = "text-align: center;">Attribute</th>
                                 <th style = "text-align: center;">Value</th>
                             </tr>
                             <tr>
-                                <td>User</td>
-                                <td>
-                                    {{vm.msgCount}}
+                                <td style = "text-align: center;">Post_Key</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.key}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Title</td>
-                                <td>
-                                    {{vm.msgCount}}
+                                <td style = "text-align: center;">Post_Type</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.postType}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Subject</td>
-                                <td>
-                                    {{vm.msgCount}}
+                                <td style = "text-align: center;">User</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.user}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Link</td>
-                                <td>
-                                    {{vm.msgCount}}
+                                <td style = "text-align: center;">Title</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.title}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Categories and Sensitivity</td>
-                                <td>
-                                    {{vm.msgCount}}
+                                <td style = "text-align: center;">Date</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.date *1000| date:'yyyy-MM-dd hh:mm a'}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align: center;">Sensitivity Level</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.level}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align: center;">Content</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.content}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align: center;">Evidence</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.evidence}}
+                                </td>
+                            </tr>
+                            <!--<tr>-->
+                                <!--<td>Link</td>-->
+                                <!--<td>-->
+                                    <!--{{vm.msgCount}}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                            <tr>
+                                <td style = "text-align: center;">Categories and Sensitivity</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.predictClass}}
                                 </td>
                             </tr>
 

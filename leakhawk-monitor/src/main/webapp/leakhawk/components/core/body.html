@@ -79,11 +79,11 @@
                                 <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                                    aria-expanded="false">Sensitivity<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#">Critical</a></li>
+                                    <li><a data-ng-click="vm.routeToLevel(3)">Critical</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#">High</a></li>
+                                    <li><a data-ng-click="vm.routeToLevel(2)">High</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#">Low</a></li>
+                                    <li><a data-ng-click="vm.routeToLevel(1)">Low</a></li>
                                 </ul>
                             </li>
                         </ul>

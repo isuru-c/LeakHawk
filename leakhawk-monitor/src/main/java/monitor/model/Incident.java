@@ -9,7 +9,7 @@ import javax.persistence.Id;
 @Entity
 public class Incident {
     @Id
-    private String post_key;
+    private String postKey;
     private String user;
     private String title;
     private String type;
@@ -22,8 +22,8 @@ public class Incident {
     public Incident() {
     }
 
-    public Incident(String post_key, String user, String title, String type, String date, int sensitivityLevel, boolean content, boolean evidence, String predictClass) {
-        this.post_key = post_key;
+    public Incident(String postKey, String user, String title, String type, String date, int sensitivityLevel, boolean content, boolean evidence, String predictClass) {
+        this.postKey = postKey;
         this.user = user;
         this.title = title;
         this.type = type;
@@ -34,12 +34,12 @@ public class Incident {
         this.predictClass = predictClass;
     }
 
-    public String getPost_key() {
-        return post_key;
+    public String getPostKey() {
+        return postKey;
     }
 
-    public void setPost_key(String post_key) {
-        this.post_key = post_key;
+    public void setPostKey(String postKey) {
+        this.postKey = postKey;
     }
 
     public String getUser() {

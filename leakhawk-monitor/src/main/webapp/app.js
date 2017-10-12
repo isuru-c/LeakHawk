@@ -51,17 +51,17 @@
                 views: {
                     "view@default": {
                         templateUrl: 'leakhawk/components/pages/control_panel/control_panel.html',
-                        controller: 'IncidentController',
+                        controller: 'ControlPanelController',
                         controllerAs: 'vm'
                     }
                 }
-            }).state('configuration', {
+            }).state('search', {
                 parent: 'default',
-                url: '/configuration',
+                url: '/search/:level',
                 views: {
                     "view@default": {
-                        templateUrl: 'leakhawk/components/pages/configuration/configuration.html',
-                        controller: 'ControlPanelController',
+                        templateUrl: 'leakhawk/components/pages/search/search.html',
+                        controller: 'SearchController',
                         controllerAs: 'vm'
                     }
                 }

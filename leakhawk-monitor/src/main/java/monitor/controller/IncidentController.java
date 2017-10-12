@@ -30,9 +30,16 @@ public class IncidentController {
     }
 
     @CrossOrigin(origins = "http://localhost:8000")
-    @RequestMapping(value = "/get_incident",method = RequestMethod.GET)
+    @RequestMapping(value = "/get_slevel_incidents/{level}",method = RequestMethod.GET)
     @ResponseBody
-    public IncidentResource getIncident(long id){
+    public List getIncidentForLevel(@PathVariable("level") int level){
+        return incidentService.getIncidentsForLevel(level);
+    }
+
+    @CrossOrigin(origins = "http://localhost:8000")
+    @RequestMapping(value = "/get_incident/{id}",method = RequestMethod.GET)
+    @ResponseBody
+    public IncidentResource getIncident(@PathVariable("id") String id){
         return incidentService.getIncident(id);
     }
 

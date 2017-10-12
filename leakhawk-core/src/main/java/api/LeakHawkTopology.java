@@ -7,13 +7,14 @@ package api;
 public class LeakHawkTopology {
 
 
-    public boolean startLeakHawk(){
+    public static boolean startLeakHawk(){
         LeakHawk.startLeakhawk();
         return true;
     }
 
 
-    public boolean stopLeakHawk(){
+    public static boolean stopLeakHawk(){
+        LeakHawk.stopTopology();
         return true;
     }
 
@@ -23,12 +24,16 @@ public class LeakHawkTopology {
     }
 
     public boolean setContentFilterWordFile(String path){
-
         return true;
     }
 
-
-    public static void main(String[] args) {
-        new LeakHawkTopology().startLeakHawk();
+    public static boolean addTwitterFeed(){
+        return LeakHawk.startTwitterSensor();
     }
+
+    public static boolean addPastebinFeed(){
+        return LeakHawk.startPastebinSensor();
+    }
+
+
 }

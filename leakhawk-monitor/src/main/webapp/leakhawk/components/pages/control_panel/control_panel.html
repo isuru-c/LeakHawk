@@ -6,20 +6,23 @@
                 <h3 class="box-title">Command Interface</h3>
             </div>
             <div class="box-body">
-                <a ng-if="vm.leakHawkButton != true" ng-click = "vm.startLeakHawk()" class="btn btn-app">
-                    <i class="fa fa-edit"></i> Start LeakHawk
+                <a ng-show="vm.leakHawkButton != true" ng-click = "vm.startLeakHawk()" class="btn btn-app">
+                    <i class="fa fa-play"></i>Start LeakHawk
                 </a>
-                <a ng-if="vm.leakHawkButton == true" ng-click = "vm.stopLeakHawk()" class="btn btn-app">
+                <a ng-show="vm.leakHawkButton == true" ng-click = "vm.stopLeakHawk()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Stop LeakHawk
                 </a>
-                <a ng-if="vm.twitterButton != true" ng-click = "vm.addTwitter()" class="btn btn-app">
+                <a ng-show="vm.twitterButton != true" ng-click = "vm.addTwitter()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Add Twitter Data Feed
                 </a>
-                <a ng-if="vm.twitterButton == true" ng-click = "vm.removeTwitter()" class="btn btn-app">
+                <a ng-show="vm.twitterButton == true" ng-click = "vm.removeTwitter()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Remove Twitter Data Feed
                 </a>
-                <a class="btn btn-app">
-                    <i class="fa fa-play"></i> Add Pastebin Data Feed
+                <a ng-show="vm.pastebinButton != true" ng-click = "vm.addPatebin()" class="btn btn-app">
+                    <i class="fa fa-edit"></i> Add Pastebin Data Feed
+                </a>
+                <a ng-show="vm.pastebinButton == true" ng-click = "vm.addPatebin()" class="btn btn-app">
+                    <i class="fa fa-edit"></i> Remove Pastebin Data Feed
                 </a>
             </div>
         </div>
