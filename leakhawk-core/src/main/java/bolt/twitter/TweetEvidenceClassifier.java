@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
  * This class is used to classify tweets according to evidences of hacking attacks or data breaches
  *
  * @author Isuru Chandima
- * @author Udeshika Sewwandi
  * @author Warunika Amali
  */
 public class TweetEvidenceClassifier extends LeakHawkClassifier {
@@ -292,17 +291,6 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
         user = user.toLowerCase();
         boolean evidenceFound;
 
-        //#U1-USER: Does the user, seems suspicious?
-        //need to compare with the database - percentage
-
-        //#E1 	SUBJECT:Is there any evidence of a hacking attack on the subject?
-        //#E2 	SUBJECT:Are there any signs of usage of a security tool?
-        //#E3 	SUBJECT:Are there any signs of security vulnerability?
-        //#E4 	SUBJECT:Evidence of a Hacker involvement/Hacktivist movement?
-        //#E5 	BODY:	Is there any evidence of a hacking attack in the body text?
-        //#E6 	BODY:	Are there any signs of usage of a security tool in the body text?
-        //#E7	BODY:	Are there any signs of security vulnerability in the body text?
-        //#E8	BODY:	Are there any signs of security vulnerability in the body text?
         evidenceFound = isEvidenceFound(post);
 
         try {
@@ -373,7 +361,7 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
     }
 
     /**
-     * Create arff file for the predicting text and the title
+     * Create arff file for the predicting text
      *
      * @param text
      * @return

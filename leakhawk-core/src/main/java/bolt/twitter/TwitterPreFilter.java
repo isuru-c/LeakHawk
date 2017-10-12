@@ -70,10 +70,10 @@ public class TwitterPreFilter extends LeakHawkFilter {
 
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
         try {
-            if (postText.substring(0, 4).equals("rt @")) {
+            if ("rt @".equals(postText.substring(0, 4))) {
                 // Drop this retweet, no further operations
                 return false;
-            } else if (!post.getLanguage().equals("en")) {
+            } else if (!"en".equals(post.getLanguage())) {
                 // Language is not English, drop the tweet
                 return false;
             } else if (!isContainKeyword(post.getPostText())) {
