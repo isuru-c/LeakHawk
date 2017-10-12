@@ -14,4 +14,11 @@ public interface IncidentRepository extends CrudRepository<Incident, Long> {
 
 //    @Query("UPDATE Category c SET c.priority = :priority WHERE c.categoryId = :categoryId")
 //    List<Incident> findAllOrderBySensitivitylevelDesc();
+
+    List<Incident> findBySensitivityLevel(int level);
+
+    Incident findByPostKey(String key);
+
+
+    List<Incident> findAllByOrderBySensitivityLevelDesc();
 }

@@ -19,6 +19,7 @@ package bolt.pastebin;
 import bolt.core.LeakHawkClassifier;
 import classifier.Content.*;
 import exception.LeakHawkClassifierLoadingException;
+import exception.LeakHawkDataStreamException;
 import model.ContentData;
 import model.ContentModel;
 import model.Post;
@@ -94,23 +95,21 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
                     contentModel.setContentFound(true);
+                }else if(post.getUrlList().size()>0){
+                    if(classifier.classify(post.getUrlContent(),title)) {
+                        ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
+                        contentDataList.add(contentData);
+                        contentModel.setContentFound(true);
+                    }
                 }
             } catch (java.lang.StackOverflowError e) {
-                /* If message is too long */
-                String postSubstring = postText.substring(0, 511);
-                if (classifier.classify(postText, title)) {
-                    ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
-                    contentDataList.add(contentData);
-                    contentModel.setContentFound(true);
-                }
+               throw new LeakHawkDataStreamException("Stackoverflow Error- too big file");
             }
         }
         contentModel.setContentDataList(contentDataList);
-
         if (contentModel.isContentFound()) {
             increaseOutCount();
         }
-
         post.setNextOutputStream(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 
     }

@@ -28,7 +28,7 @@ public class IncidentService {
 
 
     public List getAllIncidents() {
-        List<Incident> allOrderBySensitivityLevelDesc = (List<Incident>) incidentRepository.findAll();
+        List<Incident> allOrderBySensitivityLevelDesc = incidentRepository.findAllByOrderBySensitivityLevelDesc();
         List<IncidentResource> incidentResourceList = new ArrayList<>();
 
         for (Incident incident: allOrderBySensitivityLevelDesc){
@@ -38,8 +38,17 @@ public class IncidentService {
         return incidentResourceList;
     }
 
-    public IncidentResource getIncident(long id) {
-        Incident incident = incidentRepository.findOne(id);
+    public List getIncidentsForLevel(int level) {
+        List<Incident> allOrderBySensitivityLevelDesc = incidentRepository.findBySensitivityLevel(level);
+        List<IncidentResource> incidentResourceList = new ArrayList<>();
+        for (Incident incident: allOrderBySensitivityLevelDesc){
+            incidentResourceList.add(IncidentResource.getResource(incident));
+        }
+        return incidentResourceList;
+    }
+
+    public IncidentResource getIncident(String id) {
+        Incident incident = incidentRepository.findByPostKey(id);
         IncidentResource resource = IncidentResource.getResource(incident);
         return resource;
     }

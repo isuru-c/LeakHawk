@@ -13,14 +13,18 @@
 
     function BodyController($state, $rootScope, webservice,$cookies) {
         var vm = this;
+        vm.routeToLevel = routeToLevel;
 
         loadData();
+        setInterval(function(){
+            loadData();
+        }, 20000);
 
         function loadData() {
             $("#totalPosts").LoadingOverlay("show");
             $("#sensitivePosts").LoadingOverlay("show");
             $("#criticalPosts").LoadingOverlay("show");
-            webservice.call('/incident/get_header_data', 'GET').then(function (response) {
+            webservice.call('incident/get_header_data', 'GET').then(function (response) {
                 vm.numOfTotalPosts = response.data.totalPosts;
                 vm.totalSensitivePosts = response.data.sensitivePosts;
                 vm.totalCriticalPosts = response.data.criticalPosts;
@@ -30,11 +34,15 @@
             });
         }
 
-
+        function routeToLevel(level) {
+            $state.go("search",{ 'level' : level });
+        }
 
 
         $state.go('home');
     }
+
+
 
 
 })();

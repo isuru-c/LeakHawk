@@ -27,9 +27,15 @@ import bolt.twitter.TwitterPreFilter;
 import exception.LeakHawkTopologyException;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.generated.KillOptions;
+import org.apache.storm.generated.Nimbus;
+import org.apache.storm.generated.TopologySummary;
+import org.apache.storm.thrift.TException;
 import org.apache.storm.topology.BoltDeclarer;
 import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.utils.NimbusClient;
+import org.apache.storm.utils.Utils;
 import sensor.DumpSensor;
 import sensor.PastebinSensor;
 import sensor.TwitterSensor;
@@ -37,6 +43,12 @@ import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
 import util.LeakHawkParameters;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.storm.Config.TOPOLOGY_NAME;
+
 
 /**
  * This is the main class of the system. running main method in here will start to run the storm topology.
@@ -54,19 +66,19 @@ public class LeakHawk {
     public static void startLeakhawk() {
         /* Pastebin sensor */
 
-        //PastebinSensor pastebinSensor = new PastebinSensor();
-        //pastebinSensor.start();
-
-        /* Twitter sensor */
-
-        TwitterSensor twitterSensor = new TwitterSensor();
-        twitterSensor.start();
-
-
-         /* Testing sensor */
-
-        DumpSensor dumpSensor = new DumpSensor();
-        dumpSensor.start();
+//        PastebinSensor pastebinSensor = new PastebinSensor();
+//        pastebinSensor.start();
+//
+//        /* Twitter sensor */
+//
+//        TwitterSensor twitterSensor = new TwitterSensor();
+//        twitterSensor.start();
+//
+//
+//         /* Testing sensor */
+//
+//        DumpSensor dumpSensor = new DumpSensor();
+//        dumpSensor.start();
 
         // Create topology
         final String TOPOLOGY_NAME = "LeakHawk-topology";
@@ -152,13 +164,63 @@ public class LeakHawk {
             throw new LeakHawkTopologyException("Topology build failed", exception);
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                cluster.killTopology(TOPOLOGY_NAME);
-                cluster.shutdown();
-            }
-        });
+//        Runtime.getRuntime().addShutdownHook(new Thread() {
+//            @Override
+//            public void run() {
+//                cluster.killTopology(TOPOLOGY_NAME);
+//                cluster.shutdown();
+//            }
+//        });
     }
+
+
+    public static void stopTopology() {
+        try {
+            Map conf = Utils.readStormConfig();
+            Nimbus.Client client = NimbusClient.getConfiguredClient(conf).getClient();
+            KillOptions killOpts = new KillOptions();
+            //killOpts.set_wait_secs(waitSeconds); // time to wait before killing
+            client.killTopologyWithOpts(TOPOLOGY_NAME, killOpts); //provide topology nam
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean getTopologyState() {
+        try {
+            Map conf = Utils.readStormConfig();
+            Nimbus.Client client = NimbusClient.getConfiguredClient(conf).getClient();
+            List<TopologySummary> topologyList = client.getClusterInfo().get_topologies();
+            boolean result = false;
+            for(TopologySummary topology : topologyList){
+                if(TOPOLOGY_NAME.equals(topology.get_name())){
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        return false;
+        // loop through the list and check if the required topology name is present in the list
+        // if not it's not running
+    }
+
+
+    public static boolean startPastebinSensor(){
+        PastebinSensor pastebinSensor = new PastebinSensor();
+        pastebinSensor.start();
+        return true;
+    }
+
+    public static boolean startTwitterSensor(){
+        TwitterSensor twitterSensor = new TwitterSensor();
+        twitterSensor.start();
+        return true;
+    }
+
+
 
 }

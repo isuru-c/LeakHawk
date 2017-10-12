@@ -89,4 +89,7 @@ public class LeakHawkParameters {
     // Pastebin sensor sleep time
     public static int PASTEBIN_SENSOR_SLEEP_TIME = 10000;
 
+    //contentFilterFilePath
+    public static String CONTEXT_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/context.properties";
+
 }
