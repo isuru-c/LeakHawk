@@ -6,22 +6,22 @@
                 <h3 class="box-title">Command Interface</h3>
             </div>
             <div class="box-body">
-                <a ng-show="vm.leakHawkButton != true" ng-click = "vm.startLeakHawk()" class="btn btn-app">
-                    <i class="fa fa-play"></i>Start LeakHawk
+                <a ng-show="vm.leakHawkButton != true" ng-click="vm.startLeakHawk()" class="btn btn-app">
+                    <i class="fa fa-play"></i> Start LeakHawk
                 </a>
-                <a ng-show="vm.leakHawkButton == true" ng-click = "vm.stopLeakHawk()" class="btn btn-app">
+                <a ng-show="vm.leakHawkButton == true" ng-click="vm.stopLeakHawk()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Stop LeakHawk
                 </a>
-                <a ng-show="vm.twitterButton != true" ng-click = "vm.addTwitter()" class="btn btn-app">
+                <a ng-show="vm.twitterButton != true" ng-click="vm.addTwitter()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Add Twitter Data Feed
                 </a>
-                <a ng-show="vm.twitterButton == true" ng-click = "vm.removeTwitter()" class="btn btn-app">
+                <a ng-show="vm.twitterButton == true" ng-click="vm.removeTwitter()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Remove Twitter Data Feed
                 </a>
-                <a ng-show="vm.pastebinButton != true" ng-click = "vm.addPatebin()" class="btn btn-app">
+                <a ng-show="vm.pastebinButton != true" ng-click="vm.addPatebin()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Add Pastebin Data Feed
                 </a>
-                <a ng-show="vm.pastebinButton == true" ng-click = "vm.addPatebin()" class="btn btn-app">
+                <a ng-show="vm.pastebinButton == true" ng-click="vm.addPatebin()" class="btn btn-app">
                     <i class="fa fa-edit"></i> Remove Pastebin Data Feed
                 </a>
             </div>
@@ -31,17 +31,18 @@
         <div class="box-body">
             <div class="form-group">
                 <label for="resourceFolderFilePath">Resource Folder File Path</label>
-                <input class="form-control" id="resourceFolderFilePath" placeholder="Resource Folder Filepath" type="text" ng-model="vm.resourcePath">
+                <input class="form-control" id="resourceFolderFilePath" placeholder="Resource Folder Filepath"
+                       type="text" ng-model="vm.resourcePath">
             </div>
 
             <!--<div class="form-group">-->
-                <!--<label for="contextfilterfilepath">Context Filter File Path</label>-->
-                <!--<input class="form-control" id="contextfilterfilepath" placeholder="Context Filter File Path" type="text">-->
+            <!--<label for="contextfilterfilepath">Context Filter File Path</label>-->
+            <!--<input class="form-control" id="contextfilterfilepath" placeholder="Context Filter File Path" type="text">-->
             <!--</div>-->
 
             <!--<div class="form-group">-->
-                <!--<label for="classifierFilePath">Classifier File Path</label>-->
-                <!--<input class="form-control" id="classifierFilePath" placeholder="Classifier File Path" type="text">-->
+            <!--<label for="classifierFilePath">Classifier File Path</label>-->
+            <!--<input class="form-control" id="classifierFilePath" placeholder="Classifier File Path" type="text">-->
             <!--</div>-->
 
             <!--<div class="form-group">
@@ -50,11 +51,8 @@
 
                 <p class="help-block">Example block-level help text here.</p>
             </div>-->
-            <div class="checkbox">
-                <label>
-                    <input type="submit" class="btn-success" data-ng-click="vm.saveConfig()"> Save</label>
-                </label>
-            </div>
+            <button  class="btn btn-success btn-sm" data-ng-click="vm.saveConfig()">Save</button>
+
         </div>
 
     </div>

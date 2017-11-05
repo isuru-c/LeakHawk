@@ -25,6 +25,10 @@ public class LeakHawkMain {
         return true;
     }
 
+    public String getResourceFolderPath(){
+        return LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH;
+    }
+
     public boolean setContentFilterWordFile(String path){
         return true;
     }

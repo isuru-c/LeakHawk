@@ -1,6 +1,7 @@
 package monitor.service;
 
 import api.LeakHawkMain;
+import monitor.model.ResourcePath;
 import org.springframework.stereotype.Service;
 import util.LeakHawkConstant;
 
@@ -34,7 +35,12 @@ public class ConfigurationService {
     }
 
     public boolean saveConfig(String contentPath) {
-        leakHawk.setResourceFolderPath(contentPath);
-        return true;
+        return leakHawk.setResourceFolderPath(contentPath);
+    }
+
+    public ResourcePath getConfig() {
+        ResourcePath resourcePath = new ResourcePath();
+        resourcePath.setResourcePath(leakHawk.getResourceFolderPath());
+        return resourcePath;
     }
 }

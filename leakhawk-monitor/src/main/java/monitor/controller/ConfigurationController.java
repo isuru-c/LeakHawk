@@ -51,10 +51,15 @@ public class ConfigurationController {
     @CrossOrigin(origins = "http://localhost:8000")
     @RequestMapping(value = "/save_config",method = RequestMethod.POST)
     @ResponseBody
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean saveConfig(ResourcePath contentPath){
-
+    public boolean saveConfig(@RequestBody ResourcePath contentPath){
         return configurationService.saveConfig(contentPath.getResourcePath());
+    }
+
+    @CrossOrigin(origins = "http://localhost:8000")
+    @RequestMapping(value = "/get_config",method = RequestMethod.GET)
+    @ResponseBody
+    public ResourcePath getConfig(){
+        return configurationService.getConfig();
     }
 
 

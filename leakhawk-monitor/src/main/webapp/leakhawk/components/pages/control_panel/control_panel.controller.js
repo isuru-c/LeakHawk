@@ -20,8 +20,11 @@
         vm.twitterButton = false;
         vm.pastebinButton = false;
 
-
-
+        $.LoadingOverlay("show");
+        webservice.call('configuration/get_config', 'GET').then(function (response) {
+            vm.resourcePath = response.data.resourcePath;
+            $.LoadingOverlay("hide");
+        });
 
         // webservice.call('/getIncident/'+$stateParams.id, 'GET').then(function (response) {
         //
