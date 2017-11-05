@@ -28,7 +28,7 @@ import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.apache.storm.utils.Utils;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -76,16 +76,16 @@ public class DumpSpout extends BaseRichSpout {
             post.setSyntax("");
             post.setLanguage("en");
             post.setPostText(record.value());
-            if(postType.equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
-                collector.emit(LeakHawkParameters.DUMP_SPOUT_TO_P_PRE_FILTER, new Values(post));
-            }else if(postType.equals(LeakHawkParameters.POST_TYPE_TWEETS)){
-                collector.emit(LeakHawkParameters.DUMP_SPOUT_TO_T_PRE_FILTER, new Values(post));
+            if(postType.equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
+                collector.emit(LeakHawkConstant.DUMP_SPOUT_TO_P_PRE_FILTER, new Values(post));
+            }else if(postType.equals(LeakHawkConstant.POST_TYPE_TWEETS)){
+                collector.emit(LeakHawkConstant.DUMP_SPOUT_TO_T_PRE_FILTER, new Values(post));
             }
         }
     }
 
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.DUMP_SPOUT_TO_P_PRE_FILTER, new Fields("post"));
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.DUMP_SPOUT_TO_T_PRE_FILTER, new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkConstant.DUMP_SPOUT_TO_P_PRE_FILTER, new Fields("post"));
+        outputFieldsDeclarer.declareStream(LeakHawkConstant.DUMP_SPOUT_TO_T_PRE_FILTER, new Fields("post"));
     }
 }

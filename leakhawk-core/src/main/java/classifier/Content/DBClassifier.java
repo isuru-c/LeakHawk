@@ -18,6 +18,7 @@ package classifier.Content;
 
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Database", filePath = "./src/main/resources/DB.model")
+@ContentPattern(patternName = "Database", filePath = "DB.model")
 //@ContentPattern(patternName = "Database", filePath = "DB.model")
 public class DBClassifier extends ContentClassifier {
 
@@ -79,9 +80,8 @@ public class DBClassifier extends ContentClassifier {
 
     public DBClassifier(String model, String name) {
         super(model, name);
-
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("DB.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("DB.model file loading error.", e);
         }

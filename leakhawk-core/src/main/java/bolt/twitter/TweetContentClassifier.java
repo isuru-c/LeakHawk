@@ -20,8 +20,7 @@ import bolt.core.LeakHawkClassifier;
 import model.ContentData;
 import model.ContentModel;
 import model.Post;
-import org.apache.storm.tuple.Values;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +103,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.TWEETS_CONTENT_CLASSIFIER;
+        return LeakHawkConstant.TWEETS_CONTENT_CLASSIFIER;
     }
 
     @Override
@@ -192,7 +191,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
             increaseOutCount();
         }
 
-        post.setNextOutputStream(LeakHawkParameters.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+        post.setNextOutputStream(LeakHawkConstant.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
     }
 
     int getMatchingCount(Matcher matcher) {
@@ -206,7 +205,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+        outputStream.add(LeakHawkConstant.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 
         return outputStream;
     }

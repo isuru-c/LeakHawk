@@ -21,7 +21,7 @@ package util;
  *
  * @author Isuru Chandima
  */
-public class LeakHawkParameters {
+public class LeakHawkConstant {
 
     // These keywords are used to define the topics from and into kafka broker
     public static String POST_TYPE_PASTEBIN = "pastebin-posts";
@@ -91,5 +91,6 @@ public class LeakHawkParameters {
 
     //contentFilterFilePath
     public static String CONTEXT_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/context.properties";
+    public static String RESOURCE_FOLDER_FILE_PATH = "/home/a/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
 
 }

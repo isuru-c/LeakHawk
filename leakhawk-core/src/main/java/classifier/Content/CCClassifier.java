@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import exception.LeakHawkFilePathException;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Credit Card", filePath = "./src/main/resources/CC.model")
+@ContentPattern(patternName = "Credit Card", filePath = "CC.model")
 public class CCClassifier extends ContentClassifier {
 
     private Pattern ccCardPattern;
@@ -100,7 +101,7 @@ public class CCClassifier extends ContentClassifier {
     public CCClassifier(String model,String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("CC.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("CC.model file loading error.", e);
         }

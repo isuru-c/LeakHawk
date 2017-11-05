@@ -22,7 +22,7 @@ import db.DBHandle;
 import exception.LeakHawkDatabaseException;
 import model.Statics;
 import org.apache.storm.tuple.Tuple;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -62,7 +62,7 @@ public class StaticsCounter extends LeakHawkBolt {
         Statics statics = (Statics) tuple.getValue(0);
 
         try {
-            if (LeakHawkParameters.PASTEBIN_PRE_FILTER.equals(statics.getBoltType()) || LeakHawkParameters.TWEETS_PRE_FILTER.equals(statics.getBoltType())) {
+            if (LeakHawkConstant.PASTEBIN_PRE_FILTER.equals(statics.getBoltType()) || LeakHawkConstant.TWEETS_PRE_FILTER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='totalPostCount'");
                 int currentTotalPosts = 0;
                 int currentPreFilterPassedCount = 0;
@@ -76,21 +76,21 @@ public class StaticsCounter extends LeakHawkBolt {
 
                 DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentTotalPosts + statics.getInCount()) + " where field_name='totalPostCount'");
                 DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentPreFilterPassedCount + statics.getOutCount()) + " where field_name='preFilterPassedCount'");
-            } else if (LeakHawkParameters.CONTEXT_FILTER.equals(statics.getBoltType())) {
+            } else if (LeakHawkConstant.CONTEXT_FILTER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='contextFilterPassedCount'");
                 int currentPreFilterPassedCount = 0;
                 if (data.next()) {
                     currentPreFilterPassedCount = data.getInt(1);
                 }
                 DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentPreFilterPassedCount + statics.getOutCount()) + " where field_name='contextFilterPassedCount'");
-            } else if (LeakHawkParameters.PASTEBIN_CONTENT_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkParameters.TWEETS_CONTENT_CLASSIFIER.equals(statics.getBoltType())) {
+            } else if (LeakHawkConstant.PASTEBIN_CONTENT_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkConstant.TWEETS_CONTENT_CLASSIFIER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='contentPassedCount'");
                 int contentPassedCount = 0;
                 if (data.next()) {
                     contentPassedCount = data.getInt(1);
                 }
                 DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (contentPassedCount + statics.getOutCount()) + " where field_name='contentPassedCount'");
-            } else if (LeakHawkParameters.PASTEBIN_EVIDENCE_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkParameters.TWEETS_EVIDENCE_CLASSIFIER.equals(statics.getBoltType())) {
+            } else if (LeakHawkConstant.PASTEBIN_EVIDENCE_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkConstant.TWEETS_EVIDENCE_CLASSIFIER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='evidencePassedCount'");
                 int evidencePassedCount = 0;
                 if (data.next()) {
@@ -107,7 +107,7 @@ public class StaticsCounter extends LeakHawkBolt {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.STATICS_COUNTER;
+        return LeakHawkConstant.STATICS_COUNTER;
     }
 
 

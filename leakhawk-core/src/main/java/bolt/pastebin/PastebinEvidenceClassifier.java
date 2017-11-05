@@ -21,7 +21,7 @@ import model.EvidenceModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 import weka.classifiers.misc.SerializedClassifier;
 import weka.core.Instances;
 
@@ -248,8 +248,7 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
         //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
-            sclassifier.setModelFile(new File(this.getClass().getClassLoader().getResource("EviC.model").getFile()));
-
+            sclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/EviC.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -297,7 +296,7 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.PASTEBIN_EVIDENCE_CLASSIFIER;
+        return LeakHawkConstant.PASTEBIN_EVIDENCE_CLASSIFIER;
     }
 
     @Override
@@ -313,11 +312,11 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
         if (evidenceFound) {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
-            post.setNextOutputStream(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+            post.setNextOutputStream(LeakHawkConstant.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
             increaseOutCount();
         }else {
             // No evidence found, send the post through the normal flow
-            post.setNextOutputStream(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);
+            post.setNextOutputStream(LeakHawkConstant.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);
         }
     }
 
@@ -476,8 +475,8 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);
-        outputStream.add(LeakHawkParameters.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+        outputStream.add(LeakHawkConstant.P_EVIDENCE_CLASSIFIER_TO_P_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.P_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
 
         return outputStream;
     }

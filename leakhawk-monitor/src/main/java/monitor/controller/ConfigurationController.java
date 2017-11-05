@@ -1,12 +1,12 @@
 package monitor.controller;
 
-import api.LeakHawk;
-import api.LeakHawkTopology;
+import monitor.model.ResourcePath;
 import monitor.service.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
 
 /**
  * @author Sugeesh Chandraweera
@@ -49,10 +49,12 @@ public class ConfigurationController {
     }
 
     @CrossOrigin(origins = "http://localhost:8000")
-    @RequestMapping(value = "/save_config",method = RequestMethod.GET)
+    @RequestMapping(value = "/save_config",method = RequestMethod.POST)
     @ResponseBody
-    public boolean saveConfig(String contentPath){
-        return configurationService.saveConfig(contentPath);
+    @Consumes(MediaType.APPLICATION_JSON)
+    public boolean saveConfig(ResourcePath contentPath){
+
+        return configurationService.saveConfig(contentPath.getResourcePath());
     }
 
 

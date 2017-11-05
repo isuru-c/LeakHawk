@@ -18,6 +18,7 @@ package classifier.Content;
 
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Private keys", filePath = "./src/main/resources/PK.model")
+@ContentPattern(patternName = "Private keys", filePath = "PK.model")
 //@ContentPattern(patternName = "Private keys", filePath = "PK.model")
 public class PKClassifier extends ContentClassifier {
 
@@ -75,7 +76,7 @@ public class PKClassifier extends ContentClassifier {
     public PKClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("PK.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("PK.model file loading error.", e);
         }

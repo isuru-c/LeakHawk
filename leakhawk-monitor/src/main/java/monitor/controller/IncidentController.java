@@ -1,8 +1,6 @@
 package monitor.controller;
 
-import api.LeakHawk;
-import api.LeakHawkTopology;
-import monitor.resource.ChartDetailResource;
+import api.LeakHawkMain;
 import monitor.resource.HeaderDataResource;
 import monitor.resource.IncidentResource;
 import monitor.service.IncidentService;
@@ -57,7 +55,7 @@ public class IncidentController {
     @ResponseBody
     public List startLeakHawk(){
         System.out.println("Come to here");
-        boolean b = new LeakHawkTopology().startLeakHawk();
+        boolean b = new LeakHawkMain().startLeakHawk();
         System.out.println("Come to here 2"+b);
 
         return null;

@@ -16,11 +16,10 @@
 
 package sensor;
 
-import exception.LeakHawkDataStreamException;
 import exception.LeakHawkFilePathException;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.*;
 
@@ -48,7 +47,7 @@ public class DumpSensor extends Thread {
 
     public void run() {
         // Get the list of files from the dump post folder
-        File folder = new File(LeakHawkParameters.DUMP_FOLDER_PATH);
+        File folder = new File(LeakHawkConstant.DUMP_FOLDER_PATH);
         File[] listOfFiles = folder.listFiles();
 
         // Read the each file and feed the content of the file as a post to the LeakHawk
@@ -63,7 +62,7 @@ public class DumpSensor extends Thread {
                         line = br.readLine();
                     }
                     String post = sb.toString();
-                    ProducerRecord<String, String> message = new ProducerRecord<>(LeakHawkParameters.POST_TYPE_DUMP, post);
+                    ProducerRecord<String, String> message = new ProducerRecord<>(LeakHawkConstant.POST_TYPE_DUMP, post);
                     dumpProducer.send(message);
                     br.close();
                 }

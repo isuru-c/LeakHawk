@@ -10,6 +10,7 @@
 <version>1.0-SNAPSHOT</version>
 
 <dependencies>
+
     <dependency>
         <groupId>com.googlecode.json-simple</groupId>
         <artifactId>json-simple</artifactId>
@@ -66,12 +67,6 @@
     </dependency>
 
     <dependency>
-        <groupId>nz.ac.waikato.cms.weka</groupId>
-        <artifactId>weka-stable</artifactId>
-        <version>3.8.0</version>
-    </dependency>
-
-    <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.11</version>
@@ -108,28 +103,28 @@
             </configuration>
         </plugin>
 
-        <!--<plugin>-->
-            <!--<artifactId>maven-assembly-plugin</artifactId>-->
-            <!--<configuration>-->
-                <!--<archive>-->
-                    <!--<manifest>-->
-                        <!--<mainClass>core.api.LeakHawkTopology</mainClass>-->
-                    <!--</manifest>-->
-                <!--</archive>-->
-                <!--<descriptorRefs>-->
-                    <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
-                <!--</descriptorRefs>-->
-            <!--</configuration>-->
-            <!--<executions>-->
-                <!--<execution>-->
-                    <!--<id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
-                    <!--<phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
-                    <!--<goals>-->
-                        <!--<goal>single</goal>-->
-                    <!--</goals>-->
-                <!--</execution>-->
-            <!--</executions>-->
-        <!--</plugin>-->
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>core.api.LeakHawkMain</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                    <phase>package</phase> <!-- bind to the packaging phase -->
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
 
 </build>

@@ -18,6 +18,7 @@ package classifier.Content;
 
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Configuration files", filePath = "./src/main/resources/CF.model")
+@ContentPattern(patternName = "Configuration files", filePath = "CF.model")
 public class CFClassifier extends ContentClassifier{
     private Pattern cfSymbalPattern;
     private ArrayList<Pattern> unigramPatternList;
@@ -76,7 +77,7 @@ public class CFClassifier extends ContentClassifier{
     public CFClassifier(String model, String name) {
         super(model,name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("CF.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("CF.model file loading error.", e);
         }

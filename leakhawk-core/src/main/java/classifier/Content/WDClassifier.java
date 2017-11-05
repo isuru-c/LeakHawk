@@ -15,6 +15,7 @@
  */
 package classifier.Content;
 
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
  * @author Warunika Amali
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Website Defacement", filePath = "./src/main/resources/WD.model")
+@ContentPattern(patternName = "Website Defacement", filePath = "WD.model")
 public class WDClassifier extends ContentClassifier{
 
     private int urlCount;
@@ -58,7 +59,7 @@ public class WDClassifier extends ContentClassifier{
     public WDClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("WD.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH +"/"+model);
         } catch (Exception e) {
             e.printStackTrace();
         }

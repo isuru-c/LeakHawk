@@ -24,7 +24,7 @@ import model.ContentModel;
 import model.Post;
 import db.DBConnection;
 import db.DBHandle;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -57,7 +57,7 @@ public class Synthesizer extends LeakHawkClassifier {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.SYNTHESIZER;
+        return LeakHawkConstant.SYNTHESIZER;
     }
 
     @Override
@@ -66,9 +66,9 @@ public class Synthesizer extends LeakHawkClassifier {
         // Set next output stream to be null, so there will be no more forwarding
         post.setNextOutputStream(null);
 
-        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
+        if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
             synthesizePastebinPosts(post);
-        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_DUMP)) {
+        } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_DUMP)) {
             synthesizeTweets(post);
         }
     }

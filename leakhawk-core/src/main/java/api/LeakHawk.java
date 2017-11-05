@@ -36,13 +36,12 @@ import org.apache.storm.topology.SpoutDeclarer;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.utils.NimbusClient;
 import org.apache.storm.utils.Utils;
-import sensor.DumpSensor;
 import sensor.PastebinSensor;
 import sensor.TwitterSensor;
 import spout.DumpSpout;
 import spout.PastebinSpout;
 import spout.TwitterSpout;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class LeakHawk {
 
 //        PastebinSensor pastebinSensor = new PastebinSensor();
 //        pastebinSensor.start();
-//
+
 //        /* Twitter sensor */
 //
 //        TwitterSensor twitterSensor = new TwitterSensor();
@@ -85,7 +84,7 @@ public class LeakHawk {
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
 
-        LeakHawkParameters lp = new LeakHawkParameters();
+        LeakHawkConstant lp = new LeakHawkConstant();
 
         TopologyBuilder topologyBuilder = new TopologyBuilder();
 
@@ -96,9 +95,9 @@ public class LeakHawk {
         SpoutDeclarer twitterSpout = topologyBuilder.setSpout("twitter-spout", new TwitterSpout(), 2);
 
         // Create twitter Spout and connect to the topology
-        // Use parameter LeakHawkParameters.POST_TYPE_PASTEBIN_POSTS to use dump posts as pastebin-posts
-        // Use parameter LeakHawkParameters.POST_TYPE_TWEETS to use dump posts as tweets
-        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(LeakHawkParameters.POST_TYPE_PASTEBIN), 2);
+        // Use parameter LeakHawkConstant.POST_TYPE_PASTEBIN_POSTS to use dump posts as pastebin-posts
+        // Use parameter LeakHawkConstant.POST_TYPE_TWEETS to use dump posts as tweets
+        SpoutDeclarer dumpSpout = topologyBuilder.setSpout("dump-spout", new DumpSpout(LeakHawkConstant.POST_TYPE_PASTEBIN), 2);
 
         // PastebinPostDownload is used to get the content of a pastebin post
         BoltDeclarer pastebinPostDownload = topologyBuilder.setBolt("pastebin-post-download-bolt", new PastebinPostDownload(), 4);

@@ -20,7 +20,7 @@ import bolt.core.LeakHawkBolt;
 import model.Post;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -107,24 +107,24 @@ public class UrlProcessor extends LeakHawkBolt {
 
         }
 
-        if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
-            collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, tuple, new Values(post));
-        } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
-            collector.emit(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, tuple, new Values(post));
+        if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
+            collector.emit(LeakHawkConstant.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER, tuple, new Values(post));
+        } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_TWEETS)) {
+            collector.emit(LeakHawkConstant.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER, tuple, new Values(post));
         }
     }
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.URL_PROCESSOR;
+        return LeakHawkConstant.URL_PROCESSOR;
     }
 
     @Override
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER);
-        outputStream.add(LeakHawkParameters.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.URL_PROCESSOR_TO_P_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.URL_PROCESSOR_TO_T_CONTENT_CLASSIFIER);
 
         return outputStream;
     }

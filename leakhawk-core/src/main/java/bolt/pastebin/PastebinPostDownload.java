@@ -24,7 +24,7 @@ import org.apache.storm.tuple.Values;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class PastebinPostDownload extends LeakHawkBolt {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.POST_DOWNLOADER;
+        return LeakHawkConstant.POST_DOWNLOADER;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class PastebinPostDownload extends LeakHawkBolt {
             Post post = new Post();
             String postUrl = (String) postDetails.get("scrape_url");
 
-            post.setPostType(LeakHawkParameters.POST_TYPE_PASTEBIN);
+            post.setPostType(LeakHawkConstant.POST_TYPE_PASTEBIN);
             post.setKey((String) postDetails.get("key"));
             post.setDate((String) postDetails.get("date"));
             post.setTitle((String) postDetails.get("title"));
@@ -80,7 +80,7 @@ public class PastebinPostDownload extends LeakHawkBolt {
                 postText += bufferedReader.readLine();
             }
             post.setPostText(postText);
-            collector.emit(LeakHawkParameters.P_POST_DOWNLOADER_TO_P_PRE_FILTER, tuple, new Values(post));
+            collector.emit(LeakHawkConstant.P_POST_DOWNLOADER_TO_P_PRE_FILTER, tuple, new Values(post));
         } catch (ParseException e) {
             throw new LeakHawkTopologyException("Posts cannot reach PatebinPostDownload Bolt.",e);
         } catch (MalformedURLException e) {
@@ -94,7 +94,7 @@ public class PastebinPostDownload extends LeakHawkBolt {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.P_POST_DOWNLOADER_TO_P_PRE_FILTER);
+        outputStream.add(LeakHawkConstant.P_POST_DOWNLOADER_TO_P_PRE_FILTER);
 
         return outputStream;
     }

@@ -1,19 +1,8 @@
 package monitor.service;
 
-import api.LeakHawk;
-import api.LeakHawkTopology;
-import monitor.model.ChartDetail;
-import monitor.model.Incident;
-import monitor.repository.ChartDetailRepository;
-import monitor.repository.IncidentRepository;
-import monitor.resource.HeaderDataResource;
-import monitor.resource.IncidentResource;
-import org.springframework.beans.factory.annotation.Autowired;
+import api.LeakHawkMain;
 import org.springframework.stereotype.Service;
-import util.LeakHawkParameters;
-
-import java.util.ArrayList;
-import java.util.List;
+import util.LeakHawkConstant;
 
 /**
  * @author Sugeesh Chandraweera
@@ -22,30 +11,30 @@ import java.util.List;
 @Service
 public class ConfigurationService {
 
-    private LeakHawkTopology leakHawkTopology;
+    private LeakHawkMain leakHawk;
 
     ConfigurationService(){
-        this.leakHawkTopology = new LeakHawkTopology();
+        this.leakHawk= new LeakHawkMain();
     }
 
     public boolean startLeakHawk() {
-        return leakHawkTopology.startLeakHawk();
+        return leakHawk.startLeakHawk();
     }
 
     public boolean stopLeakHawk() {
-        return leakHawkTopology.stopLeakHawk();
+        return leakHawk.stopLeakHawk();
     }
 
     public boolean addTwitterFilter() {
-        return leakHawkTopology.addTwitterFeed();
+        return leakHawk.addTwitterFeed();
     }
 
     public boolean addPastebinFilter() {
-        return leakHawkTopology.addPastebinFeed();
+        return leakHawk.addPastebinFeed();
     }
 
     public boolean saveConfig(String contentPath) {
-        LeakHawkParameters.CONTEXT_FILTER_FILE_PATH = contentPath;
+        leakHawk.setResourceFolderPath(contentPath);
         return true;
     }
 }

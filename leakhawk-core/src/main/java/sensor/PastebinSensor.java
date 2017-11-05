@@ -24,7 +24,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,8 +36,8 @@ import java.net.URL;
 
 /**
  * This Sensor will be connected to the pastebin API and fetch posts in every
- * LeakHawkParameters.pastebinSensorSleepTime. In each request
- * LeakHawkParameters.pastebinPostLimit number of latest posts will be fetched.
+ * LeakHawkConstant.pastebinSensorSleepTime. In each request
+ * LeakHawkConstant.pastebinPostLimit number of latest posts will be fetched.
  * The sensor required to find only the new posts which were not in previous
  * reply and feed those posts to the kafka broker (LeakHawk)
  *
@@ -67,7 +67,7 @@ public class PastebinSensor extends Thread {
     public void run() {
         ProducerRecord<String, String> message = null;
         try {
-            URL my_url = new URL(LeakHawkParameters.PASTEBIN_SCRAPING_URL + LeakHawkParameters.PASTEBIN_POST_LIMIT);
+            URL my_url = new URL(LeakHawkConstant.PASTEBIN_SCRAPING_URL + LeakHawkConstant.PASTEBIN_POST_LIMIT);
             String lastKey = "";
             boolean pastebinSensorRunning = true;
             while (pastebinSensorRunning) {
@@ -95,10 +95,10 @@ public class PastebinSensor extends Thread {
                     } else {
                         continue;
                     }
-                    message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_PASTEBIN, post);
+                    message = new ProducerRecord<String, String>(LeakHawkConstant.POST_TYPE_PASTEBIN, post);
                     pastebinProducer.send(message);
                 }
-                sleep(LeakHawkParameters.PASTEBIN_SENSOR_SLEEP_TIME);
+                sleep(LeakHawkConstant.PASTEBIN_SENSOR_SLEEP_TIME);
             }
         } catch (MalformedURLException e) {
             throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);

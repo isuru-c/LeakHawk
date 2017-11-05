@@ -1,10 +1,12 @@
 package api;
 
 
+import util.LeakHawkConstant;
+
 /**
  * @author Sugeesh Chandraweera
  */
-public class LeakHawkTopology {
+public class LeakHawkMain {
 
 
     public static boolean startLeakHawk(){
@@ -18,8 +20,8 @@ public class LeakHawkTopology {
         return true;
     }
 
-    public boolean setModelFolerPath(String path){
-
+    public boolean setResourceFolderPath(String path){
+        LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH = path;
         return true;
     }
 

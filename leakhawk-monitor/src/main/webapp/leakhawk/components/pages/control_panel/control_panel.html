@@ -30,19 +30,19 @@
 
         <div class="box-body">
             <div class="form-group">
-                <label for="prefilterfilepath">Pre Filter File Path</label>
-                <input class="form-control" id="preFilterFilePath" placeholder="Pre Filter Filepath" type="text">
+                <label for="resourceFolderFilePath">Resource Folder File Path</label>
+                <input class="form-control" id="resourceFolderFilePath" placeholder="Resource Folder Filepath" type="text" ng-model="vm.resourcePath">
             </div>
 
-            <div class="form-group">
-                <label for="contextfilterfilepath">Context Filter File Path</label>
-                <input class="form-control" id="contextfilterfilepath" placeholder="Context Filter File Path" type="text">
-            </div>
+            <!--<div class="form-group">-->
+                <!--<label for="contextfilterfilepath">Context Filter File Path</label>-->
+                <!--<input class="form-control" id="contextfilterfilepath" placeholder="Context Filter File Path" type="text">-->
+            <!--</div>-->
 
-            <div class="form-group">
-                <label for="classifierFilePath">Classifier File Path</label>
-                <input class="form-control" id="classifierFilePath" placeholder="Classifier File Path" type="text">
-            </div>
+            <!--<div class="form-group">-->
+                <!--<label for="classifierFilePath">Classifier File Path</label>-->
+                <!--<input class="form-control" id="classifierFilePath" placeholder="Classifier File Path" type="text">-->
+            <!--</div>-->
 
             <!--<div class="form-group">
                 <label for="exampleInputFile">File input</label>
@@ -52,7 +52,7 @@
             </div>-->
             <div class="checkbox">
                 <label>
-                    <input type="checkbox"> Check me out
+                    <input type="submit" class="btn-success" data-ng-click="vm.saveConfig()"> Save</label>
                 </label>
             </div>
         </div>

@@ -23,7 +23,8 @@ import org.apache.tika.langdetect.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
 import org.omg.CORBA.SystemException;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -48,7 +49,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
     private ArrayList<Pattern> sportsWordsPatternList;
     private ArrayList<Pattern> pornWordsPatternList;
     private ArrayList<Pattern> greetingsWordsPatternList;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
     private String headingPreFilter = "@relation PF\n" +
             "\n" +
             "@attribute $PF1 numeric\n" +
@@ -106,7 +107,9 @@ public class PastebinPreFilter extends LeakHawkFilter {
     public void prepareFilter() {
 
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("PreFilter.model"));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/PreFilter.model");
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/PreFilter.model"));
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("PreFilter.model file loading error.", e);
         }
@@ -147,7 +150,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.PASTEBIN_PRE_FILTER;
+        return LeakHawkConstant.PASTEBIN_PRE_FILTER;
     }
 
     @Override
@@ -158,7 +161,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
         // Return true if post needs to be forwarded to the next bolt
         // Return false if post needs not to be forwarded to the next bolt
         if (isPassedPreFilter(post.getTitle(), post.getPostText())) {
-            post.setNextOutputStream(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
+            post.setNextOutputStream(LeakHawkConstant.P_PRE_FILTER_TO_CONTEXT_FILTER);
             increaseOutCount();
             return true;
         }
@@ -329,7 +332,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.P_PRE_FILTER_TO_CONTEXT_FILTER);
+        outputStream.add(LeakHawkConstant.P_PRE_FILTER_TO_CONTEXT_FILTER);
 
         return outputStream;
     }

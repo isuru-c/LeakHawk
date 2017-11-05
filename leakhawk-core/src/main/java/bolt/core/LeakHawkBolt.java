@@ -24,7 +24,7 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -120,12 +120,12 @@ public abstract class LeakHawkBolt extends BaseRichBolt {
     protected void runCounter() {
         long currentTime = System.currentTimeMillis();
 
-        if (((currentTime - startTime) / 1000) > LeakHawkParameters.STATICS_UPDATE_INTERVAL) {
+        if (((currentTime - startTime) / 1000) > LeakHawkConstant.STATICS_UPDATE_INTERVAL) {
             startTime = currentTime;
 
             Statics statics = new Statics(getBoltName(), getInCount(), getOutCount());
             resetCount();
-            collector.emit(LeakHawkParameters.STATICS_FLOW, new Values(statics));
+            collector.emit(LeakHawkConstant.STATICS_FLOW, new Values(statics));
         }
     }
 
@@ -134,14 +134,14 @@ public abstract class LeakHawkBolt extends BaseRichBolt {
 
     /**
      * In the default application of LeakHawkFilter, only one specific output stream
-     * LeakHawkParameters.STATICS_FLOW is dedicated for aggregating statics for statics counter
+     * LeakHawkConstant.STATICS_FLOW is dedicated for aggregating statics for statics counter
      * <p>
      * If different type of output streams are required according to the application,
      * override declareOutputStreams method and declare output streams.
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(LeakHawkParameters.STATICS_FLOW, new Fields("statics"));
+        outputFieldsDeclarer.declareStream(LeakHawkConstant.STATICS_FLOW, new Fields("statics"));
 
         ArrayList<String> outputStreams = declareOutputStreams();
 

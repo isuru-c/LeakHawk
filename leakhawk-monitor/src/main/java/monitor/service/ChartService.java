@@ -1,6 +1,6 @@
 package monitor.service;
 
-import api.LeakHawkTopology;
+import api.LeakHawkMain;
 import monitor.model.ChartDetail;
 import monitor.model.Incident;
 import monitor.repository.ChartDetailRepository;
@@ -54,7 +54,7 @@ public class ChartService {
         chartDetailResource.setDataList(dataList);
         chartDetailResource.setTitleList(titleList);
 
-        LeakHawkTopology leakHawkTopology = new LeakHawkTopology();
+        LeakHawkMain leakHawkTopology = new LeakHawkMain();
         leakHawkTopology.startLeakHawk();
         return chartDetailResource;
 

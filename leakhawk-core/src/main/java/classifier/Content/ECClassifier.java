@@ -18,6 +18,7 @@ package classifier.Content;
 
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * @author Sugeesh Chandraweera
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "Email conversation", filePath = "./src/main/resources/EC.model")
+@ContentPattern(patternName = "Email conversation", filePath = "EC.model")
 //@ContentPattern(patternName = "Email conversation", filePath = "EC.model")
 public class ECClassifier extends ContentClassifier {
     private ArrayList<String> unigrams;
@@ -60,7 +61,7 @@ public class ECClassifier extends ContentClassifier {
         super(model, name);
 
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("EC.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("EC.model file loading error.", e);
         }

@@ -14,6 +14,8 @@
         vm.addTwitter = addTwitter;
         vm.removeTwitter = removeTwitter;
         vm.addPatebin = addPastebin;
+        vm.saveConfig = saveResourcePath;
+
         vm.leakHawkButton = false;
         vm.twitterButton = false;
         vm.pastebinButton = false;
@@ -73,6 +75,15 @@
             });
             vm.responseData += "Twitter feed removed.....\n";
             vm.twitterButton = false;
+        }
+
+        function saveResourcePath() {
+            $.LoadingOverlay("show");
+            var sendObj = {"resourcePath":vm.resourcePath};
+            webservice.call('configuration/save_config', 'POST', sendObj).then(function (response) {
+                $.LoadingOverlay("hide");
+            });
+            vm.responseData += "Configuration Saved.....\n";
         }
     }
 

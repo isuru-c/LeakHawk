@@ -21,7 +21,7 @@ import model.Post;
 import model.EvidenceModel;
 import db.DBConnection;
 import db.DBHandle;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -140,7 +140,7 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
 
     public TweetEvidenceClassifier() {
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("Twitter_EV.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/Twitter_EV.model");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -253,7 +253,7 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.TWEETS_EVIDENCE_CLASSIFIER;
+        return LeakHawkConstant.TWEETS_EVIDENCE_CLASSIFIER;
     }
 
     @Override
@@ -270,10 +270,10 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
             // If an evidence found in the post, check if it contains any other links. (urls)
             // For that process, send the post to another bolt for further processes
             increaseOutCount();
-            post.setNextOutputStream(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+            post.setNextOutputStream(LeakHawkConstant.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
         } else {
             // No evidence found, send the post through the normal flow
-            post.setNextOutputStream(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
+            post.setNextOutputStream(LeakHawkConstant.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
         }
     }
 
@@ -403,8 +403,8 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
-        outputStream.add(LeakHawkParameters.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
+        outputStream.add(LeakHawkConstant.T_EVIDENCE_CLASSIFIER_TO_T_CONTENT_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.T_EVIDENCE_CLASSIFIER_TO_URL_PROCESSOR);
 
         return outputStream;
     }

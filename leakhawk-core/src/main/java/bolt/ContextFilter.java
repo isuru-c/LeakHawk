@@ -24,7 +24,7 @@ import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.Dictionary;
 
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.*;
 import java.util.*;
@@ -51,7 +51,7 @@ public class ContextFilter extends LeakHawkFilter {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.CONTEXT_FILTER;
+        return LeakHawkConstant.CONTEXT_FILTER;
     }
 
     private void createRegularExpressionList() {
@@ -134,10 +134,10 @@ public class ContextFilter extends LeakHawkFilter {
 
             increaseOutCount();
 
-            if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_PASTEBIN)) {
-                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
-            } else if (post.getPostType().equals(LeakHawkParameters.POST_TYPE_TWEETS)) {
-                post.setNextOutputStream(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+            if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
+                post.setNextOutputStream(LeakHawkConstant.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
+            } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_TWEETS)) {
+                post.setNextOutputStream(LeakHawkConstant.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
             }
             return true;
         }
@@ -194,8 +194,8 @@ public class ContextFilter extends LeakHawkFilter {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
-        outputStream.add(LeakHawkParameters.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.CONTEXT_FILTER_TO_P_EVIDENCE_CLASSIFIER);
+        outputStream.add(LeakHawkConstant.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
 
         return outputStream;
     }

@@ -27,7 +27,7 @@ import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
@@ -39,7 +39,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Given the parameters consumer key, consumer secret, token and token secret
  * it can connect to the stream API and continuously fetch tweets from the
  * twitter and feed them to the kafka broker with the topic defined as in
- * LeakHawkParameters.postTypeTweets
+ * LeakHawkConstant.postTypeTweets
  *
  * @author Isuru Chandima
  */
@@ -60,10 +60,10 @@ public class TwitterSensor extends Thread {
     public TwitterSensor() {
 
         // Set the parameters for the twitter stream API
-        consumerKey = LeakHawkParameters.CONSUMER_KEY;
-        consumerSecret = LeakHawkParameters.CONSUMER_SECRET;
-        token = LeakHawkParameters.TOKEN;
-        tokenSecret = LeakHawkParameters.TOKEN_SECRET;
+        consumerKey = LeakHawkConstant.CONSUMER_KEY;
+        consumerSecret = LeakHawkConstant.CONSUMER_SECRET;
+        token = LeakHawkConstant.TOKEN;
+        tokenSecret = LeakHawkConstant.TOKEN_SECRET;
 
         LeakHawkKafkaProducer leakHawkKafkaProducer = new LeakHawkKafkaProducer();
         twitterProducer = leakHawkKafkaProducer.getProducer();
@@ -93,7 +93,7 @@ public class TwitterSensor extends Thread {
         while (true) {
             ProducerRecord<String, String> message = null;
             try {
-                message = new ProducerRecord<String, String>(LeakHawkParameters.POST_TYPE_TWEETS, queue.take());
+                message = new ProducerRecord<String, String>(LeakHawkConstant.POST_TYPE_TWEETS, queue.take());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

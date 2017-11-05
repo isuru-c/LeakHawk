@@ -15,6 +15,7 @@
  */
 package classifier.Content;
 
+import util.LeakHawkConstant;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
  * @author Warunika Amali
  */
 @SuppressWarnings("ALL")
-@ContentPattern(patternName = "User Credentials", filePath = "./src/main/resources/UC.model")
+@ContentPattern(patternName = "User Credentials", filePath = "UC.model")
 public class UCClassifier extends ContentClassifier{
 
     private int hashCount=0;
@@ -59,7 +60,7 @@ public class UCClassifier extends ContentClassifier{
     public UCClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(this.getClass().getClassLoader().getResourceAsStream("UC.model"));
+            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
         } catch (Exception e) {
             e.printStackTrace();
         }

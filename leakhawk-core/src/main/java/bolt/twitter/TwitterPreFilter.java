@@ -18,7 +18,7 @@ package bolt.twitter;
 
 import bolt.core.LeakHawkFilter;
 import model.Post;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class TwitterPreFilter extends LeakHawkFilter {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.TWEETS_PRE_FILTER;
+        return LeakHawkConstant.TWEETS_PRE_FILTER;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class TwitterPreFilter extends LeakHawkFilter {
             } else if (!isContainKeyword(post.getPostText())) {
                 // Filter in for the context filter
                 increaseOutCount();
-                post.setNextOutputStream(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+                post.setNextOutputStream(LeakHawkConstant.T_PRE_FILTER_TO_CONTEXT_FILTER);
                 return true;
             }
         } catch (NullPointerException e) {
@@ -112,7 +112,7 @@ public class TwitterPreFilter extends LeakHawkFilter {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.T_PRE_FILTER_TO_CONTEXT_FILTER);
+        outputStream.add(LeakHawkConstant.T_PRE_FILTER_TO_CONTEXT_FILTER);
 
         return outputStream;
     }

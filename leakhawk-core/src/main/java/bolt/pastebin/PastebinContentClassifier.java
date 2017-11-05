@@ -24,7 +24,7 @@ import model.ContentData;
 import model.ContentModel;
 import model.Post;
 import org.reflections.Reflections;
-import util.LeakHawkParameters;
+import util.LeakHawkConstant;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -74,7 +74,7 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
 
     @Override
     protected String getBoltName() {
-        return LeakHawkParameters.PASTEBIN_CONTENT_CLASSIFIER;
+        return LeakHawkConstant.PASTEBIN_CONTENT_CLASSIFIER;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
         if (contentModel.isContentFound()) {
             increaseOutCount();
         }
-        post.setNextOutputStream(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+        post.setNextOutputStream(LeakHawkConstant.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 
     }
 
@@ -118,7 +118,7 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
     public ArrayList<String> declareOutputStreams() {
         ArrayList<String> outputStream = new ArrayList<>();
 
-        outputStream.add(LeakHawkParameters.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+        outputStream.add(LeakHawkConstant.P_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
 
         return outputStream;
     }
