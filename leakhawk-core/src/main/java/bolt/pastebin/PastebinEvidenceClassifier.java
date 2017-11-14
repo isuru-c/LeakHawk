@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author sewwandi
+ * @author Udeshika Sewwandi
  */
 public class PastebinEvidenceClassifier extends LeakHawkClassifier {
 

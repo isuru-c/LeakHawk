@@ -35,7 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author sewwandi
+ * @author Udeshika Sewwandi
  * @author Warunika Amali
  */
 public class PastebinPreFilter extends LeakHawkFilter {
@@ -208,7 +208,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
      * @param post
      * @return stop words removed post
      */
-    private String stopWordsRemoval(String post){
+    public String stopWordsRemoval(String post){
         Stopwords stpWord = new Stopwords();
 
         /*remove words from stop word list which may appear in program codes*/
@@ -242,7 +242,6 @@ public class PastebinPreFilter extends LeakHawkFilter {
         for(String word:words){
             fullString+=word+" ";
         }
-
         return fullString;
     }
 
