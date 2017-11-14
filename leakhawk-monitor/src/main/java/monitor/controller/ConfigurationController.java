@@ -18,8 +18,6 @@ public class ConfigurationController {
     @Autowired
     private ConfigurationService configurationService;
 
-
-
     @CrossOrigin(origins = "http://localhost:8000")
     @RequestMapping(value = "/start_leakhawk",method = RequestMethod.GET)
     @ResponseBody

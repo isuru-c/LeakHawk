@@ -23,6 +23,8 @@ import util.LeakHawkConstant;
 import java.io.*;
 import java.util.ArrayList;
 
+import static util.LeakHawkConstant.TWITTER_PRE_FILTER_FILE_PATH;
+
 /**
  * This Bolt is used to filter out posts that does not contain any sensitive data like
  * game, movies, torrents and porn contents in tweets.
@@ -38,16 +40,15 @@ public class TwitterPreFilter extends LeakHawkFilter {
     public void prepareFilter() {
 
         try {
-            InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
 
+//          InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
+            InputStream fileInputStream = new FileInputStream(TWITTER_PRE_FILTER_FILE_PATH);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
             String strLine;
             keywordList = new ArrayList<>();
-
             while ((strLine = bufferedReader.readLine()) != null) {
                 keywordList.add(strLine);
             }
-
             bufferedReader.close();
 
         } catch (FileNotFoundException e) {
@@ -67,6 +68,11 @@ public class TwitterPreFilter extends LeakHawkFilter {
         // Convert the tweet to the lower case
         String postText = post.getPostText().toLowerCase();
         post.setPostText(postText);
+
+        // If the tweet is possibly sensitive
+        if(post.isPossiblySensitive()){
+            return true;
+        }
 
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
         try {

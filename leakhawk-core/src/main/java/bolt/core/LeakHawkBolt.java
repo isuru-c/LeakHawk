@@ -57,7 +57,7 @@ public abstract class LeakHawkBolt extends BaseRichBolt {
 
     /**
      * This method is used to prepare the bolt as the LeakHawk application wants.
-     * For creating necessary data structures and IO operations, override ths method.
+     * For creating necessary data structures and IO operations, override this method.
      * <p>
      * This method is called only once when the bolt is created in apache storm topology
      */
@@ -144,7 +144,6 @@ public abstract class LeakHawkBolt extends BaseRichBolt {
         outputFieldsDeclarer.declareStream(LeakHawkConstant.STATICS_FLOW, new Fields("statics"));
 
         ArrayList<String> outputStreams = declareOutputStreams();
-
         for (String outputStream : outputStreams) {
             outputFieldsDeclarer.declareStream(outputStream, new Fields("post"));
         }

@@ -79,48 +79,12 @@ public class Synthesizer extends LeakHawkClassifier {
 
         if (contentModel.isContentFound()) {
             List contentDataList = contentModel.getContentDataList();
-            int highestLevel = 0;
-            for (Object contentDataObj : contentDataList) {
-                ContentData contentData = (ContentData) contentDataObj;
-                if (contentData.getLevel() > highestLevel) {
-                   highestLevel = contentData.getLevel();
-                }
-            }
-            ArrayList<ContentData> highestContent = new ArrayList<>();
-            for (Object contentDataObj : contentDataList) {
-                ContentData contentData = (ContentData) contentDataObj;
-                if (contentData.getLevel() == highestLevel) {
-                    highestContent.add(contentData);
-                }
-            }
-            String classString = "";
-            for (int i = 0; i < highestContent.size(); i++) {
-                classString += highestContent.get(i).getContentType();
-                if (i != highestContent.size() - 1) {
-                    classString += ",";
-                }
-            }
+            int highestLevel = getHighestSensitivityLevel(contentDataList);
+            List<ContentData> highestContent = getAllHighestLevelContent(contentDataList,highestLevel);
+            String classString = getHighestLevelDetails(highestContent);
+
             if (evidenceModel.isEvidenceFound() && highestLevel > 0) {
-                String title = post.getTitle().replace("'", "/'");
-                String user = post.getUser().replace("'", "/'");
-                try {
-//                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
-//                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
-//                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
-
-                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "'" +
-                            ","+ contentModel.isContentFound()+",'"+post.getDate()+"',"+evidenceModel.isEvidenceFound()+"" +
-                            ",'"+classString+"',"+highestLevel+",'"+post.getTitle()+"','"+post.getPostType()+"','"+post.getUser()+"')");
-
-                    System.out.println("\nPost  : " + post.getKey());
-                    System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
-                    System.out.println("\nContent Found  : " + contentModel.isContentFound());
-                    System.out.println("Sensitivity level of post is :" + highestLevel + "\n");
-                    System.out.println("Sensitivity class is  :" + classString + "\n");
-
-                } catch (SQLException e) {
-                    throw new LeakHawkDatabaseException("Database Insertion Failed on Synthesizer.",e);
-                }
+                writeIncidentToDatabase(post,highestLevel,classString);
             }
         }
     }
@@ -144,7 +108,9 @@ public class Synthesizer extends LeakHawkClassifier {
             }
 
             if (evidenceModel.isEvidenceFound()) {
-                String title = post.getTitle().replace("'", "/'");
+                writeIncidentToDatabase(post,0, classString);
+
+                /*String title = post.getTitle().replace("'", "/'");
                 String user = post.getUser().replace("'", "/'");
                 try {
                     DBHandle.setData(connection, "INSERT INTO Incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
@@ -158,7 +124,7 @@ public class Synthesizer extends LeakHawkClassifier {
 
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }
 
@@ -169,6 +135,71 @@ public class Synthesizer extends LeakHawkClassifier {
         ArrayList<String> outputStream = new ArrayList<>();
 
         return outputStream;
+    }
+
+
+    /**
+     * This method will write the sensitive incidents to the database
+     * @param post post object of the incident
+     * @param highestLevel highest level of sensitivity
+     * @param classString class of the sensitivity
+     */
+    private void writeIncidentToDatabase(Post post, int highestLevel, String classString){
+        String title = post.getTitle().replace("'", "/'");
+        String user = post.getUser().replace("'", "/'");
+        try {
+//                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
+//                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
+//                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
+
+            DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "'" +
+                    ","+ contentModel.isContentFound()+",'"+post.getDate()+"',"+evidenceModel.isEvidenceFound()+"" +
+                    ",'"+classString+"',"+highestLevel+",'"+post.getTitle()+"','"+post.getPostType()+"','"+post.getUser()+"')");
+
+            System.out.println("\nPost  : " + post.getKey());
+            System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
+            System.out.println("\nContent Found  : " + contentModel.isContentFound());
+            System.out.println("Sensitivity level of post is :" + highestLevel + "\n");
+            System.out.println("Sensitivity class is  :" + classString + "\n");
+
+        } catch (SQLException e) {
+            throw new LeakHawkDatabaseException("Database Insertion Failed on Synthesizer.",e);
+        }
+    }
+
+
+    private int getHighestSensitivityLevel(List contentDataList){
+        int highestLevel = 0;
+        for (Object contentDataObj : contentDataList) {
+            ContentData contentData = (ContentData) contentDataObj;
+            if (contentData.getLevel() > highestLevel) {
+                highestLevel = contentData.getLevel();
+            }
+        }
+        return highestLevel;
+    }
+
+
+    private List<ContentData> getAllHighestLevelContent(List contentDataList, int highestLevel){
+        ArrayList<ContentData> highestContent = new ArrayList<>();
+        for (Object contentDataObj : contentDataList) {
+            ContentData contentData = (ContentData) contentDataObj;
+            if (contentData.getLevel() == highestLevel) {
+                highestContent.add(contentData);
+            }
+        }
+        return highestContent;
+    }
+
+    private String getHighestLevelDetails(List<ContentData> highestContent){
+        String classString = "";
+        for (int i = 0; i < highestContent.size(); i++) {
+            classString += highestContent.get(i).getContentType();
+            if (i != highestContent.size() - 1) {
+                classString += ",";
+            }
+        }
+        return classString;
     }
 }
 

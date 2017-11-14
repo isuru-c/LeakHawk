@@ -262,8 +262,10 @@ public class TweetEvidenceClassifier extends LeakHawkClassifier {
         EvidenceModel evidenceModel = new EvidenceModel();
         post.setEvidenceModel(evidenceModel);
 
-        boolean evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
-
+        boolean evidenceFound = true;
+        if(!post.isPossiblySensitive()) {
+            evidenceFound = isPassedEvidenceClassifier(post.getUser(), post.getPostText(), evidenceModel);
+        }
         evidenceModel.setEvidenceFound(evidenceFound);
 
         if (evidenceFound) {

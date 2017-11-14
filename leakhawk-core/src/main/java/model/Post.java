@@ -32,6 +32,7 @@ public class Post implements Serializable {
     private String syntax;
     private String postText;
     private String language;
+    private boolean possiblySensitive;
 
     private ContentModel contentModel = null;
     private EvidenceModel evidenceModel = null;
@@ -155,5 +156,13 @@ public class Post implements Serializable {
 
     public String getNextOutputStream() {
         return nextOutputStream;
+    }
+
+    public boolean isPossiblySensitive() {
+        return possiblySensitive;
+    }
+
+    public void setPossiblySensitive(boolean possiblySensitive) {
+        this.possiblySensitive = possiblySensitive;
     }
 }

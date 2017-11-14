@@ -91,6 +91,10 @@ public class LeakHawkConstant {
 
     //contentFilterFilePath
     public static String CONTEXT_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/context.properties";
-    public static String RESOURCE_FOLDER_FILE_PATH = "/home/a/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
+    public static String RESOURCE_FOLDER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
+
+    // Twitter pre-filter file paths
+    public static String TWITTER_PRE_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/TwitterPreFilterList.txt";
+
 
 }
