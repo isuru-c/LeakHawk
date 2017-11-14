@@ -54,6 +54,8 @@ public class TwitterSensor extends Thread {
     // Kafka producer to feed tweets into kafka broker
     private Producer<String, String> twitterProducer;
 
+
+    private boolean twitterSensorRunning = true;
     /**
      * Set twitter API parameters and kafka producer for twitter sensor
      */
@@ -90,7 +92,7 @@ public class TwitterSensor extends Thread {
         client.connect();
 
         // Fed tweets continuously and put into kafka broker
-        while (true) {
+        while (twitterSensorRunning) {
             ProducerRecord<String, String> message = null;
             try {
                 message = new ProducerRecord<String, String>(LeakHawkConstant.POST_TYPE_TWEETS, queue.take());
@@ -99,5 +101,10 @@ public class TwitterSensor extends Thread {
             }
             twitterProducer.send(message);
         }
+    }
+
+    public boolean stopSensor(){
+        this.twitterSensorRunning = false;
+        return true;
     }
 }

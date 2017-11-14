@@ -56,6 +56,8 @@ public class PastebinSensor extends Thread {
     // Kafka producer to feed tweets into kafka broke
     private Producer<String, String> pastebinProducer;
 
+    private volatile boolean pastebinSensorRunning = true;
+
     /**
      * Set kafka producer for pastebin sensor
      */
@@ -69,7 +71,6 @@ public class PastebinSensor extends Thread {
         try {
             URL my_url = new URL(LeakHawkConstant.PASTEBIN_SCRAPING_URL + LeakHawkConstant.PASTEBIN_POST_LIMIT);
             String lastKey = "";
-            boolean pastebinSensorRunning = true;
             while (pastebinSensorRunning) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(my_url.openStream()));
                 StringBuilder webPageContent = new StringBuilder();
@@ -110,6 +111,12 @@ public class PastebinSensor extends Thread {
             throw new LeakHawkDataStreamException("Pastebin Sensor Failed.", e);
         }
         pastebinProducer.close();
+    }
+
+
+    public boolean stopSensor(){
+        this.pastebinSensorRunning = false;
+        return true;
     }
 
 }

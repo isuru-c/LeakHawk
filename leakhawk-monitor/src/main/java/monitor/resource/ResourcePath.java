@@ -1,4 +1,4 @@
-package monitor.model;
+package monitor.resource;
 
 /**
  * @author Sugeesh Chandraweera

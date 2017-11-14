@@ -1,6 +1,8 @@
 package api;
 
 
+import sensor.PastebinSensor;
+import sensor.TwitterSensor;
 import util.LeakHawkConstant;
 
 /**
@@ -33,11 +35,11 @@ public class LeakHawkMain {
         return true;
     }
 
-    public static boolean addTwitterFeed(){
+    public static TwitterSensor addTwitterFeed(){
         return LeakHawk.startTwitterSensor();
     }
 
-    public static boolean addPastebinFeed(){
+    public static PastebinSensor addPastebinFeed(){
         return LeakHawk.startPastebinSensor();
     }
 

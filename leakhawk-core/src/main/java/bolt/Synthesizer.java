@@ -27,8 +27,14 @@ import db.DBHandle;
 import util.LeakHawkConstant;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import java.util.List;
 
 /**
@@ -68,6 +74,8 @@ public class Synthesizer extends LeakHawkClassifier {
 
         if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
             synthesizePastebinPosts(post);
+        } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_TWEETS)) {
+            synthesizeTweets(post);
         } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_DUMP)) {
             synthesizeTweets(post);
         }
@@ -94,6 +102,11 @@ public class Synthesizer extends LeakHawkClassifier {
         contentModel = post.getContentModel();
         String classString = "";
 
+
+        //TODO Remove this
+        writeIncidentToDatabase(post,0, classString);
+
+
         if (contentModel.isContentFound()) {
             List contentDataList = contentModel.getContentDataList();
             int i=1;
@@ -109,22 +122,6 @@ public class Synthesizer extends LeakHawkClassifier {
 
             if (evidenceModel.isEvidenceFound()) {
                 writeIncidentToDatabase(post,0, classString);
-
-                /*String title = post.getTitle().replace("'", "/'");
-                String user = post.getUser().replace("'", "/'");
-                try {
-                    DBHandle.setData(connection, "INSERT INTO Incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
-                            + post.getPostType() + "','" + post.getDate() + "'," + 0 + "," + contentModel.isContentFound()
-                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
-
-                    System.out.println("\nPost  : " + post.getKey());
-                    System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
-                    System.out.println("\nContent Found  : " + contentModel.isContentFound());
-                    System.out.println("Sensitivity class is  :" + classString + "\n");
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }*/
             }
         }
 
@@ -145,16 +142,35 @@ public class Synthesizer extends LeakHawkClassifier {
      * @param classString class of the sensitivity
      */
     private void writeIncidentToDatabase(Post post, int highestLevel, String classString){
-        String title = post.getTitle().replace("'", "/'");
-        String user = post.getUser().replace("'", "/'");
+        String title = "";
+        String user = "";
+        if(!title.isEmpty())
+            title = post.getTitle().replace("'", "/'");
+        if(!user.isEmpty())
+            user = post.getUser().replace("'", "/'");
         try {
-//                    DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "','" + user + "','" + title + "','"
-//                            + post.getPostType() + "','" + post.getDate() + "'," + highestLevel + "," + contentModel.isContentFound()
-//                            + "," + evidenceModel.isEvidenceFound() + ",'" + classString + "')");
+            String sql = "INSERT INTO incident (post_key,content,date,evidence,predict_class,sensitivity_level,title,type,user) VALUES (?,?,?,?,?,?,?,?,?)";
+            PreparedStatement stmt=connection.prepareStatement(sql);
+            String postDate = post.getDate();
+            if("tweets".equals(post.getPostType())){
+                final String TWITTER="EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+                SimpleDateFormat sf = new SimpleDateFormat(TWITTER);
+                postDate = Long.toString(sf.parse(post.getDate()).getTime());
+            }else{
+                postDate = post.getDate()+"000";
+            }
 
-            DBHandle.setData(connection, "INSERT INTO incident VALUES ('" + post.getKey() + "'" +
-                    ","+ contentModel.isContentFound()+",'"+post.getDate()+"',"+evidenceModel.isEvidenceFound()+"" +
-                    ",'"+classString+"',"+highestLevel+",'"+post.getTitle()+"','"+post.getPostType()+"','"+post.getUser()+"')");
+            stmt.setString(1,post.getKey());
+            stmt.setBoolean(2,contentModel.isContentFound());
+            stmt.setString(3,postDate);
+            stmt.setBoolean(4,evidenceModel.isEvidenceFound());
+            stmt.setString(5,classString);
+            stmt.setInt(6,highestLevel);
+            stmt.setString(7,post.getTitle());
+            stmt.setString(8,post.getPostType());
+            stmt.setString(9,post.getUser());
+
+            stmt.executeUpdate();
 
             System.out.println("\nPost  : " + post.getKey());
             System.out.println("\nEvidence Found  : " + evidenceModel.isEvidenceFound());
@@ -164,6 +180,8 @@ public class Synthesizer extends LeakHawkClassifier {
 
         } catch (SQLException e) {
             throw new LeakHawkDatabaseException("Database Insertion Failed on Synthesizer.",e);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 

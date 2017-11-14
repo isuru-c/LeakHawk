@@ -1,7 +1,10 @@
 package monitor.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * @author Sugeesh Chandraweera
@@ -9,6 +12,8 @@ import javax.persistence.Id;
 @Entity
 public class Incident {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
     private String postKey;
     private String user;
     private String title;
@@ -104,5 +109,13 @@ public class Incident {
 
     public void setPredictClass(String predictClass) {
         this.predictClass = predictClass;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

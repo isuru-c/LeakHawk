@@ -33,7 +33,6 @@ import java.sql.Statement;
  */
 public class DBHandle {
     public static int setData(Connection connection,String sql) throws SQLException{
-        //TODO prepaird statements
         Statement statement=connection.createStatement();
         int result=statement.executeUpdate(sql);
         return result;

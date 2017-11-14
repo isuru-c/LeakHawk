@@ -71,12 +71,13 @@ public class TwitterPreFilter extends LeakHawkFilter {
 
         // If the tweet is possibly sensitive
         if(post.isPossiblySensitive()){
+            post.setNextOutputStream(LeakHawkConstant.T_PRE_FILTER_TO_CONTEXT_FILTER);
             return true;
         }
 
         // Drop re-tweets, non English posts and filter in only tweets that does not contain given keywords
         try {
-            if ("rt @".equals(postText.substring(0, 4))) {
+            if (postText.length()>4 && "rt @".equals(postText.substring(0, 4))) {
                 // Drop this retweet, no further operations
                 return false;
             } else if (!"en".equals(post.getLanguage())) {

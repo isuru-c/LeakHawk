@@ -208,16 +208,16 @@ public class LeakHawk {
     }
 
 
-    public static boolean startPastebinSensor(){
+    public static PastebinSensor startPastebinSensor(){
         PastebinSensor pastebinSensor = new PastebinSensor();
         pastebinSensor.start();
-        return true;
+        return pastebinSensor;
     }
 
-    public static boolean startTwitterSensor(){
+    public static TwitterSensor startTwitterSensor(){
         TwitterSensor twitterSensor = new TwitterSensor();
         twitterSensor.start();
-        return true;
+        return twitterSensor;
     }
 
 

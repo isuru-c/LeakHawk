@@ -25,6 +25,7 @@ import org.apache.storm.tuple.Tuple;
 import util.LeakHawkConstant;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -74,29 +75,54 @@ public class StaticsCounter extends LeakHawkBolt {
                     currentPreFilterPassedCount = data1.getInt(1);
                 }
 
-                DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentTotalPosts + statics.getInCount()) + " where field_name='totalPostCount'");
-                DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentPreFilterPassedCount + statics.getOutCount()) + " where field_name='preFilterPassedCount'");
+
+                String updateTotalPosts = "UPDATE chart_detail SET value = ? where field_name = 'totalPostCount'";
+                PreparedStatement preparedStatement1 = connection.prepareStatement(updateTotalPosts);
+                preparedStatement1.setInt(1, (currentTotalPosts + statics.getInCount()));
+                preparedStatement1.executeUpdate();
+
+
+                String updatePreFilterPassed = "UPDATE chart_detail SET value = ? where field_name='preFilterPassedCount'";
+                PreparedStatement preparedStatement2 = connection.prepareStatement(updatePreFilterPassed);
+                preparedStatement2.setInt(1, (currentPreFilterPassedCount + statics.getOutCount()));
+                preparedStatement2.executeUpdate();
+
+
             } else if (LeakHawkConstant.CONTEXT_FILTER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='contextFilterPassedCount'");
                 int currentPreFilterPassedCount = 0;
                 if (data.next()) {
                     currentPreFilterPassedCount = data.getInt(1);
                 }
-                DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (currentPreFilterPassedCount + statics.getOutCount()) + " where field_name='contextFilterPassedCount'");
+
+                String updateContextFilterPassed = "UPDATE chart_detail SET value = ? where field_name='contextFilterPassedCount'";
+                PreparedStatement preparedStatement1 = connection.prepareStatement(updateContextFilterPassed);
+                preparedStatement1.setInt(1, (currentPreFilterPassedCount + statics.getOutCount()));
+                preparedStatement1.executeUpdate();
+
             } else if (LeakHawkConstant.PASTEBIN_CONTENT_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkConstant.TWEETS_CONTENT_CLASSIFIER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='contentPassedCount'");
                 int contentPassedCount = 0;
                 if (data.next()) {
                     contentPassedCount = data.getInt(1);
                 }
-                DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (contentPassedCount + statics.getOutCount()) + " where field_name='contentPassedCount'");
+
+                String updateContentPassed = "UPDATE chart_detail SET value = ? where field_name='contentPassedCount'";
+                PreparedStatement preparedStatement1 = connection.prepareStatement(updateContentPassed);
+                preparedStatement1.setInt(1, (contentPassedCount + statics.getOutCount()));
+                preparedStatement1.executeUpdate();
+
             } else if (LeakHawkConstant.PASTEBIN_EVIDENCE_CLASSIFIER.equals(statics.getBoltType()) || LeakHawkConstant.TWEETS_EVIDENCE_CLASSIFIER.equals(statics.getBoltType())) {
                 ResultSet data = DBHandle.getData(connection, "SELECT value from chart_detail where field_name='evidencePassedCount'");
                 int evidencePassedCount = 0;
                 if (data.next()) {
                     evidencePassedCount = data.getInt(1);
                 }
-                DBHandle.setData(connection, "UPDATE chart_detail SET value = " + (evidencePassedCount + statics.getOutCount()) + " where field_name='evidencePassedCount'");
+
+                String updateEvidencePassed = "UPDATE chart_detail SET value = ? where field_name='evidencePassedCount'";
+                PreparedStatement preparedStatement1 = connection.prepareStatement(updateEvidencePassed);
+                preparedStatement1.setInt(1, (evidencePassedCount + statics.getOutCount()) );
+                preparedStatement1.executeUpdate();
             }
             System.out.println("Updated Chart details.");
         } catch (SQLException e) {
