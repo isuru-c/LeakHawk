@@ -141,10 +141,9 @@ public class ContextFilter extends LeakHawkFilter {
             }
             return true;
         }
-        //TODO Chnage this to normal
-//        return false;
-        post.setNextOutputStream(LeakHawkConstant.CONTEXT_FILTER_TO_T_EVIDENCE_CLASSIFIER);
-        return true;
+
+        return false;
+
     }
 
     /**

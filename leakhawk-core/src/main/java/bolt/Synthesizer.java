@@ -73,15 +73,15 @@ public class Synthesizer extends LeakHawkClassifier {
         post.setNextOutputStream(null);
 
         if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_PASTEBIN)) {
-            synthesizePastebinPosts(post);
+            synthesizePosts(post);
         } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_TWEETS)) {
-            synthesizeTweets(post);
+            synthesizePosts(post);
         } else if (post.getPostType().equals(LeakHawkConstant.POST_TYPE_DUMP)) {
-            synthesizeTweets(post);
+            synthesizePosts(post);
         }
     }
 
-    private void synthesizePastebinPosts(Post post){
+    private void synthesizePosts(Post post){
         evidenceModel = post.getEvidenceModel();
         contentModel = post.getContentModel();
 
@@ -91,41 +91,42 @@ public class Synthesizer extends LeakHawkClassifier {
             List<ContentData> highestContent = getAllHighestLevelContent(contentDataList,highestLevel);
             String classString = getHighestLevelDetails(highestContent);
 
-            if (evidenceModel.isEvidenceFound() && highestLevel > 0) {
+            if (evidenceModel.isEvidenceFound()) {
+                writeIncidentToDatabase(post,highestLevel,classString);
+            }else if(highestLevel>=2){
                 writeIncidentToDatabase(post,highestLevel,classString);
             }
-        }
-    }
-
-    private void synthesizeTweets(Post post){
-        evidenceModel = post.getEvidenceModel();
-        contentModel = post.getContentModel();
-        String classString = "";
-
-
-        //TODO Remove this
-        writeIncidentToDatabase(post,0, classString);
-
-
-        if (contentModel.isContentFound()) {
-            List contentDataList = contentModel.getContentDataList();
-            int i=1;
-
-            for (Object contentDataObj : contentDataList) {
-                ContentData contentData = (ContentData) contentDataObj;
-                classString+=contentData.getContentType();
-                if(contentDataList.size()>i){
-                    classString += ",";
-                }
-                i++;
-            }
-
-            if (evidenceModel.isEvidenceFound()) {
-                writeIncidentToDatabase(post,0, classString);
-            }
+        }else if(evidenceModel.isEvidenceFound()){
+            writeIncidentToDatabase(post,0,"No Content Found");
         }
 
     }
+
+//    private void synthesizeTweets(Post post){
+//        evidenceModel = post.getEvidenceModel();
+//        contentModel = post.getContentModel();
+//        String classString = "";
+//
+//
+//        if (contentModel.isContentFound()) {
+//            List contentDataList = contentModel.getContentDataList();
+//            int i=1;
+//
+//            for (Object contentDataObj : contentDataList) {
+//                ContentData contentData = (ContentData) contentDataObj;
+//                classString+=contentData.getContentType();
+//                if(contentDataList.size()>i){
+//                    classString += ",";
+//                }
+//                i++;
+//            }
+//
+//            if (evidenceModel.isEvidenceFound()) {
+//                writeIncidentToDatabase(post,0, classString);
+//            }
+//        }
+//
+//    }
 
     @Override
     public ArrayList<String> declareOutputStreams() {

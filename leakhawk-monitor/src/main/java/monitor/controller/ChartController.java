@@ -63,7 +63,7 @@ public class ChartController {
     @RequestMapping(value = "/count_content_type",method = RequestMethod.GET)
     @ResponseBody
     public ChartDetailResource getThirdChartTwo(){
-        return chartService.getEvidencePassedCount();
+        return chartService.getContentTypeCount();
     }
 
 }

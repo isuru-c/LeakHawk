@@ -173,7 +173,6 @@ public class UCClassifier extends ContentClassifier{
 
     @Override
     public int getSensivityLevel(String post) {
-
         if ((hashCount < 5 && hashCount > 0)) {
             return 1;
         } else if ((hashCount < 20) && (hashCount > 5)) {

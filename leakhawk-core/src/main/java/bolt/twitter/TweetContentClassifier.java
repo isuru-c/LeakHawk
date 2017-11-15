@@ -17,6 +17,7 @@
 package bolt.twitter;
 
 import bolt.core.LeakHawkClassifier;
+import classifier.Content.Hash_id;
 import model.ContentData;
 import model.ContentModel;
 import model.Post;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
  * @author Isuru Chandima
  * @author Warunika Amali
  */
+@SuppressWarnings("ALL")
 public class TweetContentClassifier extends LeakHawkClassifier {
 
     private ArrayList<String> creditCard;
@@ -119,7 +121,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : ccPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Credit Card");
+                ContentData contentData = new ContentData("Credit Card",getCreditCardSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
             }
@@ -128,7 +130,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : dbPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Database");
+                ContentData contentData = new ContentData("Database",getDBSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -138,7 +140,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : pkPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Private Key");
+                ContentData contentData = new ContentData("Private Key",getPKSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -148,7 +150,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : ucPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("User Credentials");
+                ContentData contentData = new ContentData("User Credentials",getUCSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -158,7 +160,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : eoPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Email Only");
+                ContentData contentData = new ContentData("Email Only",getEOSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -168,7 +170,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : wdPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Website Defacement");
+                ContentData contentData = new ContentData("Website Defacement",getWDSensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -178,7 +180,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         for (Pattern pattern : daPattern) {
             Matcher matcher = pattern.matcher(text);
             if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("DNS Attack");
+                ContentData contentData = new ContentData("DNS Attack",getDASensivityLevel(text));
                 contentDataList.add(contentData);
                 contentModel.setContentFound(true);
                 break;
@@ -209,5 +211,146 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         return outputStream;
     }
+
+
+    public int getCreditCardSensivityLevel(String post){
+        int creditCardNumberCount = extractCCNumberCount(post);
+        if ((creditCardNumberCount < 5 && creditCardNumberCount > 0)) {
+            return 1;
+        } else if ((creditCardNumberCount < 20) && (creditCardNumberCount > 5)) {
+            return 2;
+        } else if (creditCardNumberCount > 20) {
+            return 3;
+        }
+        return 0;
+    }
+
+    public int extractCCNumberCount(String post) {
+        Pattern ccCardPattern = Pattern.compile("[2-6][0-9]{3}([ -]?)[0-9]{4}([ -]?)[0-9]{4}([ -]?)[0-9]{3,4}([ -]?)[0-9]{0,3}[?^a-zA-Z]?");
+        Matcher matcherCC = ccCardPattern.matcher(post);
+        int CC_Count = getMatchingCount(matcherCC);
+        return CC_Count;
+    }
+
+
+    public int getCFSensivityLevel(String post) {
+        if (post.contains("enable password")) {
+            return 3;
+        }
+        return 1;
+    }
+
+    public int getDASensivityLevel(String post){
+        ArrayList<String> DAlist = new ArrayList<String>(Arrays.asList("lanka", "lk", "ceylon", "sinhala", "buddhist", "colombo", "kandy", "kurunegala", "gampaha", "mahinda", "sirisena", "ranil"));
+        int domainCount = 0;
+        int count=0;
+        for (String i : DAlist) {
+            if (post.contains(i)) {
+                count++;
+            }
+        }
+        if (domainCount < 10) {
+            return 2;
+        } else if (domainCount >= 10) {
+            return 3;
+        }
+        return 1;
+    }
+
+
+    public int getDBSensivityLevel(String post) {
+        return 2;
+    }
+
+    public int getECSensivityLevel(String post){
+        ArrayList<String> ECList = new ArrayList<String>(Arrays.asList("CONFIDENTIAL", "secret", "do not disclose"));
+        int ecCount = 0;
+        for (String i : ECList) {
+            if (post.contains(i)) {
+                ecCount++;
+            }
+        }
+        if (ecCount > 0) {
+            return 3;
+        }
+        return 1;
+    }
+
+    public int getEOSensivityLevel(String post){
+        int email_count = EOCounter(post);
+        if (email_count < 50) {
+            return 1;
+        }
+        return 2;
+    }
+
+    public int EOCounter(String post) {
+        Pattern emailPattern = Pattern.compile("(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}([.]((([a-zA-Z0-9])|([-])){2,63})){1,4}");
+        Matcher matcherEO = emailPattern.matcher(post);
+        int EO_Count = getMatchingCount(matcherEO);
+        return EO_Count;
+    }
+
+    public int getPKSensivityLevel(String post){
+        return 3;
+    }
+
+    public int getUCSensivityLevel(String post) {
+        int hashCount = extractHashCount(post);
+        if ((hashCount < 5 && hashCount > 0)) {
+            return 1;
+        } else if ((hashCount < 20) && (hashCount > 5)) {
+            return 2;
+        } else if (hashCount > 20) {
+            return 3;
+        }
+        return 0;
+    }
+
+    /*
+    Getting the hash count in the post
+     */
+    public int extractHashCount(String post) {
+        int hashCount = 0;
+        Hash_id hash_id = new Hash_id();
+
+        String[] words= post.split(" |\n");
+        for(String word:words){
+            if(hash_id.isHash(word)==true) hashCount++;
+        }
+        return hashCount;
+    }
+
+
+    public int getWDSensivityLevel(String post) {
+        int urlCount = extractUrlCount(post);
+
+        if ((urlCount < 5 && urlCount > 0)) {
+            return 1;
+        } else if ((urlCount < 20) && (urlCount > 5)) {
+            return 2;
+        } else if (urlCount > 20) {
+            return 3;
+        }
+        return 0;
+    }
+
+    /*
+    Getting the hash count in the post
+     */
+    public int extractUrlCount(String post) {
+        int urlCount=0;
+        String[] words= post.split("\\s| ");
+        for(String word:words){
+            if (word.matches("\\b((https?):|(www))\\S+")) {
+                // System.out.println("URL =" + word);
+                urlCount++;
+            }
+        }
+        return urlCount;
+    }
+
+
+
 
 }
