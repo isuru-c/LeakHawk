@@ -17,16 +17,19 @@ public class ConfigurationService {
 
     private TwitterSensor twitterSensor;
     private PastebinSensor pastebinSensor;
+    private boolean leakhawkStarted = false;
 
     ConfigurationService(){
         this.leakHawk= new LeakHawkMain();
     }
 
     public boolean startLeakHawk() {
+        this.leakhawkStarted = true;
         return leakHawk.startLeakHawk();
     }
 
     public boolean stopLeakHawk() {
+        this.leakhawkStarted = false;
         return leakHawk.stopLeakHawk();
     }
 
@@ -55,6 +58,17 @@ public class ConfigurationService {
 
     public ResourcePath getConfig() {
         ResourcePath resourcePath = new ResourcePath();
+        if(twitterSensor==null){
+            resourcePath.setTwitterSensor(false);
+        }else{
+            resourcePath.setTwitterSensor(this.twitterSensor.getSensorState());
+        }
+        if(pastebinSensor == null){
+            resourcePath.setPastebinSensor(false);
+        }else {
+            resourcePath.setPastebinSensor(this.pastebinSensor.getSensorState());
+        }
+        resourcePath.setLeakhawk(this.leakhawkStarted);
         resourcePath.setResourcePath(leakHawk.getResourceFolderPath());
         return resourcePath;
     }

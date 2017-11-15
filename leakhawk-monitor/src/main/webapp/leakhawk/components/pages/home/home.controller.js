@@ -5,9 +5,9 @@
     angular.module('leakhawk')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['webservice', '$state', $timeout];
+    HomeController.$inject = ['webservice', '$state', $timeout, 'Notification'];
 
-    function HomeController(webservice, $state,$timeout) {
+    function HomeController(webservice, $state,$timeout, Notification) {
         var vm = this;
         vm.routeToOrder = routeToOrder;
         vm.loadTable = loadTable;
@@ -25,8 +25,8 @@
         function loadTable() {
             $("#dataTable").LoadingOverlay("show");
             webservice.call('incident/get_all_incidents', 'GET').then(function (response) {
-                vm.postList = response.data;
-                $("#dataTable").LoadingOverlay("hide");
+                    vm.postList = response.data;
+                    $("#dataTable").LoadingOverlay("hide");
             });
         }
 

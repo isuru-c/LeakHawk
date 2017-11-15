@@ -71,6 +71,11 @@ public class ConfigurationController {
         return configurationService.getConfig();
     }
 
-
+    /*try {
+        return sendSuccessResponse(advertisementService.saveItem(itemResource));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return handleServiceException(e);
+    }*/
 
 }

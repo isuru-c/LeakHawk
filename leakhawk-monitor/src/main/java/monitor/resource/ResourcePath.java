@@ -6,6 +6,12 @@ package monitor.resource;
 public class ResourcePath {
     private String resourcePath;
 
+    private boolean twitterSensor;
+
+    private boolean pastebinSensor;
+
+    private boolean leakhawk;
+
     public ResourcePath() {
     }
 
@@ -19,5 +25,29 @@ public class ResourcePath {
 
     public void setResourcePath(String resourcePath) {
         this.resourcePath = resourcePath;
+    }
+
+    public boolean isTwitterSensor() {
+        return twitterSensor;
+    }
+
+    public void setTwitterSensor(boolean twitterSensor) {
+        this.twitterSensor = twitterSensor;
+    }
+
+    public boolean isPastebinSensor() {
+        return pastebinSensor;
+    }
+
+    public void setPastebinSensor(boolean pastebinSensor) {
+        this.pastebinSensor = pastebinSensor;
+    }
+
+    public boolean isLeakhawk() {
+        return leakhawk;
+    }
+
+    public void setLeakhawk(boolean leakhawk) {
+        this.leakhawk = leakhawk;
     }
 }

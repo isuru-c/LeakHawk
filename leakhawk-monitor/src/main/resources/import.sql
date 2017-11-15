@@ -1,0 +1,32 @@
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('1AJjbYHV', true, '1507756860', true, 'User Credentials', 3, 'buy CC, Cvv , buy dumps,buy cvv Fullz( http://carder007s.com', 'pastebin-posts', 'carder0077');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930412544572915712', true, 'Tue Nov 14 12:30:11 +0000 2017', false, '', 0, 'null', 'tweets', 'Victor Bare');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930412545285922816', true, 'Tue Nov 14 12:30:11 +0000 2017', false, '', 0, 'null', 'tweets', 'jeanlytxo');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930413354853773312', true, 'Tue Nov 14 12:33:24 +0000 2017', false, '', 0, 'null', 'tweets', 'M KARAMAT');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474149977391104', true, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'Christina?');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474150321377283', false, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'liza');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474150623399936', false, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'Adam D. Dobrowolski');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474150996541442', false, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'London Skl. Trades');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474151122366464', false, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'Fortune CLI');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474151290253314', false, 'Tue Nov 14 16:34:59 +0000 2017', false, '', 0, null, 'tweets', 'PALLY');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474159200768000', false, 'Tue Nov 14 16:35:01 +0000 2017', false, '', 0, null, 'tweets', 'joshua a haines');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474163940274177', false, 'Tue Nov 14 16:35:02 +0000 2017', false, '', 0, null, 'tweets', 'Bryancha');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474167467638784', false, 'Tue Nov 14 16:35:03 +0000 2017', false, '', 0, null, 'tweets', 'iVukelambuso.');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474167983472641', false, 'Tue Nov 14 16:35:03 +0000 2017', false, '', 0, null, 'tweets', 'Melinda');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474171125194754', false, 'Tue Nov 14 16:35:04 +0000 2017', false, '', 0, null, 'tweets', 'ZeroProject.org');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('930474172177776641', false, 'Tue Nov 14 16:35:04 +0000 2017', false, '', 0, null, 'tweets', '???????');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('bcfgV5vV', true, '1509861986', true, 'Database', 2, '', 'pastebin-posts', '');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('DDLktmLU', true, '1507756875', true, 'User Credentials', 3, 'buy CC, Cvv , buy dumps,buy cvv Fullz( http://carder007s.com', 'pastebin-posts', 'carder0077');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('kSVnGeWF', true, '1507756867', true, 'User Credentials', 3, 'buy CC, Cvv , buy dumps,buy cvv Fullz( http://carder007s.com', 'pastebin-posts', 'carder0077');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('kTBrfhEh', true, '1507756833', true, 'Email only', 1, '', 'pastebin-posts', '');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('MNzk4wse', true, '1507756884', true, 'User Credentials', 3, 'buy CC, Cvv , buy dumps,buy cvv Fullz( http://carder007s.com', 'pastebin-posts', 'carder0077');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('NtkJ876j', true, '1507756852', true, 'User Credentials', 3, 'buy CC, Cvv , buy dumps,buy cvv Fullz( http://carder007s.com', 'pastebin-posts', 'carder0077');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('yNZZfxxS', true, '1507756602', true, 'User Credentials', 3, '', 'pastebin-posts', '');
+INSERT INTO LeakHawk.incident (post_key, content, date, evidence, predict_class, sensitivity_level, title, type, user) VALUES ('Z1qnctR0', true, '1507756488', true, 'User Credentials', 3, '', 'pastebin-posts', '');
+
+
+
+INSERT INTO LeakHawk.chart_detail (field_name, value) VALUES ('totalPostCount', 13167);
+INSERT INTO LeakHawk.chart_detail (field_name, value) VALUES ('preFilterPassedCount', 3179);
+INSERT INTO LeakHawk.chart_detail (field_name, value) VALUES ('contextFilterPassedCount', 1243);
+INSERT INTO LeakHawk.chart_detail (field_name, value) VALUES ('contentPassedCount', 92);
+INSERT INTO LeakHawk.chart_detail (field_name, value) VALUES ('evidencePassedCount', 114);

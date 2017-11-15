@@ -27,6 +27,7 @@ import net.didion.jwnl.dictionary.Dictionary;
 import util.LeakHawkConstant;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +43,20 @@ public class ContextFilter extends LeakHawkFilter {
 
     private List<String> regularExpressionList;
     private ArrayList<String> synonyms;
+
+    private String dict_properties = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<jwnl_properties language=\"en\">\n" +
+            "    <version publisher=\"Princeton\" number=\"3.0\" language=\"en\"/>\n" +
+            "    <dictionary class=\"net.didion.jwnl.dictionary.FileBackedDictionary\">\n" +
+            "        <param name=\"dictionary_element_factory\"\n" +
+            "               value=\"net.didion.jwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory\"/>\n" +
+            "        <param name=\"file_manager\" value=\"net.didion.jwnl.dictionary.file_manager.FileManagerImpl\">\n" +
+            "            <param name=\"file_type\" value=\"net.didion.jwnl.princeton.file.PrincetonRandomAccessDictionaryFile\"/>\n" +
+            "            <param name=\"dictionary_path\" value=\"~//home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/dict\"/>\n" +
+            "        </param>\n" +
+            "    </dictionary>\n" +
+            "    <resource class=\"PrincetonResource\"/>\n" +
+            "</jwnl_properties>\n";
 
     @Override
     public void prepareFilter() {
@@ -72,7 +87,7 @@ public class ContextFilter extends LeakHawkFilter {
         synonyms = new ArrayList<>();
         ArrayList<String> wordSet = new ArrayList<>();
         try {
-            InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("SriLanka.txt");
+            InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("context_wordList.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
             String strLine;
             while ((strLine = br.readLine()) != null) {
@@ -80,12 +95,15 @@ public class ContextFilter extends LeakHawkFilter {
             }
             br.close();
 
+            //TODO Check this right
             // initialize JWNL (this must be done before JWNL can be used)
-            JWNL.initialize(this.getClass().getClassLoader().getResourceAsStream("properties.xml"));
+//            JWNL.initialize(this.getClass().getClassLoader().getResourceAsStream("properties.xml"));
+            InputStream dict_stream = new ByteArrayInputStream(dict_properties.getBytes(StandardCharsets.UTF_8.name()));
+            JWNL.initialize(dict_stream);
         } catch (IOException e) {
-            throw new LeakHawkFilePathException("Can't load SriLanka.txt file.", e);
+            throw new LeakHawkFilePathException("Can't load context_wordList.txt file.", e);
         } catch (JWNLException e) {
-            throw new LeakHawkFilePathException("Can't load properties.xml file.", e);
+            throw new LeakHawkFilePathException("Can't load dict_properties.xml file.", e);
         }
         Dictionary dictionary = Dictionary.getInstance();
 

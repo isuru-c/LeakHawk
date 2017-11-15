@@ -1,28 +1,31 @@
-
 (function () {
     'use strict';
 
     angular.module('leakhawk')
         .controller('ControlPanelController', ControlPanelController);
 
-    ControlPanelController.$inject = ['webservice','$stateParams' ,'$state'];
+    ControlPanelController.$inject = ['webservice', '$stateParams', '$state', 'Notification'];
 
-    function ControlPanelController(webservice, $stateParams,$state) {
+    function ControlPanelController(webservice, $stateParams, $state, Notification) {
         var vm = this;
         vm.startLeakHawk = startLeakHawk;
         vm.stopLeakHawk = stopLeakHawk;
         vm.addTwitter = addTwitter;
         vm.removeTwitter = removeTwitter;
+        vm.removePastebin = removePastebin;
         vm.addPatebin = addPastebin;
         vm.saveConfig = saveResourcePath;
 
-        vm.leakHawkButton = false;
-        vm.twitterButton = false;
-        vm.pastebinButton = false;
+        vm.leakhawkBoolean = false;
+        vm.twitterBoolean = false;
+        vm.pastebinBoolean = false;
 
         $.LoadingOverlay("show");
         webservice.call('configuration/get_config', 'GET').then(function (response) {
             vm.resourcePath = response.data.resourcePath;
+            vm.leakhawkBoolean = response.data.leakhawk;
+            vm.twitterBoolean = response.data.twitterSensor;
+            vm.pastebinBoolean = response.data.pastebinSensor;
             $.LoadingOverlay("hide");
         });
 
@@ -31,60 +34,92 @@
         //     vm.postDetails = response.data.details;
         // });
 
-        function startLeakHawk(){
+        function startLeakHawk() {
             $.LoadingOverlay("show");
             webservice.call('configuration/start_leakhawk', 'GET').then(function (response) {
-                $.LoadingOverlay("hide");
-                vm.responseData += "LeakHawk Started.....\n";
+                if (response.status == 200) {
+                    $.LoadingOverlay("hide");
+                    vm.responseData += "LeakHawk Started.....\n";
+                    Notification.success('LeakHawk Started');
+                }
             });
-            vm.leakHawkButton = true;
+            vm.leakhawkBoolean = true;
+
         }
 
-        function stopLeakHawk(){
+        function stopLeakHawk() {
             $.LoadingOverlay("show");
             webservice.call('configuration/stop_leakhawk', 'GET').then(function (response) {
-                $.LoadingOverlay("hide");
-                vm.responseData += "LeakHawk Stoped.....\n";
+                if (response.status == 200) {
+                    $.LoadingOverlay("hide");
+                    vm.responseData += "LeakHawk Stoped.....\n";
+                    Notification.success('LeakHawk Stopped');
+                }
             });
-            vm.leakHawkButton = false;
+            vm.leakhawkBoolean = false;
         }
 
 
         function addTwitter() {
             $.LoadingOverlay("show");
             webservice.call('configuration/add_twitter', 'GET').then(function (response) {
-                console.log(response.data);
-                $.LoadingOverlay("hide");
+                if (response.status == 200) {
+                    console.log(response.data);
+                    $.LoadingOverlay("hide");
+                    Notification.success('Twitter feed added');
+                }
             });
             vm.responseData += "Twitter feed added.....\n";
-            vm.twitterButton = true;
+            vm.twitterBoolean = true;
         }
 
         function addPastebin() {
             $.LoadingOverlay("show");
             webservice.call('configuration/add_pastebin', 'GET').then(function (response) {
-                console.log(response.data);
-                $.LoadingOverlay("hide");
+                if (response.status == 200) {
+                    console.log(response.data);
+                    $.LoadingOverlay("hide");
+                    Notification.success('Pastebin feed added');
+                }
             });
             vm.responseData += "Pastebin feed added.....\n";
-            vm.pastebinButtonButton = true;
+            vm.pastebinBoolean = true;
         }
 
         function removeTwitter() {
             $.LoadingOverlay("show");
             webservice.call('configuration/removeTwitter', 'GET').then(function (response) {
-                console.log(response.data);
-                $.LoadingOverlay("hide");
+                if (response.status == 200) {
+                    console.log(response.data);
+                    $.LoadingOverlay("hide");
+                    Notification.success('Twitter feed removed');
+                }
             });
             vm.responseData += "Twitter feed removed.....\n";
-            vm.twitterButton = false;
+            vm.twitterBoolean = false;
+        }
+
+        function removePastebin() {
+            $.LoadingOverlay("show");
+            webservice.call('configuration/removePastebin', 'GET').then(function (response) {
+                if (response.status == 200) {
+                    console.log(response.data);
+                    $.LoadingOverlay("hide");
+                    Notification.success('Pastebin feed removed');
+                }
+            });
+            vm.responseData += "Pastebin feed removed.....\n";
+            vm.twitterBoolean = false;
         }
 
         function saveResourcePath() {
             $.LoadingOverlay("show");
-            var sendObj = {"resourcePath":vm.resourcePath};
+            var sendObj = {"resourcePath": vm.resourcePath};
             webservice.call('configuration/save_config', 'POST', sendObj).then(function (response) {
-                $.LoadingOverlay("hide");
+                if(response.status==200) {
+                    $.LoadingOverlay("hide");
+                    Notification.success('Configuration saved.');
+                }
             });
             vm.responseData += "Configuration Saved.....\n";
         }

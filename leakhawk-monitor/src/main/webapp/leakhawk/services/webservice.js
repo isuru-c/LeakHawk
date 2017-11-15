@@ -9,9 +9,9 @@
     angular.module('leakhawk')
         .service('webservice', webservice);
 
-    webservice.$inject = ['$http', '$q'];
+    webservice.$inject = ['$http', '$q','Notification'];
 
-    function webservice($http, $q) {
+    function webservice($http, $q, Notification) {
         var service = {
             call: call
         };
@@ -61,6 +61,7 @@
                     return deferred.promise;
                 }, function (error) {
                     //This will be called if $q.all finds any of the requests erroring.
+                    Notification.error('Request Failed.');
                     console.log("There is an error: " + error);
                     console.log(error);
                 }

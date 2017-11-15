@@ -2,9 +2,9 @@
     'use strict';
 
     angular.module('leakhawk', [
-        'ui.router', 'ngCookies','flow','chart.js'
-    ]).config(['$stateProvider', '$urlRouterProvider', '$httpProvider',
-        function ($stateProvider, $urlRouterProvider, $httpProvider) {
+        'ui.router', 'ngCookies', 'flow', 'chart.js', 'ui-notification'
+    ]).config(['$stateProvider', '$urlRouterProvider', '$httpProvider','NotificationProvider',
+        function ($stateProvider, $urlRouterProvider, $httpProvider, NotificationProvider) {
 
             $stateProvider.state('default', {
                 url: '',
@@ -79,5 +79,17 @@
 
             $urlRouterProvider.otherwise('/404');
 
-        }]);
+            NotificationProvider.setOptions({
+                delay: 3000,
+                startTop: 20,
+                startRight: 10,
+                verticalSpacing: 20,
+                horizontalSpacing: 20,
+                positionX: 'right',
+                positionY: 'top'
+            });
+
+        }
+
+    ]);
 })();

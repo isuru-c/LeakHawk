@@ -110,7 +110,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
         try {
 //            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/PreFilter.model");
             tclassifier = new SerializedClassifier();
-            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/PreFilter.model"));
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/PreFilter_pb.model"));
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("PreFilter.model file loading error.", e);
         }

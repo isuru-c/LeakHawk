@@ -119,4 +119,8 @@ public class PastebinSensor extends Thread {
         return true;
     }
 
+    public boolean getSensorState(){
+        return this.pastebinSensorRunning;
+    }
+
 }

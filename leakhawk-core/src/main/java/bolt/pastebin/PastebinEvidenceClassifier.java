@@ -248,7 +248,7 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
         //ML model loaded
         try {
             sclassifier = new SerializedClassifier();
-            sclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/EviC.model"));
+            sclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/Evidence_pb.model"));
         } catch (Exception e) {
             e.printStackTrace();
         }

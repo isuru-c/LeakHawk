@@ -25,6 +25,7 @@ import weka.core.Stopwords;
 import java.io.*;
 import java.util.ArrayList;
 
+import static util.LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH;
 import static util.LeakHawkConstant.TWITTER_PRE_FILTER_FILE_PATH;
 
 /**
@@ -45,7 +46,7 @@ public class TwitterPreFilter extends LeakHawkFilter {
         try {
 
 //          InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream("TwitterPreFilterList.txt");
-            InputStream fileInputStream = new FileInputStream(TWITTER_PRE_FILTER_FILE_PATH);
+            InputStream fileInputStream = new FileInputStream(RESOURCE_FOLDER_FILE_PATH+"/PreFilter_twitter.txt");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
             String strLine;
             keywordList = new ArrayList<>();

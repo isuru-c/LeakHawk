@@ -107,4 +107,8 @@ public class TwitterSensor extends Thread {
         this.twitterSensorRunning = false;
         return true;
     }
+
+    public boolean getSensorState(){
+        return this.twitterSensorRunning;
+    }
 }
