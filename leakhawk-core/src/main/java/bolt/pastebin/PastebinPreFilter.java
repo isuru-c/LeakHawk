@@ -27,6 +27,7 @@ import util.LeakHawkConstant;
 import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import weka.core.Stopwords;
 
 import java.io.*;
 import java.util.*;
@@ -34,7 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author sewwandi
+ * @author Udeshika Sewwandi
  * @author Warunika Amali
  */
 public class PastebinPreFilter extends LeakHawkFilter {
@@ -160,7 +161,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
         // Return true if post needs to be forwarded to the next bolt
         // Return false if post needs not to be forwarded to the next bolt
-        if (isPassedPreFilter(post.getTitle(), post.getPostText())) {
+        if (isPassedPreFilter(post.getTitle(), post.getPostText(), post)) {
             post.setNextOutputStream(LeakHawkConstant.P_PRE_FILTER_TO_CONTEXT_FILTER);
             increaseOutCount();
             return true;
@@ -175,7 +176,7 @@ public class PastebinPreFilter extends LeakHawkFilter {
      * @param post
      * @return
      */
-    private boolean isPassedPreFilter(String title, String post) {
+    private boolean isPassedPreFilter(String title, String post,Post originalPost) {
 
         title = title.toLowerCase();
         post = post.toLowerCase();
@@ -191,10 +192,57 @@ public class PastebinPreFilter extends LeakHawkFilter {
         }
         //check whether the post is in English
         else if(isPostEnglish(post)){
-            isPrefilterPassed = isNotFilteredOut(post, title);
+            /*remove stop words only in a English language post*/
+            String preprocessedText = stopWordsRemoval(post);
+            /*set the post text with the stop words removed text*/
+            originalPost.setPostText(preprocessedText);
+            isPrefilterPassed = isNotFilteredOut(preprocessedText, title);
+            //isPrefilterPassed = isNotFilteredOut(post, title);
         }
 
         return isPrefilterPassed;
+    }
+
+    /**
+     * Returns the post by removing stop words related to English language
+     * @param post
+     * @return stop words removed post
+     */
+    public String stopWordsRemoval(String post){
+        Stopwords stpWord = new Stopwords();
+
+        /*remove words from stop word list which may appear in program codes*/
+        stpWord.remove("and");
+        stpWord.remove("as");
+        stpWord.remove("do");
+        stpWord.remove("for");
+        stpWord.remove("i");
+        stpWord.remove("if");
+        stpWord.remove("is");
+        stpWord.remove("in");
+        stpWord.remove("not");
+        stpWord.remove("of");
+        stpWord.remove("on");
+        stpWord.remove("or");
+        stpWord.remove("this");
+
+        StringBuilder stringBuilder = new StringBuilder(post);
+        /*split string from spaces*/
+        String[] words = stringBuilder.toString().split("\\s");
+        String fullString = "";
+
+        /*replace stop words with a space*/
+        for(int i=0;i<words.length;i++){
+            if(stpWord.is(words[i])){
+                words[i] = "";
+            }
+        }
+
+        /*concatenate string without stop words*/
+        for(String word:words){
+            fullString+=word+" ";
+        }
+        return fullString;
     }
 
     /**

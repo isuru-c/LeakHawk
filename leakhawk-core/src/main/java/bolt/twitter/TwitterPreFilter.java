@@ -17,8 +17,10 @@
 package bolt.twitter;
 
 import bolt.core.LeakHawkFilter;
+import bolt.pastebin.PastebinPreFilter;
 import model.Post;
 import util.LeakHawkConstant;
+import weka.core.Stopwords;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import static util.LeakHawkConstant.TWITTER_PRE_FILTER_FILE_PATH;
  * Extends the superclass LeakHawkPreFilter
  *
  * @author Isuru Chandima
+ * @author Udeshika Sewwandi
  */
 public class TwitterPreFilter extends LeakHawkFilter {
 
@@ -106,13 +109,57 @@ public class TwitterPreFilter extends LeakHawkFilter {
      * @return true if the post contains any given words in keywordList, false otherwise
      */
     private boolean isContainKeyword(String postText) {
+        /*get stop words removed text*/
+        String preprocessedText = stopWordsRemoval(postText);
 
         for (String keyword : keywordList) {
-            if (postText.contains(keyword))
+            if (preprocessedText.contains(keyword))
                 return true;
         }
 
         return false;
+    }
+
+    /**
+     * Returns the post by removing stop words related to English language
+     * @param post
+     * @return stop words removed post
+     */
+    public String stopWordsRemoval(String post){
+        Stopwords stpWord = new Stopwords();
+
+        /*remove words from stop word list which may appear in program codes*/
+        stpWord.remove("and");
+        stpWord.remove("as");
+        stpWord.remove("do");
+        stpWord.remove("for");
+        stpWord.remove("i");
+        stpWord.remove("if");
+        stpWord.remove("is");
+        stpWord.remove("in");
+        stpWord.remove("not");
+        stpWord.remove("of");
+        stpWord.remove("on");
+        stpWord.remove("or");
+        stpWord.remove("this");
+
+        StringBuilder stringBuilder = new StringBuilder(post);
+        /*split string from spaces*/
+        String[] words = stringBuilder.toString().split("\\s");
+        String fullString = "";
+
+        /*replace stop words with a space*/
+        for(int i=0;i<words.length;i++){
+            if(stpWord.is(words[i])){
+                words[i] = "";
+            }
+        }
+
+        /*concatenate string without stop words*/
+        for(String word:words){
+            fullString+=word+" ";
+        }
+        return fullString;
     }
 
     @Override
