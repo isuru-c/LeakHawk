@@ -52,7 +52,7 @@ public class ContextFilter extends LeakHawkFilter {
             "               value=\"net.didion.jwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory\"/>\n" +
             "        <param name=\"file_manager\" value=\"net.didion.jwnl.dictionary.file_manager.FileManagerImpl\">\n" +
             "            <param name=\"file_type\" value=\"net.didion.jwnl.princeton.file.PrincetonRandomAccessDictionaryFile\"/>\n" +
-            "            <param name=\"dictionary_path\" value=\"~//home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/dict\"/>\n" +
+            "            <param name=\"dictionary_path\" value=\""+LeakHawkConstant.DICTIONARY_PATH+"\n   \"/>\n" +
             "        </param>\n" +
             "    </dictionary>\n" +
             "    <resource class=\"PrincetonResource\"/>\n" +

@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -42,7 +43,7 @@ public class CFClassifier extends ContentClassifier{
     private Pattern digitPattern;
     private Pattern alphaPattern;
     private Pattern alphDigitPattern;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
     private String headingCF = "@relation CF\n" +
             "\n" +
             "@attribute $CF1 numeric\n" +
@@ -77,7 +78,9 @@ public class CFClassifier extends ContentClassifier{
     public CFClassifier(String model, String name) {
         super(model,name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/CF.model");
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("CF.model file loading error.", e);
         }
@@ -203,6 +206,8 @@ public class CFClassifier extends ContentClassifier{
 
         } catch (IOException e) {
             throw new LeakHawkDataStreamException("Post text error occured.", e);
+        }catch (StackOverflowError e) {
+
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("CF.model classification error.", e);
         }

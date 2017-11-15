@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -47,7 +48,7 @@ public class DAClassifier extends ContentClassifier {
     private Pattern relatedPattern3;
     private Pattern relatedPattern4;
     private Pattern relatedPattern5;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
 
     private String headingDA = "@relation train\n" +
             "\n" +
@@ -75,12 +76,14 @@ public class DAClassifier extends ContentClassifier {
         super(model, name);
 
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/DA.model");
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("DA.model file loading error.", e);
         }
 
-        unigrams= new ArrayList<String>();
+        unigrams = new ArrayList<String>();
         unigrams.add(" mx | ns | ptr | cname | soa ");
         unigrams.add("dns|record|host");
         unigrams.add("snoop|axfr|brute|poisoning");
@@ -99,7 +102,7 @@ public class DAClassifier extends ContentClassifier {
 
         unigramPatternList = new ArrayList<Pattern>();
         for (String word : unigrams) {
-            unigramPatternList.add(Pattern.compile(word,Pattern.CASE_INSENSITIVE));
+            unigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         bigramPatternList = new ArrayList<Pattern>();
@@ -113,13 +116,13 @@ public class DAClassifier extends ContentClassifier {
         }
 
         relatedPattern1 = Pattern.compile("dns-brute|dnsrecon|fierce|tsunami|dnsdict6|axfr", Pattern.CASE_INSENSITIVE);
-        relatedPattern3 = Pattern.compile("dns leaked|dns fuck3d|zone transfer|dns|enumeration_attack" , Pattern.CASE_INSENSITIVE);
+        relatedPattern3 = Pattern.compile("dns leaked|dns fuck3d|zone transfer|dns|enumeration_attack", Pattern.CASE_INSENSITIVE);
         relatedPattern4 = Pattern.compile("dns_enumeration", Pattern.CASE_INSENSITIVE);
         relatedPattern5 = Pattern.compile("dns enumeration attack|dns enumeration|misconfigured dns|dns cache snooping", Pattern.CASE_INSENSITIVE);
 
     }
 
-    public String createARFF(String text,String title) {
+    public String createARFF(String text, String title) {
         String feature_list = "";
 
         for (Pattern pattern : unigramPatternList) {
@@ -151,15 +154,15 @@ public class DAClassifier extends ContentClassifier {
         feature_list += getMatchingCount(matcher) + ",";
 
         feature_list += "?";
-        return headingDA+feature_list;
+        return headingDA + feature_list;
     }
 
 
     @Override
-    public boolean classify(String text,String title) {
-        try{
+    public boolean classify(String text, String title) {
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // read it with BufferedReader
@@ -181,22 +184,24 @@ public class DAClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
         } catch (IOException e) {
             throw new LeakHawkDataStreamException("Post text error occured.", e);
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("DA.model classification error.", e);
         }
         return false;
     }
 
-    public int getSensivityLevel(String post){
+    public int getSensivityLevel(String post) {
         ArrayList<String> DAlist = new ArrayList<String>(Arrays.asList("lanka", "lk", "ceylon", "sinhala", "buddhist", "colombo", "kandy", "kurunegala", "gampaha", "mahinda", "sirisena", "ranil"));
         int domainCount = 0;
-        int count=0;
+        int count = 0;
         for (String i : DAlist) {
             if (post.contains(i)) {
                 count++;
@@ -209,7 +214,6 @@ public class DAClassifier extends ContentClassifier {
         }
         return 1;
     }
-
 
 
 }

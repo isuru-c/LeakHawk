@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -43,7 +44,7 @@ public class PKClassifier extends ContentClassifier {
     private Pattern relatedPattern1;
     private Pattern relatedPattern2;
 
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
 
     private String headingPK = "@relation PK\n" +
             "\n" +
@@ -76,7 +77,9 @@ public class PKClassifier extends ContentClassifier {
     public PKClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/PK.model");
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("PK.model file loading error.", e);
         }
@@ -120,7 +123,7 @@ public class PKClassifier extends ContentClassifier {
 
         trigramPatternList = new ArrayList<Pattern>();
         for (String word : trigramList) {
-            trigramPatternList.add(Pattern.compile( word, Pattern.CASE_INSENSITIVE));
+            trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
         fourgramPatternList = new ArrayList<Pattern>();
@@ -133,7 +136,7 @@ public class PKClassifier extends ContentClassifier {
 
     }
 
-    public String createARFF(String text,String title) {
+    public String createARFF(String text, String title) {
         String feature_list = "";
 
         for (Pattern pattern : unigramPatternList) {
@@ -167,10 +170,10 @@ public class PKClassifier extends ContentClassifier {
     }
 
     @Override
-    public boolean classify(String text,String title) {
-        try{
+    public boolean classify(String text, String title) {
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // read it with BufferedReader
@@ -192,12 +195,14 @@ public class PKClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
         } catch (IOException e) {
             throw new LeakHawkDataStreamException("Post text error occured.", e);
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("PK.model classification error.", e);
         }
@@ -205,7 +210,7 @@ public class PKClassifier extends ContentClassifier {
     }
 
     @Override
-    public int getSensivityLevel(String post){
+    public int getSensivityLevel(String post) {
         return 3;
     }
 

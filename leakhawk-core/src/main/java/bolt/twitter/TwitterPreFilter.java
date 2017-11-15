@@ -26,7 +26,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import static util.LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH;
-import static util.LeakHawkConstant.TWITTER_PRE_FILTER_FILE_PATH;
+
 
 /**
  * This Bolt is used to filter out posts that does not contain any sensitive data like

@@ -16,6 +16,7 @@
 package classifier.Content;
 
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -29,16 +30,16 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "User Credentials", filePath = "UC.model")
-public class UCClassifier extends ContentClassifier{
+public class UCClassifier extends ContentClassifier {
 
-    private int hashCount=0;
+    private int hashCount = 0;
     private ArrayList<Pattern> unigramPatternList;
     private ArrayList<Pattern> bigramPatternList;
     private Pattern titlePattern;
     private Pattern relatedTerms2Pattern;
     private Pattern relatedTerms3Pattern;
     private Pattern ucPattern;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
     private String headingCC = "@relation UC\n" +
             "\n" +
             "@attribute $UC1 numeric\n" +
@@ -60,7 +61,9 @@ public class UCClassifier extends ContentClassifier{
     public UCClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/UC.model");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -126,7 +129,7 @@ public class UCClassifier extends ContentClassifier{
         feature_list += matchingCount + ",";
 
         extractHashCount(text);
-        feature_list +=hashCount + ",";
+        feature_list += hashCount + ",";
         feature_list += "?";
 
         return headingCC + feature_list;
@@ -135,9 +138,9 @@ public class UCClassifier extends ContentClassifier{
 
     @Override
     public boolean classify(String text, String title) {
-        try{
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // read it with BufferedReader
@@ -160,11 +163,13 @@ public class UCClassifier extends ContentClassifier{
             labeled.instance(0).setClassValue(pred);
 
             String classLabel = unlabeled.classAttribute().value((int) pred);
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -190,9 +195,9 @@ public class UCClassifier extends ContentClassifier{
 
         Hash_id hash_id = new Hash_id();
 
-        String[] words= post.split(" |\n");
-        for(String word:words){
-            if(hash_id.isHash(word)==true) hashCount++;
+        String[] words = post.split(" |\n");
+        for (String word : words) {
+            if (hash_id.isHash(word) == true) hashCount++;
         }
     }
 }

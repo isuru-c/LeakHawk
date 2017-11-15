@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -39,7 +40,7 @@ public class ECClassifier extends ContentClassifier {
     private Pattern titlePattern;
     private ArrayList<Pattern> unigramPatternList;
     private Pattern relatedPattern1;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
 
     private String headingEC = "@relation train\n" +
             "\n" +
@@ -55,13 +56,13 @@ public class ECClassifier extends ContentClassifier {
             "@data\n";
 
 
-
-
     public ECClassifier(String model, String name) {
         super(model, name);
 
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/EC.model");
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("EC.model file loading error.", e);
         }
@@ -79,7 +80,7 @@ public class ECClassifier extends ContentClassifier {
         }
 
         titlePattern = Pattern.compile("conversation|email", Pattern.CASE_INSENSITIVE);
-        relatedPattern1 = Pattern.compile( ">" );
+        relatedPattern1 = Pattern.compile(">");
 
 
     }
@@ -130,19 +131,21 @@ public class ECClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
         } catch (IOException e) {
             throw new LeakHawkDataStreamException("Post text error occured.", e);
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("EC.model classification error.", e);
         }
         return false;
     }
 
-    public int getSensivityLevel(String post){
+    public int getSensivityLevel(String post) {
         ArrayList<String> ECList = new ArrayList<String>(Arrays.asList("CONFIDENTIAL", "secret", "do not disclose"));
         int ecCount = 0;
         for (String i : ECList) {

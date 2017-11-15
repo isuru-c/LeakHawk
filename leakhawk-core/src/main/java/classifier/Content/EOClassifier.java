@@ -19,6 +19,7 @@ package classifier.Content;
 import exception.LeakHawkClassifierLoadingException;
 import exception.LeakHawkDataStreamException;
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -37,7 +38,7 @@ public class EOClassifier extends ContentClassifier {
     private Pattern relatedPattern1;
     private Pattern relatedPattern2;
     private Pattern emailPattern;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
 
     private String headingEO = "@relation train\n" +
             "\n" +
@@ -53,7 +54,9 @@ public class EOClassifier extends ContentClassifier {
     public EOClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/EO.model");
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("EO.model file loading error.", e);
         }
@@ -78,13 +81,13 @@ public class EOClassifier extends ContentClassifier {
         int emailCount = getMatchingCount(matcherEO);
         feature_list += emailCount + ",";
 
-        int wordCount= text.replace('[', ' ').replace('*', ' ').replace(']', ' ').replace(',', ' ').replace('/', ' ').replace(':', ' ').split("\\s+").length;
+        int wordCount = text.replace('[', ' ').replace('*', ' ').replace(']', ' ').replace(',', ' ').replace('/', ' ').replace(':', ' ').split("\\s+").length;
         feature_list += wordCount + ",";
 
-        double rate = ((double) emailCount/wordCount)*100;
-        if(rate>89){
+        double rate = ((double) emailCount / wordCount) * 100;
+        if (rate > 89) {
             feature_list += 1 + ",";
-        }else {
+        } else {
             feature_list += 0 + ",";
         }
 
@@ -118,19 +121,21 @@ public class EOClassifier extends ContentClassifier {
             double pred = tclassifier.classifyInstance(unlabeled.instance(0));
             String classLabel = unlabeled.classAttribute().value((int) pred);
 
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new LeakHawkDataStreamException("Post text error occured.", e);
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             throw new LeakHawkClassifierLoadingException("EO.model classification error.", e);
         }
         return false;
     }
 
-    public int getSensivityLevel(String post){
+    public int getSensivityLevel(String post) {
         int email_count = EOCounter(post);
         if (email_count < 50) {
             return 1;

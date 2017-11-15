@@ -16,6 +16,7 @@
 package classifier.Content;
 
 import util.LeakHawkConstant;
+import weka.classifiers.misc.SerializedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -29,7 +30,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("ALL")
 @ContentPattern(patternName = "Website Defacement", filePath = "WD.model")
-public class WDClassifier extends ContentClassifier{
+public class WDClassifier extends ContentClassifier {
 
     private int urlCount;
     private ArrayList<Pattern> unigramPatternList;
@@ -38,7 +39,7 @@ public class WDClassifier extends ContentClassifier{
     private Pattern relatedTerms1Pattern;
     private Pattern relatedTerms2Pattern;
     private Pattern relatedTerms3Pattern;
-    private RandomForest tclassifier;
+    private SerializedClassifier tclassifier;
     private String headingWD = "@relation WD\n" +
             "\n" +
             "@attribute $WD1 numeric\n" +
@@ -59,7 +60,9 @@ public class WDClassifier extends ContentClassifier{
     public WDClassifier(String model, String name) {
         super(model, name);
         try {
-            tclassifier = (RandomForest) weka.core.SerializationHelper.read(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH +"/"+model);
+            tclassifier = new SerializedClassifier();
+            tclassifier.setModelFile(new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH + "/" + model));
+//            tclassifier = (RandomForest) weka.core.SerializationHelper.read("/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/WD.model");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,7 +76,7 @@ public class WDClassifier extends ContentClassifier{
         bigramList.add("site hacked|got hacked");
         bigramList.add("sites defaced|mass deface");
 
-        ArrayList<String> trigramList =new ArrayList<String>();
+        ArrayList<String> trigramList = new ArrayList<String>();
         trigramList.add("sites got Hacked");
 
         unigramPatternList = new ArrayList<>();
@@ -91,7 +94,7 @@ public class WDClassifier extends ContentClassifier{
             trigramPatternList.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
         }
 
-        relatedTerms1Pattern =Pattern.compile("(web)*site(s)*[A-Za-z0-9_ ]*hack(ed)*|deface(d) by|hack(ed) by|deface|pwned|hacked|leaked", Pattern.CASE_INSENSITIVE);
+        relatedTerms1Pattern = Pattern.compile("(web)*site(s)*[A-Za-z0-9_ ]*hack(ed)*|deface(d) by|hack(ed) by|deface|pwned|hacked|leaked", Pattern.CASE_INSENSITIVE);
         relatedTerms2Pattern = Pattern.compile("sited hacked by|websited hacked by|website hacked by|site hacked by|websited hacked|domain hack|defaced|leaked by|site deface|mass deface", Pattern.CASE_INSENSITIVE);
         relatedTerms3Pattern = Pattern.compile("mirror-zone.org|dark-h.net|zone-h.org|zone-hc.com|dark-h.org|turk-h.org|Zone-hc.com|add-attack.com/mirror|zone-db.com|hack-db.com", Pattern.CASE_INSENSITIVE);
 
@@ -132,7 +135,7 @@ public class WDClassifier extends ContentClassifier{
         feature_list += matchingCount + ",";
 
         extractUrlCount(text);
-        feature_list +=urlCount + ",";
+        feature_list += urlCount + ",";
         feature_list += "?";
 
         return headingWD + feature_list;
@@ -141,9 +144,9 @@ public class WDClassifier extends ContentClassifier{
 
     @Override
     public boolean classify(String text, String title) {
-        try{
+        try {
             // convert String into InputStream
-            String result = createARFF(text,title);
+            String result = createARFF(text, title);
             InputStream is = new ByteArrayInputStream(result.getBytes());
 
             // read it with BufferedReader
@@ -166,11 +169,13 @@ public class WDClassifier extends ContentClassifier{
             labeled.instance(0).setClassValue(pred);
 
             String classLabel = unlabeled.classAttribute().value((int) pred);
-            if("pos".equals(classLabel)){
+            if ("pos".equals(classLabel)) {
                 return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (StackOverflowError e) {
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -195,9 +200,9 @@ public class WDClassifier extends ContentClassifier{
      */
     public void extractUrlCount(String post) {
 
-        urlCount=0;
-        String[] words= post.split("\\s| ");
-        for(String word:words){
+        urlCount = 0;
+        String[] words = post.split("\\s| ");
+        for (String word : words) {
             if (word.matches("\\b((https?):|(www))\\S+")) {
                 // System.out.println("URL =" + word);
                 urlCount++;
