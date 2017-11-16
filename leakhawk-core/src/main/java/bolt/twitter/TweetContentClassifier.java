@@ -119,70 +119,92 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         String text = post.getPostText();
         for (Pattern pattern : ccPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Credit Card",getCreditCardSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Credit Card", getCreditCardSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Credit Card", getCreditCardSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
+                break;
             }
         }
 
         for (Pattern pattern : dbPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Database",getDBSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Database", getDBSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Database", getDBSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
 
         for (Pattern pattern : pkPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Private Key",getPKSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Private Key", getPKSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Private Key", getPKSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
 
         for (Pattern pattern : ucPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("User Credentials",getUCSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "User Credentials", getUCSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "User Credentials", getUCSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
 
         for (Pattern pattern : eoPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Email Only",getEOSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Email Only", getEOSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Email Only", getEOSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
 
         for (Pattern pattern : wdPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("Website Defacement",getWDSensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Website Defacement", getWDSensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Website Defacement", getWDSensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
 
         for (Pattern pattern : daPattern) {
-            Matcher matcher = pattern.matcher(text);
-            if(getMatchingCount(matcher)!=0){
-                ContentData contentData = new ContentData("DNS Attack",getDASensivityLevel(text));
-                contentDataList.add(contentData);
-                contentModel.setContentFound(true);
+            boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "DNS Attack", getDASensivityLevel(text));
+            if(post.getUrlList().size()>0) {
+                boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "DNS Attack", getDASensivityLevel(post.getUrlContent()));
+                if(urlMatched){
+                    matched = true;
+                }
+            }
+            if(matched){
                 break;
             }
         }
@@ -194,6 +216,17 @@ public class TweetContentClassifier extends LeakHawkClassifier {
         }
 
         post.setNextOutputStream(LeakHawkConstant.T_CONTENT_CLASSIFIER_TO_SYNTHESIZER);
+    }
+
+    boolean matchWithPattern(Pattern pattern,String text,List contentDataList, ContentModel contentModel,String type, int level){
+        Matcher matcher = pattern.matcher(text);
+        if(getMatchingCount(matcher)!=0){
+            ContentData contentData = new ContentData(type,level);
+            contentDataList.add(contentData);
+            contentModel.setContentFound(true);
+            return true;
+        }
+        return false;
     }
 
     int getMatchingCount(Matcher matcher) {

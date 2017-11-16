@@ -35,6 +35,13 @@ public class IncidentController {
     }
 
     @CrossOrigin(origins = "http://localhost:8000")
+    @RequestMapping(value = "/get_incidents_orderby_date",method = RequestMethod.GET)
+    @ResponseBody
+    public List getIncidentsOrderbyDate(){
+        return incidentService.getIncidentsOrderByDate();
+    }
+
+    @CrossOrigin(origins = "http://localhost:8000")
     @RequestMapping(value = "/get_incident/{id}",method = RequestMethod.GET)
     @ResponseBody
     public IncidentResource getIncident(@PathVariable("id") String id){

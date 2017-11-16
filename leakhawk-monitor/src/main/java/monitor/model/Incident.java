@@ -1,9 +1,6 @@
 package monitor.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -19,6 +16,9 @@ public class Incident {
     private String title;
     private String type;
     private String date;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean link;
     private int sensitivityLevel;
     private boolean content;
     private boolean evidence;
@@ -117,5 +117,13 @@ public class Incident {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isLink() {
+        return link;
+    }
+
+    public void setLink(boolean link) {
+        this.link = link;
     }
 }

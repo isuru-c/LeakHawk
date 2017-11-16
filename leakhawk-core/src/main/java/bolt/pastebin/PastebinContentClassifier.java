@@ -95,7 +95,9 @@ public class PastebinContentClassifier extends LeakHawkClassifier {
                     ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                     contentDataList.add(contentData);
                     contentModel.setContentFound(true);
-                }else if(post.getUrlList().size()>0){
+                }
+
+                if(post.getUrlList().size()>0){
                     if(classifier.classify(post.getUrlContent(),title)) {
                         ContentData contentData = new ContentData(classifier.getName(), classifier.getSensivityLevel(postText));
                         contentDataList.add(contentData);

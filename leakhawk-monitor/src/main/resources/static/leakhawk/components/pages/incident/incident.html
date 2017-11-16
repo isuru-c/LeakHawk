@@ -22,6 +22,17 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td style = "text-align: center;">Post</td>
+                                <td style = "text-align: center;">
+                                    <a href="https://pastebin.com/{{vm.postDetails.key}}" ng-if="vm.postDetails.postType=='pastebin-posts'">
+                                        https://pastebin.com/{{vm.postDetails.key}}
+                                    </a>
+                                    <a href="http://twitter.com/itdoesnotmatter/status/{{vm.postDetails.key}}" ng-if="vm.postDetails.postType=='tweets'">
+                                        http://twitter.com/itdoesnotmatter/status/{{vm.postDetails.key}}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td style = "text-align: center;">Post_Type</td>
                                 <td style = "text-align: center;">
                                     {{vm.postDetails.postType}}
@@ -42,14 +53,21 @@
                             <tr>
                                 <td style = "text-align: center;">Date</td>
                                 <td style = "text-align: center;">
-                                    {{vm.postDetails.date *1000| date:'yyyy-MM-dd hh:mm a'}}
+                                    {{vm.postDetails.date | date:'yyyy-MM-dd hh:mm a'}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align: center;">Has Link</td>
+                                <td style = "text-align: center;">
+                                    {{vm.postDetails.link}}
                                 </td>
                             </tr>
                             <tr>
                                 <td style = "text-align: center;">Sensitivity Level</td>
-                                <td style = "text-align: center;">
-                                    {{vm.postDetails.level}}
-                                </td>
+                                <td ng-if="vm.postDetails.level==0" style="color: #8fdf82; text-align: center; ">No Content Found</td>
+                                <td ng-if="vm.postDetails.level==1" style="color: #6400ff; text-align: center;"><strong>Low</strong></td>
+                                <td ng-if="vm.postDetails.level==2" style="color: rgba(255,99,0,0.99); text-align: center;"><strong>High</strong></td>
+                                <td ng-if="vm.postDetails.level==3" style="color: #ff1e00; text-align: center;"><strong>Critical</strong></td>
                             </tr>
                             <tr>
                                 <td style = "text-align: center;">Content</td>
@@ -70,7 +88,7 @@
                                 <!--</td>-->
                             <!--</tr>-->
                             <tr>
-                                <td style = "text-align: center;">Categories and Sensitivity</td>
+                                <td style = "text-align: center;">Sensitive Categories</td>
                                 <td style = "text-align: center;">
                                     {{vm.postDetails.predictClass}}
                                 </td>

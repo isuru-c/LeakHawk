@@ -150,7 +150,7 @@ public class Synthesizer extends LeakHawkClassifier {
         if(!user.isEmpty())
             user = post.getUser().replace("'", "/'");
         try {
-            String sql = "INSERT INTO incident (post_key,content,date,evidence,predict_class,sensitivity_level,title,type,user) VALUES (?,?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO incident (post_key,content,date,evidence,predict_class,sensitivity_level,title,type,user,link) VALUES (?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement stmt=connection.prepareStatement(sql);
             String postDate = post.getDate();
             if("tweets".equals(post.getPostType())){
@@ -170,6 +170,7 @@ public class Synthesizer extends LeakHawkClassifier {
             stmt.setString(7,post.getTitle());
             stmt.setString(8,post.getPostType());
             stmt.setString(9,post.getUser());
+            stmt.setBoolean(10,post.isUrlContentFound());
 
             stmt.executeUpdate();
 

@@ -15,6 +15,7 @@ public class IncidentResource {
     private int level;
     private boolean content;
     private boolean evidence;
+    private boolean link;
 
     public IncidentResource() {
     }
@@ -91,6 +92,14 @@ public class IncidentResource {
         this.evidence = evidence;
     }
 
+    public boolean isLink() {
+        return link;
+    }
+
+    public void setLink(boolean link) {
+        this.link = link;
+    }
+
     public static IncidentResource getResource(Incident incident){
         IncidentResource incidentResource = new IncidentResource();
         incidentResource.setKey(incident.getPostKey());
@@ -99,7 +108,8 @@ public class IncidentResource {
         if(!incident.getUser().isEmpty()) {
             incidentResource.setUser(incident.getUser());
         }
-        incidentResource.setDate(incident.getDate());
+        incidentResource.setLink(incident.isLink());
+        incidentResource.setDate(incident.getDate().toString());
         incidentResource.setLevel(incident.getSensitivityLevel());
         incidentResource.setTitle(incident.getTitle());
         incidentResource.setPostType(incident.getType());

@@ -9,7 +9,7 @@
 
     function HomeController(webservice, $state,$timeout, Notification) {
         var vm = this;
-        vm.routeToOrder = routeToOrder;
+        vm.routeToIncident = routeToIncident;
         vm.loadTable = loadTable;
 
 
@@ -31,7 +31,7 @@
         }
 
 
-        function routeToOrder(id) {
+        function routeToIncident(id) {
             $state.go("incident",{ 'id' : id });
         }
     }

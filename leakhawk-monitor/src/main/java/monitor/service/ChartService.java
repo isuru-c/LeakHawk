@@ -240,24 +240,40 @@ public class ChartService {
         int ec = 0;
         int eo = 0;
         int pk = 0;
+        int uc = 0;
+        int wd = 0;
 
         Iterable<Incident> allIncident = incidentRepository.findAll();
 
         for(Incident incident : allIncident){
-            if(incident.getPredictClass().contains("Credit Card")){
-                cc++;
-            }else if(incident.getPredictClass().contains("Configuration files")){
-                cf++;
-            }else if(incident.getPredictClass().contains("DNS Attack")){
-                da++;
-            }else if(incident.getPredictClass().contains("Database")){
-                db++;
-            }else if(incident.getPredictClass().contains("Email conversation")){
-                ec++;
-            }else if(incident.getPredictClass().contains("Email only")){
-                eo++;
-            }else if(incident.getPredictClass().contains("Private keys")){
-                pk++;
+            if(!incident.getPredictClass().isEmpty()) {
+                if (incident.getPredictClass().contains("Credit Card")) {
+                    cc++;
+                }
+                if (incident.getPredictClass().contains("Configuration files")) {
+                    cf++;
+                }
+                if (incident.getPredictClass().contains("DNS Attack")) {
+                    da++;
+                }
+                if (incident.getPredictClass().contains("Database")) {
+                    db++;
+                }
+                if (incident.getPredictClass().contains("Email conversation")) {
+                    ec++;
+                }
+                if (incident.getPredictClass().contains("Email only")) {
+                    eo++;
+                }
+                if (incident.getPredictClass().contains("Private keys")) {
+                    pk++;
+                }
+                if (incident.getPredictClass().contains("User Credentials")) {
+                    uc++;
+                }
+                if (incident.getPredictClass().contains("Website Defacement")) {
+                    wd++;
+                }
             }
         }
         titleList.add("Credit Card");
@@ -267,6 +283,8 @@ public class ChartService {
         titleList.add("Email conversation");
         titleList.add("Email only");
         titleList.add("Private keys");
+        titleList.add("User Credentials");
+        titleList.add("Website Defacement");
 
         dataList.add(String.valueOf(cc));
         dataList.add(String.valueOf(cf));
@@ -275,6 +293,8 @@ public class ChartService {
         dataList.add(String.valueOf(ec));
         dataList.add(String.valueOf(eo));
         dataList.add(String.valueOf(pk));
+        dataList.add(String.valueOf(uc));
+        dataList.add(String.valueOf(wd));
 
         chartDetailResource.setDataList(dataList);
         chartDetailResource.setTitleList(titleList);

@@ -20,19 +20,19 @@
                                     <th></th>
                                 </tr>
 
-                                <tr ng-repeat="order in vm.postList" data-href='google.com'>
-                                    <td>{{order.postType}}</td>
-                                    <td ng-if="order.postType=='pastebin-posts'"><a href="https://pastebin.com/{{order.key}}">{{order.key}}</a></td>
-                                    <td ng-if="order.postType=='tweets'"><a href="http://twitter.com/itdoesnotmatter/status/{{order.key}}">{{order.key}}</a></td>
-                                    <td>{{order.date | date:'yyyy-MM-dd hh:mm a'}}</td>
-                                    <td ng-if="order.user!=null">{{order.user}}</td>
-                                    <td ng-if="order.user==null">Unknown</td>
-                                    <td>{{order.predictClass}}</td>
-                                    <td ng-if="order.level==0" style="color: #8fdf82">No Content Found</td>
-                                    <td ng-if="order.level==1" style="color: #6400ff"><strong>Low</strong></td>
-                                    <td ng-if="order.level==2" style="color: rgba(255,99,0,0.99)"><strong>High</strong></td>
-                                    <td ng-if="order.level==3" style="color: #ff1e00"><strong>Critical</strong></td>
-                                    <td><strong><button data-ng-click="vm.routeToOrder(order.key)" class="btn btn-block btn-success btn-sm">More Detail</button></strong></a></td>
+                                <tr ng-repeat="post in vm.postList" data-href='google.com'>
+                                    <td>{{post.postType}}</td>
+                                    <td ng-if="post.postType=='pastebin-posts'"><a href="https://pastebin.com/{{post.key}}">{{post.key}}</a></td>
+                                    <td ng-if="post.postType=='tweets'"><a href="http://twitter.com/itdoesnotmatter/status/{{post.key}}">{{post.key}}</a></td>
+                                    <td>{{post.date | date:'yyyy-MM-dd hh:mm a'}}</td>
+                                    <td ng-if="post.user!=null">{{post.user}}</td>
+                                    <td ng-if="post.user==null">Unknown</td>
+                                    <td>{{post.predictClass}}</td>
+                                    <td ng-if="post.level==0" style="color: #8fdf82">No Content Found</td>
+                                    <td ng-if="post.level==1" style="color: #6400ff"><strong>Low</strong></td>
+                                    <td ng-if="post.level==2" style="color: rgba(255,99,0,0.99)"><strong>High</strong></td>
+                                    <td ng-if="post.level==3" style="color: #ff1e00"><strong>Critical</strong></td>
+                                    <td><strong><button data-ng-click="vm.routeToIncident(post.key)" class="btn btn-block btn-success btn-sm">More Detail</button></strong></a></td>
                                 </tr>
                                 </tbody>
                             </table>

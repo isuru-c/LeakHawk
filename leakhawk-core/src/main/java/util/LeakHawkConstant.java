@@ -74,7 +74,7 @@ public class LeakHawkConstant {
     public static String T_CONTENT_CLASSIFIER_TO_SYNTHESIZER = "tcc-s";
 
     // Path for the dump post folder
-    public  static String DUMP_FOLDER_PATH = "./posts";
+    public static String DUMP_FOLDER_PATH = "./posts";
 
     // Parameters needs to connect to the twitter stream API
     public static String CONSUMER_KEY = "Qrk3fZ04WaW0Qw0zVE7MSwYNi";
@@ -93,9 +93,13 @@ public class LeakHawkConstant {
     public static String CONTEXT_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/context.properties";
 
     //TODO Server changed
-//        public static String RESOURCE_FOLDER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
-    public static String RESOURCE_FOLDER_FILE_PATH = "/home/leakhawk/resources";
-    public static String DICTIONARY_PATH = "/home/leakhawk/dict";
+    public static String RESOURCE_FOLDER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
+    public static String DICTIONARY_PATH = "/home/neo/Desktop/MyFYP/Reasent_projects/1/LeakHawk/leakhawk-core/src/main/resources/dict";
+
+
+//    public static String RESOURCE_FOLDER_FILE_PATH = "/home/leakhawk/resources";
+//    public static String DICTIONARY_PATH = "/home/leakhawk/dict";
+
 
     // Twitter pre-filter file paths
     public static String TWITTER_PRE_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/TwitterPreFilterList.txt";

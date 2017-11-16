@@ -14,11 +14,15 @@
     function BodyController($state, $rootScope, webservice,$cookies) {
         var vm = this;
         vm.routeToLevel = routeToLevel;
+        vm.pastebinRunning = false;
+        vm.twitterRunning = false;
+
 
         loadData();
         setInterval(function(){
             loadData();
         }, 20000);
+
 
         function loadData() {
             $("#totalPosts").LoadingOverlay("show");
@@ -32,10 +36,34 @@
                 $("#sensitivePosts").LoadingOverlay("hide");
                 $("#criticalPosts").LoadingOverlay("hide");
             });
+
+            dataFeedsCheck();
+        }
+
+
+        function dataFeedsCheck() {
+            $("#dataFeeds").LoadingOverlay("show");
+            webservice.call('configuration/get_config', 'GET').then(function (response) {
+                vm.twitterRunning = response.data.twitterSensor;
+                vm.pastebinRunning = response.data.pastebinSensor;
+                $("#dataFeeds").LoadingOverlay("hide");
+            });
         }
 
         function routeToLevel(level) {
-            $state.go("search",{ 'level' : level });
+            $state.go("search",{ 'level' : level});
+        }
+
+        function routeToDate() {
+            $state.go("search",{  'type' : 'date' });
+        }
+
+        function routeToSource() {
+            $state.go("search",{ 'type' : 'source' });
+        }
+
+        function routeToType() {
+            $state.go("search",{ 'type' : 'type' });
         }
 
 

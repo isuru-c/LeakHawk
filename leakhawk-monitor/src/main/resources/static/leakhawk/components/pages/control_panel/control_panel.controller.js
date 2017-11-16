@@ -88,7 +88,7 @@
 
         function removeTwitter() {
             $.LoadingOverlay("show");
-            webservice.call('configuration/removeTwitter', 'GET').then(function (response) {
+            webservice.call('configuration/stop_twitter', 'GET').then(function (response) {
                 if (response.status == 200) {
                     console.log(response.data);
                     $.LoadingOverlay("hide");
@@ -101,7 +101,7 @@
 
         function removePastebin() {
             $.LoadingOverlay("show");
-            webservice.call('configuration/removePastebin', 'GET').then(function (response) {
+            webservice.call('configuration/stop_pastebin', 'GET').then(function (response) {
                 if (response.status == 200) {
                     console.log(response.data);
                     $.LoadingOverlay("hide");

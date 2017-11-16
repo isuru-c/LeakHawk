@@ -17,8 +17,9 @@ public interface IncidentRepository extends CrudRepository<Incident, Long> {
 
     List<Incident> findBySensitivityLevel(int level);
 
+    List<Incident> findAllByOrderByDateDesc();
+
     Incident findByPostKey(String key);
 
-
-    List<Incident> findAllByOrderBySensitivityLevelDesc();
+    List<Incident> findAllByOrderBySensitivityLevelDescIdDesc();
 }

@@ -10,13 +10,15 @@
 
             <div class="row">
                 <div class="col-md-3 col-sm-6 col-xs-12">
-                    <div class="info-box">
+                    <div class="info-box" id="dataFeeds">
                         <span class="info-box-icon bg-aqua"><i class="fa fa-sellsy"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">Num of Data Feeds</span>
+                            <span class="info-box-text">Data Feeds</span>
                             <!--<span class="info-box-number" style="font-size: 14px">Twitter</span>-->
-                            <span class="info-box-number" style="font-size: 14px">Pastebin</span>
+                            <span ng-if="vm.pastebinRunning==true" class="info-box-number" style="font-size: 14px">Pastebin</span>
+                            <span ng-if="vm.twitterRunning==true" class="info-box-number" style="font-size: 14px">Twitter</span>
+                            <span ng-if="vm.twitterRunning==false & vm.twitterRunning==false"  class="info-box-number" style="font-size: 14px">Twitter</span>
                         </div>
                     </div>
                 </div>
@@ -86,10 +88,22 @@
                                     <li><a data-ng-click="vm.routeToLevel(1)">Low</a></li>
                                 </ul>
                             </li>
+                            <!--<li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                   aria-expanded="false">Sort By<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a data-ng-click="vm.routeToDate()">Date</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    &lt;!&ndash;<li><a data-ng-click="vm.routeToSource()">Source</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a data-ng-click="vm.routeToType()">Type</a></li>&ndash;&gt;
+                                </ul>
+                            </li>-->
                         </ul>
                     </div><!-- /.navbar-collapse -->
                 </div><!-- /.container-fluid -->
             </nav>
+        </div>
     </nav>
 </header>
 
