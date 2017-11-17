@@ -348,12 +348,13 @@ public class PastebinEvidenceClassifier extends LeakHawkClassifier {
         //#E7	BODY:	Are there any signs of security vulnerability in the body text?
         //#E8	BODY:	Are there any signs of security vulnerability in the body text?
         try {
-            ResultSet data = DBHandle.getData(connection, "SELECT user FROM incident");
+            ResultSet data = DBHandle.getData(connection, "SELECT user FROM incident Where sensitivity_level > 1");
             while (data.next()) {
                 String userFromDB = data.getString("user");
                 if (title.contains(userFromDB.toLowerCase())) {
                     evidenceModel.setClassifier1Passed(true);
                     evidenceFound = true;
+                    break;
                 }
             }
         } catch (SQLException e) {

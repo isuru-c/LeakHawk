@@ -93,12 +93,12 @@ public class LeakHawkConstant {
     public static String CONTEXT_FILTER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources/context.properties";
 
     //TODO Server changed
-    public static String RESOURCE_FOLDER_FILE_PATH = "/home/neo/Desktop/MyFYP/Project/LeakHawk2.0/LeakHawk/leakhawk-core/src/main/resources";
-    public static String DICTIONARY_PATH = "/home/neo/Desktop/MyFYP/Reasent_projects/1/LeakHawk/leakhawk-core/src/main/resources/dict";
+//    public static String RESOURCE_FOLDER_FILE_PATH = "/home/neo/Desktop/MyFYP/Reasent_projects/1/LeakHawk/leakhawk-core/src/main/resources";
+//    public static String DICTIONARY_PATH = "/home/neo/Desktop/MyFYP/Reasent_projects/1/LeakHawk/leakhawk-core/src/main/resources/dict";
 
 
-//    public static String RESOURCE_FOLDER_FILE_PATH = "/home/leakhawk/resources";
-//    public static String DICTIONARY_PATH = "/home/leakhawk/dict";
+    public static String RESOURCE_FOLDER_FILE_PATH = "/home/leakhawk/resources";
+    public static String DICTIONARY_PATH = "/home/leakhawk/dict";
 
 
     // Twitter pre-filter file paths

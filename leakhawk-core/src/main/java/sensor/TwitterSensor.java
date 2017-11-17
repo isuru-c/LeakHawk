@@ -25,11 +25,17 @@ import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
+import exception.LeakHawkFilePathException;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import util.LeakHawkConstant;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -60,6 +66,21 @@ public class TwitterSensor extends Thread {
      * Set twitter API parameters and kafka producer for twitter sensor
      */
     public TwitterSensor() {
+
+        try {
+            File initialFile = new File(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH+"/twitter.properties");
+            InputStream input = new FileInputStream(initialFile);
+            Properties properties = new Properties();
+            properties.load(input);
+
+            LeakHawkConstant.CONSUMER_KEY = properties.getProperty("consumerKey");
+            LeakHawkConstant.CONSUMER_SECRET = properties.getProperty("consumerSecret");
+            LeakHawkConstant.TOKEN = properties.getProperty("token");
+            LeakHawkConstant.TOKEN_SECRET = properties.getProperty("tokenSecret");
+
+        } catch (IOException e) {
+            throw new LeakHawkFilePathException("Can't load twitter.properties file.", e);
+        }
 
         // Set the parameters for the twitter stream API
         consumerKey = LeakHawkConstant.CONSUMER_KEY;

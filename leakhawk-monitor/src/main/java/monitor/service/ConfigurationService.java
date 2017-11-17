@@ -6,6 +6,12 @@ import org.springframework.stereotype.Service;
 import sensor.PastebinSensor;
 import sensor.TwitterSensor;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Sugeesh Chandraweera
  */
@@ -71,5 +77,24 @@ public class ConfigurationService {
         resourcePath.setLeakhawk(this.leakhawkStarted);
         resourcePath.setResourcePath(leakHawk.getResourceFolderPath());
         return resourcePath;
+    }
+
+    public boolean checkFilesExist(String contentPath) {
+        List<String> fileNames = new ArrayList<>();
+        fileNames.add("context.properties");
+        fileNames.add("context_wordList.txt");
+        fileNames.add("PreFilter_twitter.txt");
+        fileNames.add("twitter.properties");
+
+        boolean check = true;
+
+        for(String file : fileNames){
+            Path path = Paths.get(contentPath+"/"+file);
+            if(!Files.exists(path)){
+                check = false;
+                break;
+            }
+        }
+        return check;
     }
 }

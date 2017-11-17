@@ -23,7 +23,7 @@
                                 <tr ng-repeat="post in vm.postList" data-href='google.com'>
                                     <td>{{post.postType}}</td>
                                     <td><a href="https://pastebin.com/{{post.key}}">{{post.key}}</a></td>
-                                    <td>{{post.date *1000| date:'yyyy-MM-dd hh:mm a'}}</td>
+                                    <td>{{post.date| date:'yyyy-MM-dd hh:mm a'}}</td>
                                     <td ng-if="post.user!=null">{{post.user}}</td>
                                     <td ng-if="post.user==null">Unknown</td>
                                     <td>{{post.predictClass}}</td>

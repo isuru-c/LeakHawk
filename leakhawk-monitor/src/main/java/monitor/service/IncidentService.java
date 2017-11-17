@@ -39,7 +39,7 @@ public class IncidentService {
     }
 
     public List getIncidentsForLevel(int level) {
-        List<Incident> allOrderBySensitivityLevelDesc = incidentRepository.findBySensitivityLevel(level);
+        List<Incident> allOrderBySensitivityLevelDesc = incidentRepository.findBySensitivityLevelOrderByIdDesc(level);
         List<IncidentResource> incidentResourceList = new ArrayList<>();
         for (Incident incident: allOrderBySensitivityLevelDesc){
             incidentResourceList.add(IncidentResource.getResource(incident));

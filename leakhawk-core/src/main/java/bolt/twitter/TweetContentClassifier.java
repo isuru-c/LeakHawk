@@ -116,11 +116,10 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         List<ContentData> contentDataList = new ArrayList();
 
-
         String text = post.getPostText();
         for (Pattern pattern : ccPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Credit Card", getCreditCardSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Credit Card", getCreditCardSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -133,7 +132,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : dbPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Database", getDBSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Database", getDBSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -146,7 +145,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : pkPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Private Key", getPKSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Private Key", getPKSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -159,7 +158,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : ucPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "User Credentials", getUCSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "User Credentials", getUCSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -172,7 +171,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : eoPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Email Only", getEOSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Email Only", getEOSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -185,7 +184,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : wdPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "Website Defacement", getWDSensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "Website Defacement", getWDSensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;
@@ -198,7 +197,7 @@ public class TweetContentClassifier extends LeakHawkClassifier {
 
         for (Pattern pattern : daPattern) {
             boolean matched = matchWithPattern(pattern, text, contentDataList, contentModel, "DNS Attack", getDASensivityLevel(text));
-            if(post.getUrlList().size()>0) {
+            if(matched==false && post.getUrlList().size()>0) {
                 boolean urlMatched = matchWithPattern(pattern, post.getUrlContent(), contentDataList, contentModel, "DNS Attack", getDASensivityLevel(post.getUrlContent()));
                 if(urlMatched){
                     matched = true;

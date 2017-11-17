@@ -9,7 +9,7 @@
                 <a ng-show="vm.leakhawkBoolean != true" ng-click="vm.startLeakHawk()" class="btn btn-app">
                     <i class="fa fa-play"></i> Start LeakHawk
                 </a>
-                <a ng-show="vm.leakhawkBoolean == true" ng-click="vm.stopLeakHawk()" class="btn btn-app">
+                <a ng-show="vm.leakhawkBoolean == true" class="btn btn-app" disabled>
                     <i class="fa fa-edit"></i> Stop LeakHawk
                 </a>
                 <a ng-show="vm.twitterBoolean != true" ng-click="vm.addTwitter()" class="btn btn-app">
@@ -31,7 +31,7 @@
         <div class="box-body">
             <div class="form-group">
                 <label for="resourceFolderFilePath">Resource Folder File Path</label>
-                <input class="form-control" id="resourceFolderFilePath" placeholder="Resource Folder Filepath"
+                <input ng-disabled="vm.leakhawkBoolean== true" class="form-control" id="resourceFolderFilePath" placeholder="Resource Folder Filepath"
                        type="text" ng-model="vm.resourcePath">
             </div>
 

@@ -37,13 +37,18 @@
         function startLeakHawk() {
             $.LoadingOverlay("show");
             webservice.call('configuration/start_leakhawk', 'GET').then(function (response) {
-                if (response.status == 200) {
+                if (response.data.status==200) {
                     $.LoadingOverlay("hide");
                     vm.responseData += "LeakHawk Started.....\n";
                     Notification.success('LeakHawk Started');
+                    vm.leakhawkBoolean = true;
+                }else if(response.data.status == 400){
+                    $.LoadingOverlay("hide");
+                    Notification.warning('Please insert all needed files to the resource folder.');
+                    Notification.error('Leakhawk start failed.');
                 }
             });
-            vm.leakhawkBoolean = true;
+
 
         }
 
@@ -116,10 +121,14 @@
             $.LoadingOverlay("show");
             var sendObj = {"resourcePath": vm.resourcePath};
             webservice.call('configuration/save_config', 'POST', sendObj).then(function (response) {
-                if(response.status==200) {
+                if(response.data.status==200) {
                     $.LoadingOverlay("hide");
                     Notification.success('Configuration saved.');
+                }else if(response.data.status == 400){
+                    $.LoadingOverlay("hide");
+                    Notification.warning('Please insert all needed files to the given folder.');
                 }
+
             });
             vm.responseData += "Configuration Saved.....\n";
         }

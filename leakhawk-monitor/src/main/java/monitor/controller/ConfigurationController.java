@@ -4,13 +4,16 @@ import monitor.resource.ResourcePath;
 import monitor.service.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import util.LeakHawkConstant;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Sugeesh Chandraweera
  */
 @RestController
 @RequestMapping("/configuration")
-public class ConfigurationController {
+public class ConfigurationController extends AbstractController{
 
     @Autowired
     private ConfigurationService configurationService;
@@ -18,8 +21,13 @@ public class ConfigurationController {
     @CrossOrigin(origins = "http://localhost:8000")
     @RequestMapping(value = "/start_leakhawk",method = RequestMethod.GET)
     @ResponseBody
-    public boolean startLeakHawk(){
-        return configurationService.startLeakHawk();
+    public Response startLeakHawk(){
+        if(configurationService.checkFilesExist(LeakHawkConstant.RESOURCE_FOLDER_FILE_PATH)){
+            return sendSuccessResponse(configurationService.startLeakHawk());
+        }else {
+            return handleServiceException(null,"Please insert all needed files into resource folder.");
+        }
+
     }
 
     @CrossOrigin(origins = "http://localhost:8000")
@@ -60,8 +68,12 @@ public class ConfigurationController {
     @CrossOrigin(origins = "http://localhost:8000")
     @RequestMapping(value = "/save_config",method = RequestMethod.POST)
     @ResponseBody
-    public boolean saveConfig(@RequestBody ResourcePath contentPath){
-        return configurationService.saveConfig(contentPath.getResourcePath());
+    public Response saveConfig(@RequestBody ResourcePath contentPath){
+        if(configurationService.checkFilesExist(contentPath.getResourcePath())) {
+            return sendSuccessResponse(configurationService.saveConfig(contentPath.getResourcePath()));
+        }else {
+            return handleServiceException(null,"Please insert all needed files");
+        }
     }
 
     @CrossOrigin(origins = "http://localhost:8000")

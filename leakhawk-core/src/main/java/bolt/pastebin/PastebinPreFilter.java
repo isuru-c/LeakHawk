@@ -161,12 +161,12 @@ public class PastebinPreFilter extends LeakHawkFilter {
 
         // Return true if post needs to be forwarded to the next bolt
         // Return false if post needs not to be forwarded to the next bolt
-        if (isPassedPreFilter(post.getTitle(), post.getPostText(), post)) {
+//        if (isPassedPreFilter(post.getTitle(), post.getPostText(), post)) {
             post.setNextOutputStream(LeakHawkConstant.P_PRE_FILTER_TO_CONTEXT_FILTER);
             increaseOutCount();
             return true;
-        }
-        return false;
+//        }
+//        return false;
     }
 
     /**

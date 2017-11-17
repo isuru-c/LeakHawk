@@ -68,9 +68,22 @@ Now you should be able to run the projet.
 
 * [Maven](https://maven.apache.org/) - Dependency Management
 
+## Configure
+
+You need to provide resource folder to LeakHawk in the initialization. This folder needs these files
+* context.properties - Context Filter Matching Regex patterns 
+* context_wordList.txt - Context Filter Word List
+* PreFilter_twitter.txt - Twitter Pre filtered word list 
+* twitter.properties - Twitter API user credentials
+* All Model files need inside the code
+
+you need to provide that resource folder file path when you going to start the LeakHawk.
+
+
 
 ## Authors
 
+* **Nalinda Herath** 
 * **Sugeesh Chandraweera** - [Sugeesh](https://github.com/sugeesh)
 * **Isuru Chandima** - [Isuru](https://github.com/isuru-c)
 * **Warunika Amali** - [Warunika](https://github.com/warunikaAmali)

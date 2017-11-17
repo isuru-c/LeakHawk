@@ -19,8 +19,8 @@
 
         function call(url, method, data, image) {
             //TODO change for the server
-            url = 'http://localhost:8080/' + url;
-            // url = 'http://leakhawk.projects.mrt.ac.lk:8080/' + url;
+            // url = 'http://localhost:8080/' + url;
+            url = 'http://leakhawk.projects.mrt.ac.lk:8080/' + url;
 
             var obj = {};
 
